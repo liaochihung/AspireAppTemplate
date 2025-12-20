@@ -18,6 +18,15 @@ builder.Services.AddHttpClient<WeatherApiClient>(client =>
         client.BaseAddress = new("https+http://apiservice");
     });
 
+// var oidcScheme = OpenIdConnectDefaults.AuthenticationScheme;
+// builder.Services.AddAuthentication(oidcScheme)
+//     .AddKeyCloakOpenIdConnect("keycloak", realm: "WeatherShop", oidcScheme, options =>
+//     {
+//         options.ClientId="WeatherWeb";
+//         options.ResponseType = OpenIdConnectResponseType.Code;
+
+//     });
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
