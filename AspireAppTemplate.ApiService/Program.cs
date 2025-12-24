@@ -1,3 +1,5 @@
+using AspireAppTemplate.ApiService;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire client integrations.
@@ -33,6 +35,9 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 string[] summaries = ["Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"];
 
 app.MapGet("/weatherforecast", () =>
@@ -50,6 +55,7 @@ app.MapGet("/weatherforecast", () =>
 .WithName("GetWeatherForecast")
 .RequireAuthorization();
 
+app.MapProductEndpoints();
 app.MapDefaultEndpoints();
 
 app.Run();

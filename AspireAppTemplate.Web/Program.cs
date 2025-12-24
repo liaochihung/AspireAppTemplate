@@ -1,5 +1,9 @@
+using System.IdentityModel.Tokens.Jwt;
 using AspireAppTemplate.Web;
 using AspireAppTemplate.Web.Components;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,21 +15,42 @@ builder.AddRedisOutputCache("cache");
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddHttpContextAccessor()
+                .AddTransient<AuthorizationHandler>();
+
 builder.Services.AddHttpClient<WeatherApiClient>(client =>
     {
         // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
         // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
         client.BaseAddress = new("https+http://apiservice");
-    });
+    }).AddHttpMessageHandler<AuthorizationHandler>();
 
-// var oidcScheme = OpenIdConnectDefaults.AuthenticationScheme;
-// builder.Services.AddAuthentication(oidcScheme)
-//     .AddKeyCloakOpenIdConnect("keycloak", realm: "WeatherShop", oidcScheme, options =>
-//     {
-//         options.ClientId="WeatherWeb";
-//         options.ResponseType = OpenIdConnectResponseType.Code;
 
-//     });
+builder.Services.AddHttpClient<ProductApiClient>(client =>
+{
+    // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
+    // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
+    client.BaseAddress = new("https+http://apiservice");
+}).AddHttpMessageHandler<AuthorizationHandler>();
+
+
+var oidcScheme = OpenIdConnectDefaults.AuthenticationScheme;
+builder.Services.AddAuthentication(oidcScheme)
+    .AddKeycloakOpenIdConnect("keycloak", realm: "WeatherShop", oidcScheme, options =>
+    {
+        options.ClientId="WeatherWeb";
+        options.ResponseType = OpenIdConnectResponseType.Code;
+        options.Scope.Add("weather:all");
+        options.TokenValidationParameters.NameClaimType = JwtRegisteredClaimNames.Name;
+        options.SaveTokens = true;
+        options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+
+        if (builder.Environment.IsDevelopment())
+        {
+            options.RequireHttpsMetadata = false;
+        }
+    }).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme);
+builder.Services.AddCascadingAuthenticationState();
 
 var app = builder.Build();
 
@@ -48,5 +73,6 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
 app.MapDefaultEndpoints();
+app.MapLoginAndLogout();
 
 app.Run();

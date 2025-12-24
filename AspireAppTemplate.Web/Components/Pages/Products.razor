@@ -1,0 +1,259 @@
+@page "/products"
+@using System.Linq
+@using Microsoft.AspNetCore.Components.Authorization
+@rendermode InteractiveServer
+@inject ProductApiClient ProductApiClient
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JS
+
+<h3 class="mb-4">Products</h3>
+
+<AuthorizeView>
+    <Authorized>
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger">@errorMessage</div>
+        }
+        @if (isLoading)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <div class="row g-4">
+                <div class="col-12 col-lg-7">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Product list</h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Name</th>
+                                            <th class="text-end">Price</th>
+                                            <th>Description</th>
+                                            <th class="text-end">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (products?.Any() != true)
+                                        {
+                                            <tr><td colspan="4"><em>No products found.</em></td></tr>
+                                        }
+                                        else
+                                        {
+                                            @foreach (var p in products)
+                                            {
+                                                <tr>
+                                                    <td>@p.Name</td>
+                                                    <td class="text-end">@p.Price.ToString("C")</td>
+                                                    <td>@p.Description</td>
+                                                    <td class="text-end">
+                                                        <button class="btn btn-sm btn-outline-primary me-2" @onclick="() => StartEdit(p)">Edit</button>
+                                                        <button class="btn btn-sm btn-outline-danger" @onclick="() => ConfirmDelete(p.Id)">Delete</button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-5">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">@((isEditing) ? "Edit product" : "Add product")</h5>
+
+                            <div class="mb-3 form-floating">
+                                <input class="form-control" id="nameInput" placeholder="Name" @bind="formModel.Name" />
+                                <label for="nameInput">Name</label>
+                            </div>
+
+                            <div class="mb-3 form-floating">
+                                <input type="number" step="0.01" class="form-control" id="priceInput" placeholder="Price" @bind="formModel.Price" />
+                                <label for="priceInput">Price</label>
+                            </div>
+
+                            <div class="mb-3 form-floating">
+                                <input class="form-control" id="descInput" placeholder="Description" @bind="formModel.Description" />
+                                <label for="descInput">Description</label>
+                            </div>
+
+                            <div class="d-flex justify-content-end">
+                                @if (isEditing)
+                                {
+                                    <button class="btn btn-secondary me-2" @onclick="CancelEdit">Cancel</button>
+                                    <button class="btn btn-primary" @onclick="SaveForm">Save changes</button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-outline-secondary me-2" @onclick="ClearForm">Clear</button>
+                                    <button class="btn btn-success" @onclick="SaveForm">Add product</button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 text-muted small">
+                        <p class="mb-1">Tip: click Edit to load a product into the form. Deleting asks for confirmation.</p>
+                    </div>
+                </div>
+            </div>
+        }
+
+    </Authorized>
+    <NotAuthorized>
+        <p><strong>Please <a href="authentication/login">log in</a> to view the product data.</strong></p>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private Product[]? products;
+    private bool isLoading = true;
+    private string? errorMessage;
+
+    // single mutable form model bound to the UI
+    private ProductEditModel formModel = new();
+    private bool isEditing = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            await LoadProducts();
+        }
+    }
+
+    private async Task LoadProducts()
+    {
+        isLoading = true;
+        errorMessage = null;
+        try
+        {
+            products = await ProductApiClient.GetProductsAsync();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void StartEdit(Product p)
+    {
+        formModel = new ProductEditModel
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Price = p.Price,
+            Description = p.Description
+        };
+        isEditing = true;
+    }
+
+    private void CancelEdit()
+    {
+        ClearForm();
+        isEditing = false;
+    }
+
+    private void ClearForm()
+    {
+        formModel = new ProductEditModel();
+    }
+
+    private async Task SaveForm()
+    {
+        errorMessage = null;
+        try
+        {
+            if (isEditing)
+            {
+                var toUpdate = new Product
+                {
+                    Id = formModel.Id,
+                    Name = formModel.Name,
+                    Price = formModel.Price,
+                    Description = formModel.Description
+                };
+
+                var success = await ProductApiClient.UpdateProductAsync(toUpdate.Id, toUpdate);
+                if (success)
+                {
+                    var arr = (products ?? Array.Empty<Product>()).ToList();
+                    var idx = arr.FindIndex(x => x.Id == toUpdate.Id);
+                    if (idx >= 0)
+                    {
+                        arr[idx] = toUpdate;
+                        products = arr.ToArray();
+                    }
+                    CancelEdit();
+                }
+            }
+            else
+            {
+                var toCreate = new Product
+                {
+                    Name = formModel.Name,
+                    Price = formModel.Price,
+                    Description = formModel.Description
+                };
+
+                var created = await ProductApiClient.CreateProductAsync(toCreate);
+                if (created is not null)
+                {
+                    var list = (products ?? Array.Empty<Product>()).ToList();
+                    list.Add(created);
+                    products = list.ToArray();
+                    ClearForm();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    private async Task ConfirmDelete(int id)
+    {
+        var ok = await JS.InvokeAsync<bool>("confirm", $"Delete product #{id}? This action cannot be undone.");
+        if (!ok) return;
+        errorMessage = null;
+        try
+        {
+            var success = await ProductApiClient.DeleteProductAsync(id);
+            if (success)
+            {
+                products = (products ?? Array.Empty<Product>()).Where(p => p.Id != id).ToArray();
+
+                // if the deleted item was being edited, clear the form
+                if (isEditing && formModel.Id == id)
+                {
+                    CancelEdit();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    private class ProductEditModel
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public decimal Price { get; set; }
+        public string? Description { get; set; }
+    }
+}
