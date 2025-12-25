@@ -9,10 +9,18 @@ var keycloak = builder.AddKeycloak("keycloak", 8080, username, password)
     .WithDataVolume("keycloak")
     .WithRealmImport("./Realms");
 
+var postgresPassword = builder.AddParameter("postgres-password", secret: true, value: "1111");
+var postgres = builder.AddPostgres("postgres", password: postgresPassword, port: 5436)
+    .WithDataVolume();
+
+var aspiredb = postgres.AddDatabase("aspiredb");
+
 var apiService = builder.AddProject<Projects.AspireAppTemplate_ApiService>("apiservice")
     .WithHttpHealthCheck("/health")
     .WithReference(keycloak)
-    .WaitFor(keycloak);
+    .WaitFor(keycloak)
+    .WithReference(aspiredb)
+    .WaitFor(aspiredb);
 
 builder.AddProject<Projects.AspireAppTemplate_Web>("webfrontend")
     .WithExternalHttpEndpoints()

@@ -5,4 +5,5 @@
   <Project Path="AspireAppTemplate.Shared/AspireAppTemplate.Shared.csproj" />
   <Project Path="AspireAppTemplate.Tests/AspireAppTemplate.Tests.csproj" />
   <Project Path="AspireAppTemplate.Web/AspireAppTemplate.Web.csproj" />
+  <Project Path="AspireAppTemplate.Database/AspireAppTemplate.Database.csproj" />
 </Solution>
