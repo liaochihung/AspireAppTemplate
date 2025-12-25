@@ -4,9 +4,10 @@
 @using AspireAppTemplate.Shared
 @attribute [StreamRendering(true)]
 @attribute [OutputCache(Duration = 5)]
-@attribute [Authorize(Roles = AppRoles.Administrator)]
+@attribute [Authorize(Policy = AppPolicies.CanViewWeather)]
 @inject WeatherApiClient WeatherApi
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAuthorizationService AuthorizationService
 
 <PageTitle>Weather</PageTitle>
 
@@ -59,7 +60,10 @@
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
-        if (user.Identity?.IsAuthenticated == true && user.IsInRole(AppRoles.Administrator))
+        // 使用 Policy 檢查取代直接檢查 Role
+        var authResult = await AuthorizationService.AuthorizeAsync(user, AppPolicies.CanViewWeather);
+
+        if (authResult.Succeeded)
         {
             forecasts = await WeatherApi.GetWeatherAsync();
         }

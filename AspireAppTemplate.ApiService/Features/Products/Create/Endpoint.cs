@@ -25,8 +25,8 @@ public class Endpoint : Endpoint<Request, Product>
     public override void Configure()
     {
         Post("products");
-        // 範例：要求特定的 Role
-        Roles(AppRoles.Administrator); 
+        // 範例：要求特定的 Policy (內部對應到 Role)
+        Policies(AppPolicies.CanManageProducts); 
         Description(x => x
             .WithName("CreateProduct")
             .WithTags("Products"));

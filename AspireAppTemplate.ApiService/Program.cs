@@ -39,7 +39,11 @@ builder.Services.AddAuthentication()
             // options.TokenValidationParameters.RoleClaimType = "roles";
         });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(AppPolicies.CanManageProducts, policy => 
+        policy.RequireRole(AppRoles.Administrator));
+});
 
 var app = builder.Build();
 

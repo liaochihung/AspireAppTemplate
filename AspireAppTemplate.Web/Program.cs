@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Serilog;
+using AspireAppTemplate.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -95,6 +96,15 @@ builder.Services.AddAuthentication(oidcScheme)
         // };
     }).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme);
 builder.Services.AddCascadingAuthenticationState();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(AppPolicies.CanManageProducts, policy => 
+        policy.RequireRole(AppRoles.Administrator));
+
+    options.AddPolicy(AppPolicies.CanViewWeather, policy => 
+        policy.RequireRole(AppRoles.Administrator));
+});
 
 var app = builder.Build();
 
