@@ -3,6 +3,7 @@ using FastEndpoints;
 using FastEndpoints.Swagger;
 using AspireAppTemplate.Shared;
 using Serilog;
+using AspireAppTemplate.Database;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,7 @@ builder.Logging.ClearProviders();
 
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
+builder.AddNpgsqlDbContext<AppDbContext>("aspiredb");
 
 builder.Host.UseSerilog((context, services, configuration) => configuration
     .ReadFrom.Configuration(context.Configuration)
@@ -49,6 +51,15 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
+
+if (app.Environment.IsDevelopment())
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await context.Database.EnsureCreatedAsync();
+    }
+}
 
 app.UseAuthentication();
 app.UseAuthorization();
