@@ -1,5 +1,6 @@
 using FastEndpoints;
 using AspireAppTemplate.Shared;
+using AspireAppTemplate.Database;
 
 namespace AspireAppTemplate.ApiService.Features.Products.Delete;
 
@@ -10,6 +11,10 @@ public class Request
 
 public class Endpoint : Endpoint<Request>
 {
+    private readonly AppDbContext _db;
+
+    public Endpoint(AppDbContext db) => _db = db;
+
     public override void Configure()
     {
         Delete("products/{Id}");
@@ -23,7 +28,7 @@ public class Endpoint : Endpoint<Request>
     {
         Logger.LogInformation("Deleting product with ID: {Id}", req.Id);
 
-        var existing = Data.Products.FirstOrDefault(p => p.Id == req.Id);
+        var existing = await _db.Products.FindAsync([req.Id], ct);
 
         if (existing is null)
         {
@@ -32,7 +37,8 @@ public class Endpoint : Endpoint<Request>
             return;
         }
 
-        Data.Products.Remove(existing);
+        _db.Products.Remove(existing);
+        await _db.SaveChangesAsync(ct);
         
         Logger.LogInformation("Product deleted: {Id}", req.Id);
 

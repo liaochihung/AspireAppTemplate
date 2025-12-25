@@ -12,6 +12,8 @@
     *   User: `postgres`
     *   Pass: `1111`
     *   DB: `aspiredb`
+*   **Health Check**: 已整合 `AddDbContextCheck<AppDbContext>()` 確保 `/health` 端點驗證資料庫連線。
+*   **Endpoints**: 所有 Product Endpoints 直接注入 `AppDbContext` 進行 CRUD 操作。
 
 ### Identity Management
 *   **Keycloak**: 使用 Docker 容器運行。

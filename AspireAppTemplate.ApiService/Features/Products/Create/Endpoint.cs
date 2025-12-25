@@ -1,6 +1,7 @@
 using FastEndpoints;
 using FluentValidation;
 using AspireAppTemplate.Shared;
+using AspireAppTemplate.Database;
 
 namespace AspireAppTemplate.ApiService.Features.Products.Create;
 
@@ -22,10 +23,13 @@ public class Validator : Validator<Request>
 
 public class Endpoint : Endpoint<Request, Product>
 {
+    private readonly AppDbContext _db;
+
+    public Endpoint(AppDbContext db) => _db = db;
+
     public override void Configure()
     {
         Post("products");
-        // 範例：要求特定的 Policy (內部對應到 Role)
         Policies(AppPolicies.CanManageProducts); 
         Description(x => x
             .WithName("CreateProduct")
@@ -38,13 +42,13 @@ public class Endpoint : Endpoint<Request, Product>
 
         var product = new Product
         {
-            Id = Data.GetNextId(),
             Name = req.Name,
             Price = req.Price,
             Description = req.Description
         };
 
-        Data.Products.Add(product);
+        _db.Products.Add(product);
+        await _db.SaveChangesAsync(ct);
         
         Logger.LogInformation("Product created with ID: {Id}", product.Id);
 

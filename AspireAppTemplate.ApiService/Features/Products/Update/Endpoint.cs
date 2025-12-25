@@ -1,6 +1,7 @@
 using FastEndpoints;
 using FluentValidation;
 using AspireAppTemplate.Shared;
+using AspireAppTemplate.Database;
 
 namespace AspireAppTemplate.ApiService.Features.Products.Update;
 
@@ -23,6 +24,10 @@ public class Validator : Validator<Request>
 
 public class Endpoint : Endpoint<Request>
 {
+    private readonly AppDbContext _db;
+
+    public Endpoint(AppDbContext db) => _db = db;
+
     public override void Configure()
     {
         Put("products/{Id}");
@@ -36,7 +41,7 @@ public class Endpoint : Endpoint<Request>
     {
         Logger.LogInformation("Updating product with ID: {Id}", req.Id);
 
-        var existing = Data.Products.FirstOrDefault(p => p.Id == req.Id);
+        var existing = await _db.Products.FindAsync([req.Id], ct);
 
         if (existing is null)
         {
@@ -48,6 +53,8 @@ public class Endpoint : Endpoint<Request>
         existing.Name = req.Name;
         existing.Price = req.Price;
         existing.Description = req.Description;
+
+        await _db.SaveChangesAsync(ct);
         
         Logger.LogInformation("Product updated: {Id}", req.Id);
 
