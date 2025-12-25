@@ -2,6 +2,7 @@
   <Project Path="AspireAppTemplate.ApiService/AspireAppTemplate.ApiService.csproj" />
   <Project Path="AspireAppTemplate.AppHost/AspireAppTemplate.AppHost.csproj" />
   <Project Path="AspireAppTemplate.ServiceDefaults/AspireAppTemplate.ServiceDefaults.csproj" />
+  <Project Path="AspireAppTemplate.Shared/AspireAppTemplate.Shared.csproj" />
   <Project Path="AspireAppTemplate.Tests/AspireAppTemplate.Tests.csproj" />
   <Project Path="AspireAppTemplate.Web/AspireAppTemplate.Web.csproj" />
 </Solution>

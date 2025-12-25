@@ -1,22 +1,110 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using AspireAppTemplate.Web;
 using AspireAppTemplate.Web.Components;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Serilog;
+using AspireAppTemplate.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Clear default logging providers (like Console) to avoid duplicate logs,
+// but keep Serilog flowing to OpenTelemetry via writeToProviders: true.
+builder.Logging.ClearProviders();
 
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
 builder.AddRedisOutputCache("cache");
 
+builder.Host.UseSerilog((context, services, configuration) => configuration
+    .ReadFrom.Configuration(context.Configuration)
+    .ReadFrom.Services(services)
+    .Enrich.FromLogContext(),
+    writeToProviders: true);
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddHttpContextAccessor()
+                .AddTransient<AuthorizationHandler>();
 
 builder.Services.AddHttpClient<WeatherApiClient>(client =>
     {
         // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
         // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
         client.BaseAddress = new("https+http://apiservice");
-    });
+    }).AddHttpMessageHandler<AuthorizationHandler>();
+
+
+builder.Services.AddHttpClient<ProductApiClient>(client =>
+{
+    // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
+    // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
+    client.BaseAddress = new("https+http://apiservice");
+}).AddHttpMessageHandler<AuthorizationHandler>();
+
+
+var oidcScheme = OpenIdConnectDefaults.AuthenticationScheme;
+builder.Services.AddAuthentication(oidcScheme)
+    .AddKeycloakOpenIdConnect("keycloak", realm: "WeatherShop", oidcScheme, options =>
+    {
+        options.ClientId="WeatherWeb";
+        options.ResponseType = OpenIdConnectResponseType.Code;
+        options.Scope.Add("weather:all");
+        options.TokenValidationParameters.NameClaimType = JwtRegisteredClaimNames.Name;
+        options.TokenValidationParameters.RoleClaimType = ClaimTypes.Role; // "role"
+        options.SaveTokens = true;
+        options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+
+        if (builder.Environment.IsDevelopment())
+        {
+            options.RequireHttpsMetadata = false;
+        }
+
+        // --- Role Configuration ---
+        // options.Events = new OpenIdConnectEvents
+        // {
+        //    OnTicketReceived = context =>
+        //    {
+        //        var claimsPrincipal = context.Principal;
+        //        if (claimsPrincipal != null)
+        //        {
+        //            var identity = claimsPrincipal.Identity as ClaimsIdentity;
+        //            if (identity != null)
+        //            {
+        //                // Find all incoming claims where the type is "role" (from the token JSON key)
+        //                var roleClaims = claimsPrincipal.FindAll("role").ToList();
+
+        //                if (roleClaims.Any())
+        //                {
+        //                    // Remove the old "role" claims
+        //                    roleClaims.ForEach(c => identity.RemoveClaim(c));
+
+        //                    // Add new claims using the standard ClaimTypes.Role type
+        //                    foreach (var roleClaim in roleClaims)
+        //                    {
+        //                        identity.AddClaim(new Claim(ClaimTypes.Role, roleClaim.Value, ClaimValueTypes.String, context.Options.Authority));
+        //                    }
+        //                }
+        //            }
+        //        }
+        //        return Task.CompletedTask;
+        //    }
+        // };
+    }).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme);
+builder.Services.AddCascadingAuthenticationState();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(AppPolicies.CanManageProducts, policy => 
+        policy.RequireRole(AppRoles.Administrator));
+
+    options.AddPolicy(AppPolicies.CanViewWeather, policy => 
+        policy.RequireRole(AppRoles.Administrator));
+});
 
 var app = builder.Build();
 
@@ -39,5 +127,19 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
 app.MapDefaultEndpoints();
+app.MapLoginAndLogout();
 
-app.Run();
+try
+{
+    Log.Information("Starting AspireAppTemplate.Web");
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "AspireAppTemplate.Web terminated unexpectedly");
+}
+finally
+{
+    Log.Information("AspireAppTemplate.Web is shutting down");
+    Log.CloseAndFlush();
+}

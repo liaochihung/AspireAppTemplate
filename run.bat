@@ -1,0 +1,2 @@
+cd AspireAppTemplate.AppHost
+dotnet watch
