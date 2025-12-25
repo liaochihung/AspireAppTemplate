@@ -1,9 +1,10 @@
-﻿@page "/weather"
+@page "/weather"
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Authorization
+@using AspireAppTemplate.Shared
 @attribute [StreamRendering(true)]
 @attribute [OutputCache(Duration = 5)]
-@attribute [Authorize(Roles = "Administrator")]
+@attribute [Authorize(Roles = AppRoles.Administrator)]
 @inject WeatherApiClient WeatherApi
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
@@ -58,7 +59,7 @@
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
-        if (user.Identity?.IsAuthenticated == true && user.IsInRole("Administrator"))
+        if (user.Identity?.IsAuthenticated == true && user.IsInRole(AppRoles.Administrator))
         {
             forecasts = await WeatherApi.GetWeatherAsync();
         }

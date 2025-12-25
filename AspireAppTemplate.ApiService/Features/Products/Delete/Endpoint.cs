@@ -13,7 +13,7 @@ public class Endpoint : Endpoint<Request>
     public override void Configure()
     {
         Delete("products/{Id}");
-        Roles("Administrator");
+        Roles(AppRoles.Administrator);
         Description(x => x
             .WithName("DeleteProduct")
             .WithTags("Products"));

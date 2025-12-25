@@ -26,7 +26,7 @@ public class Endpoint : Endpoint<Request>
     public override void Configure()
     {
         Put("products/{Id}");
-        Roles("Administrator");
+        Roles(AppRoles.Administrator);
         Description(x => x
             .WithName("UpdateProduct")
             .WithTags("Products"));
