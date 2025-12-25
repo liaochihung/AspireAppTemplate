@@ -5,6 +5,8 @@
 @inject ProductApiClient ProductApiClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IJSRuntime JS
+@inject PersistentComponentState ApplicationState
+@implements IDisposable
 
 <h3 class="mb-4">Products</h3>
 
@@ -114,6 +116,7 @@
     private Product[]? products;
     private bool isLoading = true;
     private string? errorMessage;
+    private PersistingComponentStateSubscription _subscription;
 
     // single mutable form model bound to the UI
     private ProductEditModel formModel = new();
@@ -121,13 +124,35 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
-        if (user.Identity?.IsAuthenticated == true)
+        _subscription = ApplicationState.RegisterOnPersisting(PersistProducts);
+        
+        // 嘗試從 Prerender 狀態中恢復資料
+        if (ApplicationState.TryTakeFromJson<Product[]>("products", out var restored))
         {
-            await LoadProducts();
+            products = restored;
+            isLoading = false;
         }
+        else
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user.Identity?.IsAuthenticated == true)
+            {
+                await LoadProducts();
+            }
+        }
+    }
+
+    private Task PersistProducts()
+    {
+        ApplicationState.PersistAsJson("products", products);
+        return Task.CompletedTask;
+    }
+
+    void IDisposable.Dispose()
+    {
+        _subscription.Dispose();
     }
 
     private async Task LoadProducts()
@@ -181,7 +206,7 @@
                 var toUpdate = new Product
                 {
                     Id = formModel.Id,
-                    Name = formModel.Name,
+                    Name = formModel.Name ?? string.Empty,
                     Price = formModel.Price,
                     Description = formModel.Description
                 };
@@ -201,7 +226,7 @@
             {
                 var toCreate = new Product
                 {
-                    Name = formModel.Name,
+                    Name = formModel.Name ?? string.Empty,
                     Price = formModel.Price,
                     Description = formModel.Description
                 };

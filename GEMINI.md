@@ -16,10 +16,10 @@
     *   基於 **Blazor Interactive Server** 的前端應用程式。
     *   整合 **Keycloak (OpenID Connect)** 進行使用者身分驗證。
     *   使用 `OutputCache` (Redis) 進行頁面級別的快取。
-    *   透過 `AuthorizationHandler` 自動管理 HTTP 請求的 Token 傳遞。
+    *   實作 `PersistentComponentState` 以優化 Prerendering 階段的資料獲取，避免重複呼叫 API。
 
 *   **API Service (`AspireAppTemplate.ApiService`)**:
-    *   提供業務邏輯與數據的後端 API (如 Weather, Products)。
+    *   採用 **FastEndpoints** 構建輕量級、垂直切片的後端 API。
     *   受 **JWT Bearer Token** 保護，驗證由 Keycloak 簽發的 Token。
 
 *   **Keycloak (Identity Provider)**:
@@ -36,6 +36,8 @@
 *   **.NET Aspire**: 用於建構可觀察、分散式的雲端原生應用。
 *   **Keycloak**: 開源的身分與存取管理解決方案。
 *   **Blazor**: 使用 C# 建構互動式 Web UI 的框架。
+*   **FastEndpoints**: 用於取代傳統 Controller 的 API 開發框架。
+*   **Serilog**: 強大且結構化的日誌記錄系統。
 *   **Docker**: 容器化運行環境。
 
 ## 快速開始 (Getting Started)
@@ -52,13 +54,6 @@
 run.bat
 ```
 
-該腳本實際上執行了以下標準 Aspire 啟動指令：
-
-```bash
-cd AspireAppTemplate.AppHost
-dotnet watch
-```
-
 啟動後：
 1.  瀏覽器會自動開啟 **Aspire Dashboard**。
 2.  您可以在 Dashboard 中看到 `webfrontend`, `apiservice`, `keycloak`, `cache` 等服務的狀態與 Endpoint。
@@ -66,17 +61,22 @@ dotnet watch
 
 ## 開發指南 (Development Guidelines)
 
-*   **解決方案結構**:
-    *   `.slnx` 檔案: 採用新的簡化 XML 格式定義解決方案。
-    *   `ServiceDefaults`: 包含 OpenTelemetry、HealthChecks 等標準化配置，確保所有服務具備一致的可觀察性。
-    
+*   **日誌記錄 (Logging)**:
+    *   所有服務均整合了 **Serilog**。
+    *   為了避免主控台出現重複日誌，初始化時會調用 `builder.Logging.ClearProviders()`。
+    *   透過 `writeToProviders: true` 確保日誌能正確流向 OpenTelemetry (OTLP) 並顯示在 Aspire Dashboard。
+
+*   **Blazor 資料獲取**:
+    *   由於預設開啟 **Prerendering**，`OnInitializedAsync` 會執行兩次。
+    *   請務必實作 `PersistentComponentState` 機制來快取首屏資料，以提升效能並減少 API 負擔。
+
 *   **身份驗證配置**:
     *   Web 端設定位於 `AspireAppTemplate.Web/Program.cs`。
     *   API 端設定位於 `AspireAppTemplate.ApiService/Program.cs`。
-    *   若需修改 Keycloak Realm (例如 Client ID 或 Roles)，請編輯 `AspireAppTemplate.AppHost/Realms/import-realmdata.json`。
 
-*   **新增服務**:
-    *   在 `AspireAppTemplate.AppHost/AppHost.cs` 中使用 `builder.AddProject<T>` (加入 .NET 專案) 或 `builder.AddContainer` (加入 Docker 映像檔)。
+*   **解決方案結構**:
+    *   `.slnx` 檔案: 採用新的簡化 XML 格式定義解決方案。
+    *   `ServiceDefaults`: 包含 OpenTelemetry、HealthChecks 等標準化配置。
 
 ---
 *Created by Gemini CLI - 2025/12/25*
