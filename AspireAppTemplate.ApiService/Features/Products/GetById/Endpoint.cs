@@ -21,10 +21,13 @@ public class Endpoint : Endpoint<Request, Product>
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
+        Logger.LogInformation("Retrieving product with ID: {Id}", req.Id);
+        
         var product = Data.Products.FirstOrDefault(p => p.Id == req.Id);
 
         if (product is null)
         {
+            Logger.LogWarning("Product with ID: {Id} not found", req.Id);
             await SendNotFoundAsync(ct);
             return;
         }

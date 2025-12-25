@@ -2,11 +2,22 @@ using AspireAppTemplate.ApiService;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using AspireAppTemplate.Shared;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Clear default logging providers (like Console) to avoid duplicate logs,
+// but keep Serilog flowing to OpenTelemetry via writeToProviders: true.
+builder.Logging.ClearProviders();
+
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
+
+builder.Host.UseSerilog((context, services, configuration) => configuration
+    .ReadFrom.Configuration(context.Configuration)
+    .ReadFrom.Services(services)
+    .Enrich.FromLogContext(),
+    writeToProviders: true);
 
 // Add services to the container.
 builder.Services.AddProblemDetails();
@@ -67,4 +78,17 @@ app.MapGet("/weatherforecast", () =>
 
 app.MapDefaultEndpoints();
 
-app.Run();
+try
+{
+    Log.Information("Starting AspireAppTemplate.ApiService");
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "AspireAppTemplate.ApiService terminated unexpectedly");
+}
+finally
+{
+    Log.Information("AspireAppTemplate.ApiService is shutting down");
+    Log.CloseAndFlush();
+}

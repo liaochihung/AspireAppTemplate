@@ -16,6 +16,7 @@ public class Endpoint : EndpointWithoutRequest<List<Product>>
 
     public override async Task HandleAsync(CancellationToken ct)
     {
+        Logger.LogInformation("Retrieving all products. Count: {Count}", Data.Products.Count);
         await SendAsync(Data.Products, cancellation: ct);
     }
 }

@@ -34,6 +34,8 @@ public class Endpoint : Endpoint<Request, Product>
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
+        Logger.LogInformation("Creating product: {Name}", req.Name);
+
         var product = new Product
         {
             Id = Data.GetNextId(),
@@ -43,6 +45,8 @@ public class Endpoint : Endpoint<Request, Product>
         };
 
         Data.Products.Add(product);
+        
+        Logger.LogInformation("Product created with ID: {Id}", product.Id);
 
         await SendCreatedAtAsync<GetAll.Endpoint>(new { }, product, cancellation: ct);
     }

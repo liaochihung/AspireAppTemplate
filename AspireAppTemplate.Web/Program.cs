@@ -4,12 +4,23 @@ using AspireAppTemplate.Web.Components;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Clear default logging providers (like Console) to avoid duplicate logs,
+// but keep Serilog flowing to OpenTelemetry via writeToProviders: true.
+builder.Logging.ClearProviders();
 
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
 builder.AddRedisOutputCache("cache");
+
+builder.Host.UseSerilog((context, services, configuration) => configuration
+    .ReadFrom.Configuration(context.Configuration)
+    .ReadFrom.Services(services)
+    .Enrich.FromLogContext(),
+    writeToProviders: true);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -75,4 +86,17 @@ app.MapRazorComponents<App>()
 app.MapDefaultEndpoints();
 app.MapLoginAndLogout();
 
-app.Run();
+try
+{
+    Log.Information("Starting AspireAppTemplate.Web");
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "AspireAppTemplate.Web terminated unexpectedly");
+}
+finally
+{
+    Log.Information("AspireAppTemplate.Web is shutting down");
+    Log.CloseAndFlush();
+}

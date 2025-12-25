@@ -21,15 +21,21 @@ public class Endpoint : Endpoint<Request>
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
+        Logger.LogInformation("Deleting product with ID: {Id}", req.Id);
+
         var existing = Data.Products.FirstOrDefault(p => p.Id == req.Id);
 
         if (existing is null)
         {
+            Logger.LogWarning("Product with ID: {Id} not found for deletion", req.Id);
             await SendNotFoundAsync(ct);
             return;
         }
 
         Data.Products.Remove(existing);
+        
+        Logger.LogInformation("Product deleted: {Id}", req.Id);
+
         await SendNoContentAsync(ct);
     }
 }

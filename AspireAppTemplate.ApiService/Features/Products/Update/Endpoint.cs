@@ -34,10 +34,13 @@ public class Endpoint : Endpoint<Request>
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
+        Logger.LogInformation("Updating product with ID: {Id}", req.Id);
+
         var existing = Data.Products.FirstOrDefault(p => p.Id == req.Id);
 
         if (existing is null)
         {
+            Logger.LogWarning("Product with ID: {Id} not found for update", req.Id);
             await SendNotFoundAsync(ct);
             return;
         }
@@ -45,6 +48,8 @@ public class Endpoint : Endpoint<Request>
         existing.Name = req.Name;
         existing.Price = req.Price;
         existing.Description = req.Description;
+        
+        Logger.LogInformation("Product updated: {Id}", req.Id);
 
         await SendNoContentAsync(ct);
     }
