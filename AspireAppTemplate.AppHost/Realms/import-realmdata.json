@@ -44,6 +44,28 @@
   "quickLoginCheckMilliSeconds": 1000,
   "maxDeltaTimeSeconds": 43200,
   "failureFactor": 30,
+  "users": [
+    {
+      "id": "user-admin-id-123",
+      "username": "admin",
+      "enabled": true,
+      "email": "admin@example.com",
+      "emailVerified": true,
+      "firstName": "Admin",
+      "lastName": "User",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [ "Administrator", "default-roles-weathershop" ],
+      "clientRoles": {
+        "account": [ "view-profile", "manage-account" ]
+      }
+    }
+  ],
   "roles": {
     "realm": [
       {
@@ -74,6 +96,15 @@
         "id": "5e1d3cf6-c7ac-478d-a70c-4299abf58490",
         "name": "offline_access",
         "description": "${role_offline-access}",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "86683c73-be28-4380-a014-6316c0404192",
+        "attributes": {}
+      },
+      {
+        "id": "6739d675-8025-4122-81e0-6a90854483d4",
+        "name": "Administrator",
+        "description": "Administrator Role",
         "composite": false,
         "clientRole": false,
         "containerId": "86683c73-be28-4380-a014-6316c0404192",
@@ -1272,6 +1303,22 @@
             "user.attribute": "foo",
             "access.token.claim": "true",
             "claim.name": "realm_access.roles",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "id": "mapper-role-simple-claim",
+          "name": "role simple claim",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "multivalued": "true",
+            "user.attribute": "foo",
+            "access.token.claim": "true",
+            "id.token.claim": "true",
+            "claim.name": "role",
             "jsonType.label": "String"
           }
         }

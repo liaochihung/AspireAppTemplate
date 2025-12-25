@@ -24,8 +24,9 @@
 
 *   **Keycloak (Identity Provider)**:
     *   以 Docker 容器運行，提供 IAM 服務。
-    *   **預設管理員帳號**: `admin` / `admin` (於 `AppHost.cs` 中設定)。
-    *   啟動時會自動匯入 `AspireAppTemplate.AppHost/Realms` 中的 Realm 設定。
+    *   **控制台管理員 (Admin Console)**: `admin` / `admin` (於 `AppHost.cs` 設定)。
+    *   **預設應用程式使用者 (App User)**: `admin` / `admin` (預設擁有 `Administrator` 角色，可用於登入系統)。
+    *   啟動時會自動匯入 `AspireAppTemplate.AppHost/Realms` 中的 Realm 設定，其中包含自動映射 Role Claim 的配置，確保 .NET `[Authorize(Roles)]` 能直接運作。
 
 *   **Redis (Cache)**:
     *   以 Docker 容器運行，提供分散式快取服務。
