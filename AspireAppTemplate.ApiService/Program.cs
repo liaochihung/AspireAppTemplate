@@ -1,4 +1,7 @@
 using AspireAppTemplate.ApiService;
+using FastEndpoints;
+using FastEndpoints.Swagger;
+using AspireAppTemplate.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,9 +10,8 @@ builder.AddServiceDefaults();
 
 // Add services to the container.
 builder.Services.AddProblemDetails();
-
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddFastEndpoints();
+builder.Services.SwaggerDocument(); // FastEndpoints 的 Swagger 整合
 
 builder.Services.AddAuthentication()
     .AddKeycloakJwtBearer(
@@ -21,27 +23,35 @@ builder.Services.AddAuthentication()
             {
                 options.RequireHttpsMetadata = false;
             }
+
+            // 建議：將 Keycloak 的 roles 對映到 Claims
+            // options.TokenValidationParameters.RoleClaimType = "roles";
         });
 
-builder.Services.AddAuthorizationBuilder();
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
-
 app.UseAuthentication();
 app.UseAuthorization();
 
-string[] summaries = ["Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"];
+app.UseFastEndpoints(c =>
+{
+    c.Endpoints.RoutePrefix = "api";
+});
 
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwaggerGen(); // 使用 FastEndpoints 的 Swagger UI
+}
+
+// 保留原本的 Minimal API 範例，或者將其也遷移到 FastEndpoints
 app.MapGet("/weatherforecast", () =>
 {
+    string[] summaries = ["Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"];
     var forecast = Enumerable.Range(1, 5).Select(index =>
         new WeatherForecast
         (
@@ -55,12 +65,6 @@ app.MapGet("/weatherforecast", () =>
 .WithName("GetWeatherForecast")
 .RequireAuthorization();
 
-app.MapProductEndpoints();
 app.MapDefaultEndpoints();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

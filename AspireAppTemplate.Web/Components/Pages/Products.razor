@@ -186,18 +186,16 @@
                     Description = formModel.Description
                 };
 
-                var success = await ProductApiClient.UpdateProductAsync(toUpdate.Id, toUpdate);
-                if (success)
+                await ProductApiClient.UpdateProductAsync(toUpdate.Id, toUpdate);
+                
+                var arr = (products ?? Array.Empty<Product>()).ToList();
+                var idx = arr.FindIndex(x => x.Id == toUpdate.Id);
+                if (idx >= 0)
                 {
-                    var arr = (products ?? Array.Empty<Product>()).ToList();
-                    var idx = arr.FindIndex(x => x.Id == toUpdate.Id);
-                    if (idx >= 0)
-                    {
-                        arr[idx] = toUpdate;
-                        products = arr.ToArray();
-                    }
-                    CancelEdit();
+                    arr[idx] = toUpdate;
+                    products = arr.ToArray();
                 }
+                CancelEdit();
             }
             else
             {
@@ -231,16 +229,14 @@
         errorMessage = null;
         try
         {
-            var success = await ProductApiClient.DeleteProductAsync(id);
-            if (success)
-            {
-                products = (products ?? Array.Empty<Product>()).Where(p => p.Id != id).ToArray();
+            await ProductApiClient.DeleteProductAsync(id);
+            
+            products = (products ?? Array.Empty<Product>()).Where(p => p.Id != id).ToArray();
 
-                // if the deleted item was being edited, clear the form
-                if (isEditing && formModel.Id == id)
-                {
-                    CancelEdit();
-                }
+            // if the deleted item was being edited, clear the form
+            if (isEditing && formModel.Id == id)
+            {
+                CancelEdit();
             }
         }
         catch (Exception ex)
