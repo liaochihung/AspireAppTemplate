@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using AspireAppTemplate.Web;
 using AspireAppTemplate.Web.Components;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -53,6 +54,7 @@ builder.Services.AddAuthentication(oidcScheme)
         options.ResponseType = OpenIdConnectResponseType.Code;
         options.Scope.Add("weather:all");
         options.TokenValidationParameters.NameClaimType = JwtRegisteredClaimNames.Name;
+        options.TokenValidationParameters.RoleClaimType = ClaimTypes.Role; // "role"
         options.SaveTokens = true;
         options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 
@@ -60,6 +62,37 @@ builder.Services.AddAuthentication(oidcScheme)
         {
             options.RequireHttpsMetadata = false;
         }
+
+        // --- Role Configuration ---
+        // options.Events = new OpenIdConnectEvents
+        // {
+        //    OnTicketReceived = context =>
+        //    {
+        //        var claimsPrincipal = context.Principal;
+        //        if (claimsPrincipal != null)
+        //        {
+        //            var identity = claimsPrincipal.Identity as ClaimsIdentity;
+        //            if (identity != null)
+        //            {
+        //                // Find all incoming claims where the type is "role" (from the token JSON key)
+        //                var roleClaims = claimsPrincipal.FindAll("role").ToList();
+
+        //                if (roleClaims.Any())
+        //                {
+        //                    // Remove the old "role" claims
+        //                    roleClaims.ForEach(c => identity.RemoveClaim(c));
+
+        //                    // Add new claims using the standard ClaimTypes.Role type
+        //                    foreach (var roleClaim in roleClaims)
+        //                    {
+        //                        identity.AddClaim(new Claim(ClaimTypes.Role, roleClaim.Value, ClaimValueTypes.String, context.Options.Authority));
+        //                    }
+        //                }
+        //            }
+        //        }
+        //        return Task.CompletedTask;
+        //    }
+        // };
     }).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme);
 builder.Services.AddCascadingAuthenticationState();
 

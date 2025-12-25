@@ -1,8 +1,9 @@
 ﻿@page "/weather"
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authorization
 @attribute [StreamRendering(true)]
 @attribute [OutputCache(Duration = 5)]
-
+@attribute [Authorize(Roles = "Administrator")]
 @inject WeatherApiClient WeatherApi
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
@@ -12,14 +13,15 @@
 
 <p>This component demonstrates showing data loaded from a backend API service.</p>
 
-@if (forecasts == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <AuthorizeView>
-        <Authorized>
+<AuthorizeView>
+    <Authorized>
+        @if (forecasts == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+
             <table class="table">
                 <thead>
                     <tr>
@@ -41,13 +43,12 @@ else
                     }
                 </tbody>
             </table>
-        </Authorized>
-        <NotAuthorized>
-            <p><strong>Please <a href="authentication/login">log in</a> to see the weather forecast.</strong></p>
-        </NotAuthorized>
-    </AuthorizeView>
-
-}
+        }
+    </Authorized>
+    <NotAuthorized>
+        <p><strong>Please <a href="authentication/login">log in</a> to see the weather forecast.</strong></p>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
     private WeatherForecast[]? forecasts;
@@ -57,7 +58,7 @@ else
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
-        if (user.Identity?.IsAuthenticated == true)
+        if (user.Identity?.IsAuthenticated == true && user.IsInRole("Administrator"))
         {
             forecasts = await WeatherApi.GetWeatherAsync();
         }

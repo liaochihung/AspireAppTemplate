@@ -26,7 +26,7 @@ public class Endpoint : Endpoint<Request, Product>
     {
         Post("products");
         // 範例：要求特定的 Role
-        // Roles("Administrator"); 
+        Roles("Administrator"); 
         Description(x => x
             .WithName("CreateProduct")
             .WithTags("Products"));

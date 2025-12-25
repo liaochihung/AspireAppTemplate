@@ -13,7 +13,7 @@ public class Endpoint : Endpoint<Request>
     public override void Configure()
     {
         Delete("products/{Id}");
-        AllowAnonymous();
+        Roles("Administrator");
         Description(x => x
             .WithName("DeleteProduct")
             .WithTags("Products"));
