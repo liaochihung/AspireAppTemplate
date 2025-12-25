@@ -19,6 +19,13 @@
 *   **Keycloak**: 使用 Docker 容器運行。
     *   預設 Admin: `admin` / `admin`
     *   Realm 設定由 `Realms/import-realmdata.json` 自動匯入。
+    *   自訂 Theme 位於 `keycloak-themes/my-company-theme/`，需在 Keycloak Admin 手動啟用。
+
+### UI Framework (2025-12-25)
+*   **MudBlazor 8.2.0**: 取代 Bootstrap CSS，提供完整 Material Design 元件庫。
+*   **Element Plus 風格配色**: 主色 `#409EFF`，使用 4px 圓角，支援中文字體。
+*   **深色/淺色切換**: 內建於 `MainLayout.razor`，AppBar 右側有切換按鈕。
+*   **配置位置**: Theme 設定於 `MainLayout.razor` 的 `_theme` 欄位。
 
 ## 常見任務 (Common Tasks)
 

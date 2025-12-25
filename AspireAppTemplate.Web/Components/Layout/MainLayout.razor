@@ -1,23 +1,121 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<MudThemeProvider @ref="_mudThemeProvider" Theme="_theme" @bind-IsDarkMode="_isDarkMode" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
 
-    <main>
-        <div class="top-row px-4">
-            <LoginDisplay />
-        </div>
+<MudLayout>
+    <MudAppBar Elevation="1" Color="Color.Surface">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
+        <MudText Typo="Typo.h6" Class="ml-3">AspireAppTemplate</MudText>
+        <MudSpacer />
+        <MudTooltip Text="@(_isDarkMode ? "淺色模式" : "深色模式")">
+            <MudIconButton Icon="@(_isDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)"
+                           Color="Color.Inherit" OnClick="@ToggleDarkMode" />
+        </MudTooltip>
+        <LoginDisplay />
+    </MudAppBar>
 
-        <article class="content px-4">
+    <MudDrawer @bind-Open="_drawerOpen" 
+               Variant="DrawerVariant.Mini"
+               OpenMiniOnHover="true"
+               Breakpoint="Breakpoint.None"
+               ClipMode="DrawerClipMode.Always" 
+               Elevation="2">
+        <MudNavMenu>
+            <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+            <MudNavLink Href="counter" Icon="@Icons.Material.Filled.AddCircle">Counter</MudNavLink>
+            <MudNavLink Href="products" Icon="@Icons.Material.Filled.ShoppingCart">Products</MudNavLink>
+            <MudNavLink Href="weather" Icon="@Icons.Material.Filled.Cloud">Weather</MudNavLink>
+            <MudNavLink Href="token" Icon="@Icons.Material.Filled.Token">Access Token</MudNavLink>
+        </MudNavMenu>
+    </MudDrawer>
+
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Large" Class="my-4">
             @Body
-        </article>
-    </main>
-</div>
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
 
-<div id="blazor-error-ui">
+<div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.
     <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
+    <span class="dismiss">🗙</span>
 </div>
+
+@code {
+    private MudThemeProvider? _mudThemeProvider;
+    private bool _drawerOpen = true;
+    private bool _isDarkMode = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && _mudThemeProvider != null)
+        {
+            _isDarkMode = await _mudThemeProvider.GetSystemPreference();
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void ToggleDrawer()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    private void ToggleDarkMode()
+    {
+        _isDarkMode = !_isDarkMode;
+    }
+
+    // Element Plus 風格配色
+    private MudTheme _theme = new()
+    {
+        PaletteLight = new PaletteLight
+        {
+            Primary = "#409EFF",
+            Secondary = "#67C23A",
+            Info = "#909399",
+            Success = "#67C23A",
+            Warning = "#E6A23C",
+            Error = "#F56C6C",
+            Background = "#F5F7FA",
+            Surface = "#FFFFFF",
+            AppbarBackground = "#FFFFFF",
+            AppbarText = "#303133",
+            DrawerBackground = "#FFFFFF",
+            DrawerText = "#303133",
+            TextPrimary = "#303133",
+            TextSecondary = "#606266",
+        },
+        PaletteDark = new PaletteDark
+        {
+            Primary = "#409EFF",
+            Secondary = "#67C23A",
+            Info = "#909399",
+            Success = "#67C23A",
+            Warning = "#E6A23C",
+            Error = "#F56C6C",
+            Background = "#121212",
+            Surface = "#1E1E1E",
+            AppbarBackground = "#1E1E1E",
+            AppbarText = "#FFFFFF",
+            DrawerBackground = "#1E1E1E",
+            DrawerText = "#FFFFFF",
+            TextPrimary = "#FFFFFF",
+            TextSecondary = "#B0B0B0",
+        },
+        LayoutProperties = new LayoutProperties
+        {
+            DefaultBorderRadius = "4px",
+        },
+        Typography = new Typography
+        {
+            Default = new DefaultTypography
+            {
+                FontFamily = new[] { "Helvetica Neue", "Helvetica", "PingFang SC", "Microsoft YaHei", "sans-serif" }
+            }
+        }
+    };
+}

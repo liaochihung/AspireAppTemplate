@@ -1,0 +1,252 @@
+/* Keycloak Login Theme - Element Plus Style for Keycloak 23+ (PatternFly v4/v5) */
+
+/* ============================================
+   GLOBAL PAGE - Force White/Light Background
+   ============================================ */
+
+/* Main body and all wrapper elements */
+html,
+body,
+.pf-c-background-image,
+.pf-c-page,
+.pf-c-login,
+.pf-v5-c-background-image,
+.pf-v5-c-page,
+.pf-v5-c-login {
+  background: #ffffff !important;
+  background-image: none !important;
+}
+
+/* Remove the PatternFly background SVG/image */
+.pf-c-background-image::before,
+.pf-v5-c-background-image::before,
+.pf-c-login::before,
+.pf-v5-c-login::before {
+  background-image: none !important;
+  display: none !important;
+}
+
+/* ============================================
+   HEADER SECTION (Realm Name / Logo)
+   ============================================ */
+
+/* Header background */
+.pf-c-login__header,
+.pf-v5-c-login__header {
+  background: #ffffff !important;
+  padding: 40px 20px !important;
+  text-align: center !important;
+}
+
+/* Realm/Brand name text - make it bigger */
+.pf-c-login__header .pf-c-brand,
+.pf-v5-c-login__header .pf-v5-c-brand,
+#kc-header-wrapper {
+  font-size: 32px !important;
+  font-weight: 600 !important;
+  color: #303133 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 16px !important;
+}
+
+/* Add logo before realm name */
+.pf-c-login__header .pf-c-brand::before,
+.pf-v5-c-login__header .pf-v5-c-brand::before,
+#kc-header-wrapper::before {
+  content: "" !important;
+  display: inline-block !important;
+  width: 48px !important;
+  height: 48px !important;
+  background-image: url("../img/logo.png") !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+}
+
+/* ============================================
+   LOGIN CARD / MAIN FORM AREA
+   ============================================ */
+
+/* Main login body */
+.pf-c-login__main,
+.pf-v5-c-login__main {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  padding: 20px !important;
+  background: #ffffff !important;
+}
+
+/* The card/form container */
+.pf-c-login__main-body,
+.pf-v5-c-login__main-body,
+.pf-c-card,
+.pf-v5-c-card,
+#kc-form-wrapper {
+  max-width: 400px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  background: #ffffff !important;
+  border: 1px solid #ebeef5 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+  padding: 32px !important;
+}
+
+/* Header inside card */
+.pf-c-login__main-header,
+.pf-v5-c-login__main-header {
+  text-align: center !important;
+  margin-bottom: 24px !important;
+}
+
+/* "Sign in to your account" title */
+.pf-c-login__main-header .pf-c-title,
+.pf-v5-c-login__main-header .pf-v5-c-title,
+#kc-page-title {
+  font-size: 24px !important;
+  font-weight: 600 !important;
+  color: #303133 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* ============================================
+   FORM INPUTS
+   ============================================ */
+
+/* Form control container */
+.pf-c-form__group,
+.pf-v5-c-form__group {
+  margin-bottom: 20px !important;
+}
+
+/* Labels */
+.pf-c-form__label-text,
+.pf-v5-c-form__label-text,
+.pf-c-form__label,
+.pf-v5-c-form__label {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #606266 !important;
+  margin-bottom: 8px !important;
+}
+
+/* Input fields */
+.pf-c-form-control,
+.pf-v5-c-form-control,
+input[type="text"],
+input[type="password"] {
+  border: 1px solid #dcdfe6 !important;
+  border-radius: 4px !important;
+  padding: 10px 12px !important;
+  font-size: 14px !important;
+  background: #ffffff !important;
+  color: #303133 !important;
+  transition: border-color 0.2s ease !important;
+}
+
+.pf-c-form-control:focus,
+.pf-v5-c-form-control:focus,
+input:focus {
+  border-color: #409EFF !important;
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.15) !important;
+  outline: none !important;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+
+/* Primary button (Sign In) */
+.pf-c-button.pf-m-primary,
+.pf-v5-c-button.pf-m-primary,
+.btn-primary,
+#kc-login {
+  background-color: #409EFF !important;
+  border: none !important;
+  border-radius: 4px !important;
+  padding: 12px 20px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #ffffff !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s ease !important;
+  width: 100% !important;
+}
+
+.pf-c-button.pf-m-primary:hover,
+.pf-v5-c-button.pf-m-primary:hover,
+.btn-primary:hover {
+  background-color: #66b1ff !important;
+}
+
+.pf-c-button.pf-m-primary:active,
+.pf-v5-c-button.pf-m-primary:active,
+.btn-primary:active {
+  background-color: #3a8ee6 !important;
+}
+
+/* Link buttons */
+.pf-c-button.pf-m-link,
+.pf-v5-c-button.pf-m-link,
+a {
+  color: #409EFF !important;
+  text-decoration: none !important;
+}
+
+.pf-c-button.pf-m-link:hover,
+.pf-v5-c-button.pf-m-link:hover,
+a:hover {
+  color: #66b1ff !important;
+  text-decoration: underline !important;
+}
+
+/* ============================================
+   ALERTS / MESSAGES
+   ============================================ */
+
+.pf-c-alert.pf-m-danger,
+.pf-v5-c-alert.pf-m-danger {
+  background: #fef0f0 !important;
+  border: 1px solid #fbc4c4 !important;
+  border-radius: 4px !important;
+  color: #f56c6c !important;
+}
+
+.pf-c-alert.pf-m-success,
+.pf-v5-c-alert.pf-m-success {
+  background: #f0f9eb !important;
+  border: 1px solid #c2e7b0 !important;
+  border-radius: 4px !important;
+  color: #67c23a !important;
+}
+
+/* ============================================
+   CHECKBOX (Remember me)
+   ============================================ */
+
+.pf-c-check__label,
+.pf-v5-c-check__label {
+  font-size: 14px !important;
+  color: #606266 !important;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+
+.pf-c-login__footer,
+.pf-v5-c-login__footer,
+#kc-info {
+  text-align: center !important;
+  padding: 20px !important;
+  background: #ffffff !important;
+}
+
+.pf-c-login__footer-band,
+.pf-v5-c-login__footer-band {
+  background: #ffffff !important;
+}

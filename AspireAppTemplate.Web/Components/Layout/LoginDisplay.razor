@@ -1,21 +1,20 @@
 @using Microsoft.AspNetCore.Components.Authorization
-@using System.Security.Claims;
-@using System.Security.Principal;
-@using System.Security.Cryptography
-@using System.Text
-@using System.IdentityModel.Tokens.Jwt
 
 <AuthorizeView>
     <Authorized>
-        <div>
-            <span>Welcome @context.User.Identity?.Name!</span>
-            <form method="post" action="/authentication/logout" style="display:inline;">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+            <MudText Typo="Typo.body2">@context.User.Identity?.Name</MudText>
+            <form method="post" action="/authentication/logout">
                 <AntiforgeryToken />
-                <button type="submit" class="btn btn-link">Logout</button>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Text" Color="Color.Inherit" Size="Size.Small">
+                    Logout
+                </MudButton>
             </form>
-        </div>
+        </MudStack>
     </Authorized>
     <NotAuthorized>
-        <a href="/authentication/login" class="btn btn-primary">Login</a>
+        <MudButton Href="/authentication/login" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small">
+            Login
+        </MudButton>
     </NotAuthorized>
 </AuthorizeView>
