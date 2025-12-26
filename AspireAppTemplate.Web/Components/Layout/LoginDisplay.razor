@@ -2,19 +2,38 @@
 
 <AuthorizeView>
     <Authorized>
-        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
-            <MudText Typo="Typo.body2">@context.User.Identity?.Name</MudText>
-            <form method="post" action="/authentication/logout">
-                <AntiforgeryToken />
-                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Text" Color="Color.Inherit" Size="Size.Small">
-                    Logout
-                </MudButton>
-            </form>
-        </MudStack>
+        <MudMenu AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" Dense="true" Class="ml-2">
+            <ActivatorContent>
+                <MudChip T="string" Icon="@Icons.Material.Filled.Person" Color="Color.Primary" Variant="Variant.Text">
+                    @context.User.Identity?.Name
+                </MudChip>
+            </ActivatorContent>
+            <ChildContent>
+                <div class="py-2" style="min-width: 200px">
+                    <MudMenuItem Icon="@Icons.Material.Filled.Settings" href="/account/settings">
+                        帳戶設定
+                    </MudMenuItem>
+                    <MudDivider Class="my-2" />
+                    <MudMenuItem>
+                        <form method="post" action="/authentication/logout" id="logout-form">
+                            <AntiforgeryToken />
+                            <MudButton ButtonType="ButtonType.Submit" 
+                                       FullWidth="true" 
+                                       StartIcon="@Icons.Material.Filled.Logout" 
+                                       Color="Color.Error" 
+                                       Variant="Variant.Text" 
+                                       Style="justify-content: flex-start; text-transform: none; padding-left: 0;">
+                                登出系統
+                            </MudButton>
+                        </form>
+                    </MudMenuItem>
+                </div>
+            </ChildContent>
+        </MudMenu>
     </Authorized>
     <NotAuthorized>
         <MudButton Href="/authentication/login" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small">
-            Login
+            登入
         </MudButton>
     </NotAuthorized>
 </AuthorizeView>

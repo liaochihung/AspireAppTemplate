@@ -1,0 +1,53 @@
+@page "/account/settings"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@attribute [Authorize]
+
+<PageTitle>用戶設定</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">用戶設定</MudText>
+
+<MudGrid>
+    <MudItem xs="12" sm="6">
+        <MudCard Elevation="2">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">基本資料</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudTextField Label="使用者名稱" Value="@(_authState?.User?.Identity?.Name)" ReadOnly="true" Variant="Variant.Outlined" Margin="MudBlazor.Margin.Dense" Class="mb-4" />
+                <MudTextField Label="電子郵件" Value="@("user@example.com")" ReadOnly="true" Variant="Variant.Outlined" Margin="MudBlazor.Margin.Dense" />
+                <MudAlert Severity="Severity.Info" Class="mt-4">後端設定功能開發中...</MudAlert>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="true">儲存更改</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+    
+    <MudItem xs="12" sm="6">
+        <MudCard Elevation="2">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">安全設定</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudButton Variant="Variant.Outlined" Color="Color.Error" FullWidth="true" Class="mb-4">更改密碼</MudButton>
+                <MudButton Variant="Variant.Outlined" Color="Color.Warning" FullWidth="true">啟用兩步驟驗證</MudButton>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthStateTask { get; set; } = default!;
+    private AuthenticationState? _authState;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _authState = await AuthStateTask;
+    }
+}

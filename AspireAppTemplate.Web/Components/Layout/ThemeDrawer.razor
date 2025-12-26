@@ -1,0 +1,64 @@
+@using AspireAppTemplate.Web.Infrastructure.Services
+@inject LayoutService LayoutService
+
+<MudDrawer Open="_open" OpenChanged="OnDrawerOpenChanged" Anchor="Anchor.Right" Elevation="1" Variant="@DrawerVariant.Temporary" Width="300px">
+    <MudDrawerHeader>
+        <MudText Typo="Typo.h6">主題設定</MudText>
+    </MudDrawerHeader>
+    <div class="pa-4">
+        <MudText Typo="Typo.subtitle2" Class="mb-2">主色調</MudText>
+        <MudColorPicker Value="LayoutService.UserPreferences.PrimaryColor" 
+                        ValueChanged="@(color => OnPrimaryColorChanged(color))" 
+                        PickerVariant="PickerVariant.Static" 
+                        Style="width: 100%" />
+
+        <MudDivider Class="my-4" />
+
+        <MudText Typo="Typo.subtitle2" Class="mb-2">圓角大小 (@LayoutService.UserPreferences.BorderRadius px)</MudText>
+        <MudSlider T="double" Value="LayoutService.UserPreferences.BorderRadius" 
+                   ValueChanged="@(val => OnBorderRadiusChanged(val))"
+                   Min="0" Max="24" Step="1" Color="Color.Primary" />
+        
+        <MudDivider Class="my-4" />
+        
+        <MudSwitch T="bool" Value="LayoutService.UserPreferences.IsDarkMode" 
+                   ValueChanged="@(val => OnDarkModeChanged(val))"
+                   Color="Color.Primary" Label="深色模式" />
+    </div>
+</MudDrawer>
+
+@code {
+    private bool _open;
+
+    [Parameter]
+    public bool Open { get => _open; set => _open = value; }
+
+    [Parameter]
+    public EventCallback<bool> OpenChanged { get; set; }
+
+    private async Task OnDrawerOpenChanged(bool value)
+    {
+        _open = value;
+        await OpenChanged.InvokeAsync(value);
+    }
+
+    private async Task OnPrimaryColorChanged(MudBlazor.Utilities.MudColor color)
+    {
+        await LayoutService.SetPrimaryColorAsync(color.Value);
+    }
+
+    private async Task OnBorderRadiusChanged(double radius)
+    {
+        await LayoutService.SetBorderRadiusAsync(radius);
+    }
+
+    private async Task OnDarkModeChanged(bool isDarkMode)
+    {
+        // LayoutService.ToggleDarkModeAsync always toggles, but here we might want to set it explicitly
+        // If the switch gives us the new value, we should use a setter approach in LayoutService
+        if (LayoutService.UserPreferences.IsDarkMode != isDarkMode)
+        {
+            await LayoutService.ToggleDarkModeAsync();
+        }
+    }
+}

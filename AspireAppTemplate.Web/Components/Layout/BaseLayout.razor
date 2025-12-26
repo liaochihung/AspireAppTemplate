@@ -1,0 +1,46 @@
+@using AspireAppTemplate.Web.Infrastructure.Themes
+@using AspireAppTemplate.Web.Infrastructure.Services
+@implements IDisposable
+@inherits LayoutComponentBase
+@inject LayoutService LayoutService
+
+<MudThemeProvider @ref="_mudThemeProvider" Theme="_theme" @bind-IsDarkMode="LayoutService.UserPreferences.IsDarkMode" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <ThemeDrawer @bind-Open="LayoutService.ThemeDrawerOpen" />
+    @Body
+</MudLayout>
+
+@code {
+    private MudThemeProvider? _mudThemeProvider;
+    private AppTheme _theme = new();
+
+    protected override void OnInitialized()
+    {
+        LayoutService.MajorUpdateOccurred += LayoutServiceOnMajorUpdateOccurred;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LayoutService.InitializeAsync();
+            LayoutService.ApplyUserPreferences(_theme);
+            StateHasChanged();
+        }
+    }
+
+    private void LayoutServiceOnMajorUpdateOccurred(object? sender, EventArgs e)
+    {
+        LayoutService.ApplyUserPreferences(_theme);
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        LayoutService.MajorUpdateOccurred -= LayoutServiceOnMajorUpdateOccurred;
+    }
+}

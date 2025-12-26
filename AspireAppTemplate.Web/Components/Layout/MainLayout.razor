@@ -1,121 +1,63 @@
-﻿@inherits LayoutComponentBase
+﻿@using AspireAppTemplate.Web.Infrastructure.Services
+@inherits LayoutComponentBase
+@layout BaseLayout
+@inject LayoutService LayoutService
 
-<MudThemeProvider @ref="_mudThemeProvider" Theme="_theme" @bind-IsDarkMode="_isDarkMode" />
-<MudPopoverProvider />
-<MudDialogProvider />
-<MudSnackbarProvider />
+<MudDrawer @bind-Open="LayoutService.UserPreferences.IsDrawerOpen" 
+           Variant="DrawerVariant.Mini"
+           Breakpoint="Breakpoint.None"
+           ClipMode="DrawerClipMode.Never" 
+           Elevation="0"
+           Fixed="true"
+           Class="mud-elevation-0 border-right">
+    <MudDrawerHeader Class="pa-2 d-flex align-center">
+        @* 將收合按鈕移至此處 *@
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" 
+                       Color="Color.Inherit" 
+                       OnClick="@(() => LayoutService.ToggleDrawerAsync())" 
+                       Class="mr-1"/>
+                       
+        @if (LayoutService.UserPreferences.IsDrawerOpen)
+        {
+            <MudIcon Icon="@Icons.Custom.Brands.MudBlazor" Color="Color.Primary" Size="Size.Large" />
+            <MudText Typo="Typo.h6" Class="ml-2 fw-bold">Aspire App</MudText>
+        }
+    </MudDrawerHeader>
+    <NavMenu />
+</MudDrawer>
 
-<MudLayout>
-    <MudAppBar Elevation="1" Color="Color.Surface">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
-        <MudText Typo="Typo.h6" Class="ml-3">AspireAppTemplate</MudText>
-        <MudSpacer />
-        <MudTooltip Text="@(_isDarkMode ? "淺色模式" : "深色模式")">
-            <MudIconButton Icon="@(_isDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)"
-                           Color="Color.Inherit" OnClick="@ToggleDarkMode" />
-        </MudTooltip>
-        <LoginDisplay />
-    </MudAppBar>
+<MudAppBar Elevation="0" Color="Color.Surface" Fixed="true" Class="border-bottom">
+    @* AppBar 開頭現在不需要轉向按鈕，因為它在 Drawer 裡 *@
+    <MudSpacer />
+    
+    @* 主題切換按鈕 *@
+    <MudTooltip Text="@(LayoutService.UserPreferences.IsDarkMode ? "淺色模式" : "深色模式")">
+        <MudIconButton Icon="@(LayoutService.UserPreferences.IsDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)"
+                       Color="Color.Inherit" OnClick="@(() => LayoutService.ToggleDarkModeAsync())" />
+    </MudTooltip>
+    
+    @* 主題設定按鈕 *@
+    <MudTooltip Text="主題設定">
+        <MudIconButton Icon="@Icons.Material.Filled.Palette" Color="Color.Inherit" OnClick="@(() => LayoutService.ThemeDrawerOpen = true)" />
+    </MudTooltip>
 
-    <MudDrawer @bind-Open="_drawerOpen" 
-               Variant="DrawerVariant.Mini"
-               OpenMiniOnHover="true"
-               Breakpoint="Breakpoint.None"
-               ClipMode="DrawerClipMode.Always" 
-               Elevation="2">
-        <MudNavMenu>
-            <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
-            <MudNavLink Href="counter" Icon="@Icons.Material.Filled.AddCircle">Counter</MudNavLink>
-            <MudNavLink Href="products" Icon="@Icons.Material.Filled.ShoppingCart">Products</MudNavLink>
-            <MudNavLink Href="weather" Icon="@Icons.Material.Filled.Cloud">Weather</MudNavLink>
-            <MudNavLink Href="token" Icon="@Icons.Material.Filled.Token">Access Token</MudNavLink>
-        </MudNavMenu>
-    </MudDrawer>
+    <LoginDisplay />
+</MudAppBar>
 
-    <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.Large" Class="my-4">
-            @Body
-        </MudContainer>
-    </MudMainContent>
-</MudLayout>
-
-<div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="" class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
-</div>
+<MudMainContent>
+    <MudContainer MaxWidth="MaxWidth.Large" Class="my-4">
+        @Body
+    </MudContainer>
+</MudMainContent>
 
 @code {
-    private MudThemeProvider? _mudThemeProvider;
-    private bool _drawerOpen = true;
-    private bool _isDarkMode = false;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender && _mudThemeProvider != null)
-        {
-            _isDarkMode = await _mudThemeProvider.GetSystemPreference();
-            await InvokeAsync(StateHasChanged);
-        }
-    }
-
-    private void ToggleDrawer()
-    {
-        _drawerOpen = !_drawerOpen;
-    }
-
-    private void ToggleDarkMode()
-    {
-        _isDarkMode = !_isDarkMode;
-    }
-
-    // Element Plus 風格配色
-    private MudTheme _theme = new()
-    {
-        PaletteLight = new PaletteLight
-        {
-            Primary = "#409EFF",
-            Secondary = "#67C23A",
-            Info = "#909399",
-            Success = "#67C23A",
-            Warning = "#E6A23C",
-            Error = "#F56C6C",
-            Background = "#F5F7FA",
-            Surface = "#FFFFFF",
-            AppbarBackground = "#FFFFFF",
-            AppbarText = "#303133",
-            DrawerBackground = "#FFFFFF",
-            DrawerText = "#303133",
-            TextPrimary = "#303133",
-            TextSecondary = "#606266",
-        },
-        PaletteDark = new PaletteDark
-        {
-            Primary = "#409EFF",
-            Secondary = "#67C23A",
-            Info = "#909399",
-            Success = "#67C23A",
-            Warning = "#E6A23C",
-            Error = "#F56C6C",
-            Background = "#121212",
-            Surface = "#1E1E1E",
-            AppbarBackground = "#1E1E1E",
-            AppbarText = "#FFFFFF",
-            DrawerBackground = "#1E1E1E",
-            DrawerText = "#FFFFFF",
-            TextPrimary = "#FFFFFF",
-            TextSecondary = "#B0B0B0",
-        },
-        LayoutProperties = new LayoutProperties
-        {
-            DefaultBorderRadius = "4px",
-        },
-        Typography = new Typography
-        {
-            Default = new DefaultTypography
-            {
-                FontFamily = new[] { "Helvetica Neue", "Helvetica", "PingFang SC", "Microsoft YaHei", "sans-serif" }
-            }
-        }
-    };
 }
+
+<style>
+    .border-right {
+        border-right: 1px solid var(--mud-palette-lines-default) !important;
+    }
+    .border-bottom {
+        border-bottom: 1px solid var(--mud-palette-lines-default) !important;
+    }
+</style>

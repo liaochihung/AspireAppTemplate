@@ -8,6 +8,9 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Serilog;
 using AspireAppTemplate.Shared;
 using MudBlazor.Services;
+using Blazored.LocalStorage;
+using AspireAppTemplate.Web.Infrastructure.Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +33,9 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddMudServices();
+builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddScoped<LayoutService>();
+
 
 builder.Services.AddHttpContextAccessor()
                 .AddTransient<AuthorizationHandler>();
