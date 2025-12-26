@@ -1,63 +1,76 @@
 ﻿@using AspireAppTemplate.Web.Infrastructure.Services
 @inherits LayoutComponentBase
+@implements IDisposable
 @layout BaseLayout
 @inject LayoutService LayoutService
 
-<MudDrawer @bind-Open="LayoutService.UserPreferences.IsDrawerOpen" 
-           Variant="DrawerVariant.Mini"
-           Breakpoint="Breakpoint.None"
-           ClipMode="DrawerClipMode.Never" 
-           Elevation="0"
-           Fixed="true"
-           Class="mud-elevation-0 border-right">
-    <MudDrawerHeader Class="pa-2 d-flex align-center">
-        @* 將收合按鈕移至此處 *@
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" 
-                       Color="Color.Inherit" 
-                       OnClick="@(() => LayoutService.ToggleDrawerAsync())" 
-                       Class="mr-1"/>
-                       
-        @if (LayoutService.UserPreferences.IsDrawerOpen)
-        {
-            <MudIcon Icon="@Icons.Custom.Brands.MudBlazor" Color="Color.Primary" Size="Size.Large" />
-            <MudText Typo="Typo.h6" Class="ml-2 fw-bold">Aspire App</MudText>
-        }
-    </MudDrawerHeader>
-    <NavMenu />
-</MudDrawer>
-
-<MudAppBar Elevation="0" Color="Color.Surface" Fixed="true" Class="border-bottom">
-    @* AppBar 開頭現在不需要轉向按鈕，因為它在 Drawer 裡 *@
+<MudAppBar Color="Color.Surface" Elevation="0">
+    <MudTooltip Text="Toggle Drawer">
+        <MudIconButton Icon="@Icons.Material.Rounded.Notes" Color="Color.Inherit" Edge="Edge.Start"
+            OnClick="@DrawerToggle" />
+    </MudTooltip>
+    <MudButton Variant="Variant.Text" Color="Color.Transparent" Href="/" DropShadow="false">
+        首頁
+    </MudButton>
     <MudSpacer />
     
-    @* 主題切換按鈕 *@
-    <MudTooltip Text="@(LayoutService.UserPreferences.IsDarkMode ? "淺色模式" : "深色模式")">
-        <MudIconButton Icon="@(LayoutService.UserPreferences.IsDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)"
-                       Color="Color.Inherit" OnClick="@(() => LayoutService.ToggleDarkModeAsync())" />
+    <MudTooltip Text="@(LayoutService.IsDarkMode ? "淺色模式" : "深色模式")">
+        <MudIconButton Icon="@(LayoutService.IsDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)"
+                       Color="Color.Inherit" OnClick="@ToggleDarkMode" />
     </MudTooltip>
     
-    @* 主題設定按鈕 *@
     <MudTooltip Text="主題設定">
-        <MudIconButton Icon="@Icons.Material.Filled.Palette" Color="Color.Inherit" OnClick="@(() => LayoutService.ThemeDrawerOpen = true)" />
+        <MudIconButton Icon="@Icons.Material.Filled.Palette" Color="Color.Inherit" 
+                       OnClick="@(() => _themeDrawerOpen = true)" />
     </MudTooltip>
 
     <LoginDisplay />
 </MudAppBar>
 
+<MudDrawer @bind-Open="_drawerOpen" Variant="DrawerVariant.Mini" Outlined ClipMode="DrawerClipMode.Never">
+    <NavMenu IsOpen="_drawerOpen" />
+</MudDrawer>
+
+<ThemeDrawer @bind-Open="_themeDrawerOpen" />
+
 <MudMainContent>
-    <MudContainer MaxWidth="MaxWidth.Large" Class="my-4">
+    <MudContainer MaxWidth="MaxWidth.False" Class="px-6 py-6">
         @Body
     </MudContainer>
 </MudMainContent>
 
 @code {
-}
+    private bool _drawerOpen;
+    private bool _isDarkMode;
+    private bool _themeDrawerOpen;
 
-<style>
-    .border-right {
-        border-right: 1px solid var(--mud-palette-lines-default) !important;
+    protected override async Task OnInitializedAsync()
+    {
+        var prefs = await LayoutService.GetPreferenceAsync();
+        _drawerOpen = prefs.IsDrawerOpen;
+        _isDarkMode = prefs.IsDarkMode;
+        
+        LayoutService.MajorUpdateOccurred += OnMajorUpdateOccurred;
     }
-    .border-bottom {
-        border-bottom: 1px solid var(--mud-palette-lines-default) !important;
+
+    private async Task DrawerToggle()
+    {
+        _drawerOpen = await LayoutService.ToggleDrawerAsync();
     }
-</style>
+
+    private async Task ToggleDarkMode()
+    {
+        _isDarkMode = !_isDarkMode;
+        await LayoutService.SetDarkModeAsync(_isDarkMode);
+    }
+
+    private void OnMajorUpdateOccurred(object? sender, EventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        LayoutService.MajorUpdateOccurred -= OnMajorUpdateOccurred;
+    }
+}

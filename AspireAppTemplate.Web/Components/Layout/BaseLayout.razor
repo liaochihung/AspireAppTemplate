@@ -4,13 +4,12 @@
 @inherits LayoutComponentBase
 @inject LayoutService LayoutService
 
-<MudThemeProvider @ref="_mudThemeProvider" Theme="_theme" @bind-IsDarkMode="LayoutService.UserPreferences.IsDarkMode" />
+<MudThemeProvider @ref="_mudThemeProvider" Theme="_theme" @bind-IsDarkMode="LayoutService.IsDarkMode" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
 <MudLayout>
-    <ThemeDrawer @bind-Open="LayoutService.ThemeDrawerOpen" />
     @Body
 </MudLayout>
 
@@ -23,20 +22,11 @@
         LayoutService.MajorUpdateOccurred += LayoutServiceOnMajorUpdateOccurred;
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private async void LayoutServiceOnMajorUpdateOccurred(object? sender, EventArgs e)
     {
-        if (firstRender)
-        {
-            await LayoutService.InitializeAsync();
-            LayoutService.ApplyUserPreferences(_theme);
-            StateHasChanged();
-        }
-    }
-
-    private void LayoutServiceOnMajorUpdateOccurred(object? sender, EventArgs e)
-    {
-        LayoutService.ApplyUserPreferences(_theme);
-        InvokeAsync(StateHasChanged);
+        var prefs = await LayoutService.GetPreferenceAsync();
+        LayoutService.ApplyUserPreferences(_theme, prefs);
+        await InvokeAsync(StateHasChanged);
     }
 
     public void Dispose()

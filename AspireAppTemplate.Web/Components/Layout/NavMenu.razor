@@ -1,10 +1,51 @@
-﻿<MudNavMenu>
-    <MudText Typo="Typo.subtitle2" Class="mud-text-secondary pa-4 py-2">主要導覽</MudText>
+﻿@using Microsoft.AspNetCore.Components.Authorization
+
+<MudDrawerHeader Class="pa-2 d-flex align-center" Style="min-height: 64px;">
+    <AuthorizeView>
+        <Authorized>
+            <MudAvatar Color="Color.Primary" Size="Size.Small">
+                <MudIcon Icon="@Icons.Material.Filled.Person" Size="Size.Small" />
+            </MudAvatar>
+            @if (IsOpen)
+            {
+                <div class="ml-3">
+                    <MudText Typo="Typo.subtitle1">@context.User.Identity?.Name</MudText>
+                    <MudText Typo="Typo.caption" Class="mud-text-secondary">使用者</MudText>
+                </div>
+            }
+        </Authorized>
+        <NotAuthorized>
+            <MudAvatar Size="Size.Small">
+                <MudIcon Icon="@Icons.Material.Filled.Person" Size="Size.Small" />
+            </MudAvatar>
+            @if (IsOpen)
+            {
+                <div class="ml-3">
+                    <MudText Typo="Typo.subtitle1">訪客</MudText>
+                </div>
+            }
+        </NotAuthorized>
+    </AuthorizeView>
+</MudDrawerHeader>
+
+<MudNavMenu>
+    @if (IsOpen)
+    {
+        <MudText Typo="Typo.subtitle2" Color="Color.Surface" Class="ml-4 my-3">主要導覽</MudText>
+    }
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">首頁</MudNavLink>
-    <MudNavLink Href="counter" Icon="@Icons.Material.Filled.AddCircle">計數器</MudNavLink>
-    <MudNavLink Href="products" Icon="@Icons.Material.Filled.ShoppingCart">產品清單</MudNavLink>
-    <MudNavLink Href="weather" Icon="@Icons.Material.Filled.Cloud">天氣預報</MudNavLink>
+    <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddCircle">計數器</MudNavLink>
+    <MudNavLink Href="products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ShoppingCart">產品清單</MudNavLink>
+    <MudNavLink Href="weather" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Cloud">天氣預報</MudNavLink>
     
-    <MudText Typo="Typo.subtitle2" Class="mud-text-secondary pa-4 py-2 mt-4">技術測試</MudText>
-    <MudNavLink Href="token" Icon="@Icons.Material.Filled.Token">存取權杖</MudNavLink>
+    @if (IsOpen)
+    {
+        <MudText Typo="Typo.subtitle2" Color="Color.Surface" Class="ml-4 my-3">技術測試</MudText>
+    }
+    <MudNavLink Href="token" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Token">存取權杖</MudNavLink>
 </MudNavMenu>
+
+@code {
+    [Parameter]
+    public bool IsOpen { get; set; }
+}

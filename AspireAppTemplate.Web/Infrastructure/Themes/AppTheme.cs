@@ -55,10 +55,5 @@ public class AppTheme : MudTheme
             }
         };
 
-        ZIndex = new ZIndex
-        {
-            Drawer = 1400,
-            AppBar = 1300
-        };
     }
 }

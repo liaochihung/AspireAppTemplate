@@ -1,4 +1,5 @@
 @using AspireAppTemplate.Web.Infrastructure.Services
+@using AspireAppTemplate.Web.Infrastructure.Settings
 @inject LayoutService LayoutService
 
 <MudDrawer Open="_open" OpenChanged="OnDrawerOpenChanged" Anchor="Anchor.Right" Elevation="1" Variant="@DrawerVariant.Temporary" Width="300px">
@@ -7,21 +8,21 @@
     </MudDrawerHeader>
     <div class="pa-4">
         <MudText Typo="Typo.subtitle2" Class="mb-2">主色調</MudText>
-        <MudColorPicker Value="LayoutService.UserPreferences.PrimaryColor" 
+        <MudColorPicker Value="_primaryColor" 
                         ValueChanged="@(color => OnPrimaryColorChanged(color))" 
                         PickerVariant="PickerVariant.Static" 
                         Style="width: 100%" />
 
         <MudDivider Class="my-4" />
 
-        <MudText Typo="Typo.subtitle2" Class="mb-2">圓角大小 (@LayoutService.UserPreferences.BorderRadius px)</MudText>
-        <MudSlider T="double" Value="LayoutService.UserPreferences.BorderRadius" 
+        <MudText Typo="Typo.subtitle2" Class="mb-2">圓角大小 (@_borderRadius px)</MudText>
+        <MudSlider T="double" Value="_borderRadius" 
                    ValueChanged="@(val => OnBorderRadiusChanged(val))"
                    Min="0" Max="24" Step="1" Color="Color.Primary" />
         
         <MudDivider Class="my-4" />
         
-        <MudSwitch T="bool" Value="LayoutService.UserPreferences.IsDarkMode" 
+        <MudSwitch T="bool" Value="_isDarkMode" 
                    ValueChanged="@(val => OnDarkModeChanged(val))"
                    Color="Color.Primary" Label="深色模式" />
     </div>
@@ -29,6 +30,9 @@
 
 @code {
     private bool _open;
+    private string _primaryColor = "#409EFF";
+    private double _borderRadius = 4;
+    private bool _isDarkMode;
 
     [Parameter]
     public bool Open { get => _open; set => _open = value; }
@@ -36,29 +40,43 @@
     [Parameter]
     public EventCallback<bool> OpenChanged { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+        var prefs = await LayoutService.GetPreferenceAsync();
+        _primaryColor = prefs.PrimaryColor;
+        _borderRadius = prefs.BorderRadius;
+        _isDarkMode = prefs.IsDarkMode;
+    }
+
     private async Task OnDrawerOpenChanged(bool value)
     {
         _open = value;
+        if (value)
+        {
+            // Refresh values when opening
+            var prefs = await LayoutService.GetPreferenceAsync();
+            _primaryColor = prefs.PrimaryColor;
+            _borderRadius = prefs.BorderRadius;
+            _isDarkMode = prefs.IsDarkMode;
+        }
         await OpenChanged.InvokeAsync(value);
     }
 
     private async Task OnPrimaryColorChanged(MudBlazor.Utilities.MudColor color)
     {
+        _primaryColor = color.Value;
         await LayoutService.SetPrimaryColorAsync(color.Value);
     }
 
     private async Task OnBorderRadiusChanged(double radius)
     {
+        _borderRadius = radius;
         await LayoutService.SetBorderRadiusAsync(radius);
     }
 
     private async Task OnDarkModeChanged(bool isDarkMode)
     {
-        // LayoutService.ToggleDarkModeAsync always toggles, but here we might want to set it explicitly
-        // If the switch gives us the new value, we should use a setter approach in LayoutService
-        if (LayoutService.UserPreferences.IsDarkMode != isDarkMode)
-        {
-            await LayoutService.ToggleDarkModeAsync();
-        }
+        _isDarkMode = isDarkMode;
+        await LayoutService.SetDarkModeAsync(isDarkMode);
     }
 }

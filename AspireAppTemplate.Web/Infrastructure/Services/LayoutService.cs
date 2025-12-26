@@ -14,57 +14,82 @@ public class LayoutService
         _localStorageService = localStorageService;
     }
 
-    public UserPreferences UserPreferences { get; private set; } = new();
-
     public bool ThemeDrawerOpen { get; set; }
+    public bool IsDarkMode { get; set; }
 
     public event EventHandler? MajorUpdateOccurred;
 
     private void OnMajorUpdateOccurred() => MajorUpdateOccurred?.Invoke(this, EventArgs.Empty);
 
-    public async Task InitializeAsync()
+    public async Task<UserPreferences> GetPreferenceAsync()
     {
-        var prefs = await _localStorageService.GetItemAsync<UserPreferences>(StorageKey);
-        if (prefs != null)
+        try
         {
-            UserPreferences = prefs;
+            var prefs = await _localStorageService.GetItemAsync<UserPreferences>(StorageKey);
+            if (prefs != null)
+            {
+                IsDarkMode = prefs.IsDarkMode;
+                return prefs;
+            }
         }
+        catch
+        {
+            // Ignore storage errors
+        }
+        
+        // Return default with drawer open
+        return new UserPreferences { IsDrawerOpen = true, IsDarkMode = false, PrimaryColor = "#409EFF", BorderRadius = 4 };
     }
 
-    public async Task ToggleDarkModeAsync()
+    public async Task<bool> ToggleDrawerAsync()
     {
-        UserPreferences.IsDarkMode = !UserPreferences.IsDarkMode;
-        await SaveSettingsAsync();
+        var prefs = await GetPreferenceAsync();
+        prefs.IsDrawerOpen = !prefs.IsDrawerOpen;
+        await SetPreferenceAsync(prefs);
+        return prefs.IsDrawerOpen;
     }
 
-    public async Task ToggleDrawerAsync()
+    public async Task<bool> ToggleDarkModeAsync()
     {
-        UserPreferences.IsDrawerOpen = !UserPreferences.IsDrawerOpen;
-        await SaveSettingsAsync();
+        var prefs = await GetPreferenceAsync();
+        prefs.IsDarkMode = !prefs.IsDarkMode;
+        IsDarkMode = prefs.IsDarkMode;
+        await SetPreferenceAsync(prefs);
+        return prefs.IsDarkMode;
     }
-    
+
+    public async Task SetDarkModeAsync(bool value)
+    {
+        var prefs = await GetPreferenceAsync();
+        prefs.IsDarkMode = value;
+        IsDarkMode = value;
+        await SetPreferenceAsync(prefs);
+    }
+
     public async Task SetPrimaryColorAsync(string color)
     {
-        UserPreferences.PrimaryColor = color;
-        await SaveSettingsAsync();
+        var prefs = await GetPreferenceAsync();
+        prefs.PrimaryColor = color;
+        await SetPreferenceAsync(prefs);
     }
 
     public async Task SetBorderRadiusAsync(double radius)
     {
-        UserPreferences.BorderRadius = radius;
-        await SaveSettingsAsync();
+        var prefs = await GetPreferenceAsync();
+        prefs.BorderRadius = radius;
+        await SetPreferenceAsync(prefs);
     }
 
-    private async Task SaveSettingsAsync()
+    private async Task SetPreferenceAsync(UserPreferences prefs)
     {
-        await _localStorageService.SetItemAsync(StorageKey, UserPreferences);
+        await _localStorageService.SetItemAsync(StorageKey, prefs);
         OnMajorUpdateOccurred();
     }
 
-    public void ApplyUserPreferences(MudTheme theme)
+    public void ApplyUserPreferences(MudTheme theme, UserPreferences prefs)
     {
-        theme.PaletteLight.Primary = UserPreferences.PrimaryColor;
-        theme.PaletteDark.Primary = UserPreferences.PrimaryColor;
-        theme.LayoutProperties.DefaultBorderRadius = $"{UserPreferences.BorderRadius}px";
+        theme.PaletteLight.Primary = prefs.PrimaryColor;
+        theme.PaletteDark.Primary = prefs.PrimaryColor;
+        theme.LayoutProperties.DefaultBorderRadius = $"{prefs.BorderRadius}px";
     }
 }
