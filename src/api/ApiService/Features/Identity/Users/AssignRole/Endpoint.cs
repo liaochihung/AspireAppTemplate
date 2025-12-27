@@ -3,7 +3,7 @@ using AspireAppTemplate.ApiService.Services;
 using AspireAppTemplate.Shared;
 using AspireAppTemplate.ApiService.Infrastructure.Extensions;
 
-namespace AspireAppTemplate.ApiService.Features.Identity.Users;
+namespace AspireAppTemplate.ApiService.Features.Identity.Users.AssignRole;
 
 public class UserRoleRequest
 {
@@ -11,11 +11,11 @@ public class UserRoleRequest
     public string RoleName { get; set; } = string.Empty; // From Body
 }
 
-public class AssignRoleEndpoint : Endpoint<UserRoleRequest>
+public class Endpoint : Endpoint<UserRoleRequest>
 {
     private readonly IdentityService _identityService;
 
-    public AssignRoleEndpoint(IdentityService identityService)
+    public Endpoint(IdentityService identityService)
     {
         _identityService = identityService;
     }
@@ -29,6 +29,6 @@ public class AssignRoleEndpoint : Endpoint<UserRoleRequest>
     public override async Task HandleAsync(UserRoleRequest req, CancellationToken ct)
     {
         var result = await _identityService.AssignRoleToUserAsync(req.Id, req.RoleName);
-        await this.SendResultAsync(result);
+        await this.SendResultAsync(result, ct: ct);
     }
 }

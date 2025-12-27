@@ -16,6 +16,6 @@ public class Endpoint(IdentityService identityService) : EndpointWithoutRequest<
     public override async Task HandleAsync(CancellationToken ct)
     {
         var result = await identityService.GetRolesAsync();
-        await this.SendResultAsync(result);
+        await this.SendResultAsync(result, ct: ct);
     }
 }

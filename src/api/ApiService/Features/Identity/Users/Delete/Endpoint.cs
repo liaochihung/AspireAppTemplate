@@ -1,14 +1,15 @@
-using FastEndpoints;
-using AspireAppTemplate.ApiService.Services;
 using AspireAppTemplate.ApiService.Infrastructure.Extensions;
+using AspireAppTemplate.ApiService.Services;
+using AspireAppTemplate.Shared;
+using FastEndpoints;
 
-namespace AspireAppTemplate.ApiService.Features.Identity.Users;
+namespace AspireAppTemplate.ApiService.Features.Identity.Users.Delete;
 
-public class DeleteUserEndpoint : EndpointWithoutRequest
+public class Endpoint : EndpointWithoutRequest
 {
     private readonly IdentityService _identityService;
 
-    public DeleteUserEndpoint(IdentityService identityService)
+    public Endpoint(IdentityService identityService)
     {
         _identityService = identityService;
     }
@@ -16,7 +17,7 @@ public class DeleteUserEndpoint : EndpointWithoutRequest
     public override void Configure()
     {
         Delete("/users/{id}");
-        AllowAnonymous();
+        Policies(AppPolicies.CanManageUsers);
     }
 
     public override async Task HandleAsync(CancellationToken ct)

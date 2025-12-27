@@ -16,8 +16,8 @@ public class Validator : Validator<Request>
 {
     public Validator()
     {
-        RuleFor(x => x.Name).NotEmpty().WithMessage("?¢å??ç¨±ä¸èƒ½?ºç©º");
-        RuleFor(x => x.Price).GreaterThan(0).WithMessage("?¹æ ¼å¿…é?å¤§æ–¼ 0");
+        RuleFor(x => x.Name).NotEmpty().WithMessage("¦WºÙ¤£¯à¬°ªÅ");
+        RuleFor(x => x.Price).GreaterThan(0).WithMessage("»ù®æ¤£¯à¬°0");
     }
 }
 

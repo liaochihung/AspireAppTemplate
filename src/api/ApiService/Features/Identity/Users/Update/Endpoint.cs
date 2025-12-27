@@ -37,6 +37,6 @@ public class Endpoint(IdentityService identityService) : Endpoint<UpdateUserRequ
         };
 
         var result = await identityService.UpdateUserAsync(req.Id, user);
-        await this.SendResultAsync(result);
+        await this.SendResultAsync(result, ct: ct);
     }
 }

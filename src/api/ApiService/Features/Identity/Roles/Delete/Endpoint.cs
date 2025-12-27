@@ -21,6 +21,6 @@ public class Endpoint(IdentityService identityService) : Endpoint<DeleteRoleRequ
     public override async Task HandleAsync(DeleteRoleRequest req, CancellationToken ct)
     {
         var result = await identityService.DeleteRoleAsync(req.Name);
-        await this.SendResultAsync(result);
+        await this.SendResultAsync(result, ct: ct);
     }
 }

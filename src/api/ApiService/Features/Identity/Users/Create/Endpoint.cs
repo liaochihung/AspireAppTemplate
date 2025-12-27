@@ -4,7 +4,7 @@ using AspireAppTemplate.Shared;
 using FluentValidation;
 using AspireAppTemplate.ApiService.Infrastructure.Extensions;
 
-namespace AspireAppTemplate.ApiService.Features.Identity.Users;
+namespace AspireAppTemplate.ApiService.Features.Identity.Users.Create;
 
 public class CreateUserRequest
 {
@@ -25,11 +25,11 @@ public class CreateUserValidator : Validator<CreateUserRequest>
     }
 }
 
-public class CreateUserEndpoint : Endpoint<CreateUserRequest>
+public class Endpoint : Endpoint<CreateUserRequest>
 {
     private readonly IdentityService _identityService;
 
-    public CreateUserEndpoint(IdentityService identityService)
+    public Endpoint(IdentityService identityService)
     {
         _identityService = identityService;
     }
@@ -37,7 +37,7 @@ public class CreateUserEndpoint : Endpoint<CreateUserRequest>
     public override void Configure()
     {
         Post("/users");
-        AllowAnonymous();
+        Policies(AppPolicies.CanManageUsers);
     }
 
     public override async Task HandleAsync(CreateUserRequest req, CancellationToken ct)
@@ -57,6 +57,6 @@ public class CreateUserEndpoint : Endpoint<CreateUserRequest>
         };
 
         var result = await _identityService.CreateUserAsync(user);
-        await this.SendResultAsync(result);
+        await this.SendResultAsync(result, ct: ct);
     }
 }

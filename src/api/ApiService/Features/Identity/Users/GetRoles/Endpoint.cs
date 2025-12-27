@@ -21,6 +21,6 @@ public class Endpoint(IdentityService identityService) : Endpoint<GetUserRolesRe
     public override async Task HandleAsync(GetUserRolesRequest req, CancellationToken ct)
     {
         var result = await identityService.GetUserRolesAsync(req.Id);
-        await this.SendResultAsync(result);
+        await this.SendResultAsync(result, ct: ct);
     }
 }

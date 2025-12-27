@@ -31,6 +31,6 @@ public class Endpoint(IdentityService identityService) : Endpoint<CreateRoleRequ
     {
         var role = new KeycloakRole { Name = req.Name };
         var result = await identityService.CreateRoleAsync(role);
-        await this.SendResultAsync(result);
+        await this.SendResultAsync(result, ct: ct);
     }
 }

@@ -3,13 +3,13 @@ using AspireAppTemplate.ApiService.Services;
 using AspireAppTemplate.Shared;
 using AspireAppTemplate.ApiService.Infrastructure.Extensions;
 
-namespace AspireAppTemplate.ApiService.Features.Identity.Users;
+namespace AspireAppTemplate.ApiService.Features.Identity.Users.GetAll;
 
-public class GetUsersEndpoint : EndpointWithoutRequest<IEnumerable<KeycloakUser>>
+public class Endpoint : EndpointWithoutRequest<IEnumerable<KeycloakUser>>
 {
     private readonly IdentityService _identityService;
 
-    public GetUsersEndpoint(IdentityService identityService)
+    public Endpoint(IdentityService identityService)
     {
         _identityService = identityService;
     }
@@ -17,7 +17,7 @@ public class GetUsersEndpoint : EndpointWithoutRequest<IEnumerable<KeycloakUser>
     public override void Configure()
     {
         Get("/users");
-        AllowAnonymous();
+        Policies(AppPolicies.CanManageUsers);
     }
 
     public override async Task HandleAsync(CancellationToken ct)
