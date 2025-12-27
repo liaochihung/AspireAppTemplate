@@ -39,4 +39,4 @@ builder.AddProject<Projects.AspireAppTemplate_Web>("webfrontend")
     .WithReference(keycloak)
     .WaitFor(keycloak);
 
-builder.Build().Run();
+await builder.Build().RunAsync();
