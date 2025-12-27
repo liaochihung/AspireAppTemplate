@@ -26,6 +26,12 @@
   "oauth2DeviceCodeLifespan": 600,
   "oauth2DevicePollingInterval": 5,
   "enabled": true,
+  "internationalizationEnabled": true,
+  "supportedLocales": [
+    "en",
+    "zh-TW"
+  ],
+  "defaultLocale": "zh-TW",
   "sslRequired": "external",
   "registrationAllowed": true,
   "registrationEmailAsUsername": false,
@@ -60,9 +66,15 @@
           "temporary": false
         }
       ],
-      "realmRoles": [ "Administrator", "default-roles-weathershop" ],
+      "realmRoles": [
+        "Administrator",
+        "default-roles-weathershop"
+      ],
       "clientRoles": {
-        "account": [ "view-profile", "manage-account" ]
+        "account": [
+          "view-profile",
+          "manage-account"
+        ]
       }
     }
   ],
@@ -83,9 +95,15 @@
         "description": "${role_default-roles}",
         "composite": true,
         "composites": {
-          "realm": [ "offline_access", "uma_authorization" ],
+          "realm": [
+            "offline_access",
+            "uma_authorization"
+          ],
           "client": {
-            "account": [ "view-profile", "manage-account" ]
+            "account": [
+              "view-profile",
+              "manage-account"
+            ]
           }
         },
         "clientRole": false,
@@ -129,7 +147,10 @@
           "composite": true,
           "composites": {
             "client": {
-              "realm-management": [ "query-groups", "query-users" ]
+              "realm-management": [
+                "query-groups",
+                "query-users"
+              ]
             }
           },
           "clientRole": true,
@@ -170,7 +191,26 @@
           "composite": true,
           "composites": {
             "client": {
-              "realm-management": [ "view-users", "manage-users", "view-events", "query-groups", "manage-authorization", "query-users", "manage-realm", "view-identity-providers", "create-client", "view-authorization", "query-clients", "view-clients", "query-realms", "impersonation", "view-realm", "manage-events", "manage-identity-providers", "manage-clients" ]
+              "realm-management": [
+                "view-users",
+                "manage-users",
+                "view-events",
+                "query-groups",
+                "manage-authorization",
+                "query-users",
+                "manage-realm",
+                "view-identity-providers",
+                "create-client",
+                "view-authorization",
+                "query-clients",
+                "view-clients",
+                "query-realms",
+                "impersonation",
+                "view-realm",
+                "manage-events",
+                "manage-identity-providers",
+                "manage-clients"
+              ]
             }
           },
           "clientRole": true,
@@ -238,7 +278,9 @@
           "composite": true,
           "composites": {
             "client": {
-              "realm-management": [ "query-clients" ]
+              "realm-management": [
+                "query-clients"
+              ]
             }
           },
           "clientRole": true,
@@ -343,7 +385,9 @@
           "composite": true,
           "composites": {
             "client": {
-              "account": [ "view-consent" ]
+              "account": [
+                "view-consent"
+              ]
             }
           },
           "clientRole": true,
@@ -375,7 +419,9 @@
           "composite": true,
           "composites": {
             "client": {
-              "account": [ "manage-account-links" ]
+              "account": [
+                "manage-account-links"
+              ]
             }
           },
           "clientRole": true,
@@ -412,7 +458,9 @@
     "clientRole": false,
     "containerId": "86683c73-be28-4380-a014-6316c0404192"
   },
-  "requiredCredentials": [ "password" ],
+  "requiredCredentials": [
+    "password"
+  ],
   "otpPolicyType": "totp",
   "otpPolicyAlgorithm": "HmacSHA1",
   "otpPolicyInitialCounter": 0,
@@ -420,10 +468,16 @@
   "otpPolicyLookAheadWindow": 1,
   "otpPolicyPeriod": 30,
   "otpPolicyCodeReusable": false,
-  "otpSupportedApplications": [ "totpAppFreeOTPName", "totpAppGoogleName", "totpAppMicrosoftAuthenticatorName" ],
+  "otpSupportedApplications": [
+    "totpAppFreeOTPName",
+    "totpAppGoogleName",
+    "totpAppMicrosoftAuthenticatorName"
+  ],
   "localizationTexts": {},
   "webAuthnPolicyRpEntityName": "keycloak",
-  "webAuthnPolicySignatureAlgorithms": [ "ES256" ],
+  "webAuthnPolicySignatureAlgorithms": [
+    "ES256"
+  ],
   "webAuthnPolicyRpId": "",
   "webAuthnPolicyAttestationConveyancePreference": "not specified",
   "webAuthnPolicyAuthenticatorAttachment": "not specified",
@@ -434,7 +488,9 @@
   "webAuthnPolicyAcceptableAaguids": [],
   "webAuthnPolicyExtraOrigins": [],
   "webAuthnPolicyPasswordlessRpEntityName": "keycloak",
-  "webAuthnPolicyPasswordlessSignatureAlgorithms": [ "ES256" ],
+  "webAuthnPolicyPasswordlessSignatureAlgorithms": [
+    "ES256"
+  ],
   "webAuthnPolicyPasswordlessRpId": "",
   "webAuthnPolicyPasswordlessAttestationConveyancePreference": "not specified",
   "webAuthnPolicyPasswordlessAuthenticatorAttachment": "not specified",
@@ -447,14 +503,19 @@
   "scopeMappings": [
     {
       "clientScope": "offline_access",
-      "roles": [ "offline_access" ]
+      "roles": [
+        "offline_access"
+      ]
     }
   ],
   "clientScopeMappings": {
     "account": [
       {
         "client": "account-console",
-        "roles": [ "manage-account", "view-groups" ]
+        "roles": [
+          "manage-account",
+          "view-groups"
+        ]
       }
     ]
   },
@@ -471,8 +532,12 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "redirectUris": [ "https://oauth.pstmn.io/v1/callback" ],
-      "webOrigins": [ "https://oauth.pstmn.io" ],
+      "redirectUris": [
+        "https://oauth.pstmn.io/v1/callback"
+      ],
+      "webOrigins": [
+        "https://oauth.pstmn.io"
+      ],
       "notBefore": 0,
       "bearerOnly": false,
       "consentRequired": false,
@@ -495,8 +560,20 @@
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": true,
       "nodeReRegistrationTimeout": -1,
-      "defaultClientScopes": [ "web-origins", "acr", "profile", "roles", "email" ],
-      "optionalClientScopes": [ "address", "phone", "offline_access", "weather:all", "microprofile-jwt" ]
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "weather:all",
+        "microprofile-jwt"
+      ]
     },
     {
       "id": "016c17d1-8e0f-4a67-9116-86b4691ba99c",
@@ -510,8 +587,12 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "redirectUris": [ "https://localhost:7085/signin-oidc" ],
-      "webOrigins": [ "https://localhost:7085" ],
+      "redirectUris": [
+        "https://localhost:7085/signin-oidc"
+      ],
+      "webOrigins": [
+        "https://localhost:7085"
+      ],
       "notBefore": 0,
       "bearerOnly": false,
       "consentRequired": false,
@@ -532,8 +613,20 @@
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": true,
       "nodeReRegistrationTimeout": -1,
-      "defaultClientScopes": [ "web-origins", "acr", "profile", "roles", "email" ],
-      "optionalClientScopes": [ "address", "phone", "offline_access", "weather:all", "microprofile-jwt" ]
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "weather:all",
+        "microprofile-jwt"
+      ]
     },
     {
       "id": "65816a45-48d3-4856-b052-c65cb03881d3",
@@ -545,7 +638,9 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "redirectUris": [ "/realms/WeatherShop/account/*" ],
+      "redirectUris": [
+        "/realms/WeatherShop/account/*"
+      ],
       "webOrigins": [],
       "notBefore": 0,
       "bearerOnly": false,
@@ -563,8 +658,19 @@
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": false,
       "nodeReRegistrationTimeout": 0,
-      "defaultClientScopes": [ "web-origins", "acr", "profile", "roles", "email" ],
-      "optionalClientScopes": [ "address", "phone", "offline_access", "microprofile-jwt" ]
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ]
     },
     {
       "id": "437fda77-3ba1-4d7b-b192-808e4e62833b",
@@ -576,7 +682,9 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "redirectUris": [ "/realms/WeatherShop/account/*" ],
+      "redirectUris": [
+        "/realms/WeatherShop/account/*"
+      ],
       "webOrigins": [],
       "notBefore": 0,
       "bearerOnly": false,
@@ -605,8 +713,19 @@
           "config": {}
         }
       ],
-      "defaultClientScopes": [ "web-origins", "acr", "profile", "roles", "email" ],
-      "optionalClientScopes": [ "address", "phone", "offline_access", "microprofile-jwt" ]
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ]
     },
     {
       "id": "f13fd042-6931-4032-a0ba-f63b364f8d56",
@@ -634,8 +753,19 @@
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": false,
       "nodeReRegistrationTimeout": 0,
-      "defaultClientScopes": [ "web-origins", "acr", "profile", "roles", "email" ],
-      "optionalClientScopes": [ "address", "phone", "offline_access", "microprofile-jwt" ]
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ]
     },
     {
       "id": "db2ab30c-b83b-499e-9545-decdc906a372",
@@ -663,8 +793,19 @@
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": false,
       "nodeReRegistrationTimeout": 0,
-      "defaultClientScopes": [ "web-origins", "acr", "profile", "roles", "email" ],
-      "optionalClientScopes": [ "address", "phone", "offline_access", "microprofile-jwt" ]
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ]
     },
     {
       "id": "0aa2db92-8cc4-490f-a084-55f5b889613a",
@@ -692,8 +833,19 @@
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": false,
       "nodeReRegistrationTimeout": 0,
-      "defaultClientScopes": [ "web-origins", "acr", "profile", "roles", "email" ],
-      "optionalClientScopes": [ "address", "phone", "offline_access", "microprofile-jwt" ]
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ]
     },
     {
       "id": "e0cc9cef-924e-4799-a921-4811f3bb5d65",
@@ -705,8 +857,12 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "redirectUris": [ "/admin/WeatherShop/console/*" ],
-      "webOrigins": [ "+" ],
+      "redirectUris": [
+        "/admin/WeatherShop/console/*"
+      ],
+      "webOrigins": [
+        "+"
+      ],
       "notBefore": 0,
       "bearerOnly": false,
       "consentRequired": false,
@@ -742,8 +898,19 @@
           }
         }
       ],
-      "defaultClientScopes": [ "web-origins", "acr", "profile", "roles", "email" ],
-      "optionalClientScopes": [ "address", "phone", "offline_access", "microprofile-jwt" ]
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ]
     },
     {
       "id": "4b5953fd-b218-41be-b061-58f37c1c7d26",
@@ -758,8 +925,12 @@
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "secret": "**********",
-      "redirectUris": [ "/*" ],
-      "webOrigins": [ "/*" ],
+      "redirectUris": [
+        "/*"
+      ],
+      "webOrigins": [
+        "/*"
+      ],
       "notBefore": 0,
       "bearerOnly": false,
       "consentRequired": false,
@@ -781,8 +952,19 @@
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": true,
       "nodeReRegistrationTimeout": -1,
-      "defaultClientScopes": [ "web-origins", "acr", "profile", "roles", "email" ],
-      "optionalClientScopes": [ "address", "phone", "offline_access", "microprofile-jwt" ]
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ]
     }
   ],
   "clientScopes": [
@@ -1370,8 +1552,21 @@
       ]
     }
   ],
-  "defaultDefaultClientScopes": [ "role_list", "profile", "email", "roles", "web-origins", "acr" ],
-  "defaultOptionalClientScopes": [ "offline_access", "address", "phone", "microprofile-jwt", "weather:all" ],
+  "defaultDefaultClientScopes": [
+    "role_list",
+    "profile",
+    "email",
+    "roles",
+    "web-origins",
+    "acr"
+  ],
+  "defaultOptionalClientScopes": [
+    "offline_access",
+    "address",
+    "phone",
+    "microprofile-jwt",
+    "weather:all"
+  ],
   "browserSecurityHeaders": {
     "contentSecurityPolicyReportOnly": "",
     "xContentTypeOptions": "nosniff",
@@ -1384,7 +1579,9 @@
   },
   "smtpServer": {},
   "eventsEnabled": false,
-  "eventsListeners": [ "jboss-logging" ],
+  "eventsListeners": [
+    "jboss-logging"
+  ],
   "enabledEventTypes": [],
   "adminEventsEnabled": false,
   "adminEventsDetailsEnabled": false,
@@ -1399,8 +1596,12 @@
         "subType": "anonymous",
         "subComponents": {},
         "config": {
-          "host-sending-registration-request-must-match": [ "true" ],
-          "client-uris-must-match": [ "true" ]
+          "host-sending-registration-request-must-match": [
+            "true"
+          ],
+          "client-uris-must-match": [
+            "true"
+          ]
         }
       },
       {
@@ -1418,7 +1619,9 @@
         "subType": "anonymous",
         "subComponents": {},
         "config": {
-          "max-clients": [ "200" ]
+          "max-clients": [
+            "200"
+          ]
         }
       },
       {
@@ -1428,7 +1631,16 @@
         "subType": "authenticated",
         "subComponents": {},
         "config": {
-          "allowed-protocol-mapper-types": [ "oidc-usermodel-attribute-mapper", "oidc-address-mapper", "saml-role-list-mapper", "saml-user-property-mapper", "saml-user-attribute-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-full-name-mapper", "oidc-usermodel-property-mapper" ]
+          "allowed-protocol-mapper-types": [
+            "oidc-usermodel-attribute-mapper",
+            "oidc-address-mapper",
+            "saml-role-list-mapper",
+            "saml-user-property-mapper",
+            "saml-user-attribute-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
+            "oidc-full-name-mapper",
+            "oidc-usermodel-property-mapper"
+          ]
         }
       },
       {
@@ -1446,7 +1658,16 @@
         "subType": "anonymous",
         "subComponents": {},
         "config": {
-          "allowed-protocol-mapper-types": [ "saml-user-property-mapper", "oidc-usermodel-attribute-mapper", "saml-user-attribute-mapper", "oidc-address-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-usermodel-property-mapper", "saml-role-list-mapper", "oidc-full-name-mapper" ]
+          "allowed-protocol-mapper-types": [
+            "saml-user-property-mapper",
+            "oidc-usermodel-attribute-mapper",
+            "saml-user-attribute-mapper",
+            "oidc-address-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
+            "oidc-usermodel-property-mapper",
+            "saml-role-list-mapper",
+            "oidc-full-name-mapper"
+          ]
         }
       },
       {
@@ -1456,7 +1677,9 @@
         "subType": "anonymous",
         "subComponents": {},
         "config": {
-          "allow-default-scopes": [ "true" ]
+          "allow-default-scopes": [
+            "true"
+          ]
         }
       },
       {
@@ -1466,7 +1689,9 @@
         "subType": "authenticated",
         "subComponents": {},
         "config": {
-          "allow-default-scopes": [ "true" ]
+          "allow-default-scopes": [
+            "true"
+          ]
         }
       }
     ],
@@ -1477,9 +1702,15 @@
         "providerId": "rsa-generated",
         "subComponents": {},
         "config": {
-          "privateKey": [ "MIIEowIBAAKCAQEAyJtAKWr1DdQmh9Nxp2LUGOrc5OA+rdXkV6+kOT21wVsIP/1bg6HekqfMySZhIxlALfegc90j0mrqkolb5s7axotTwwABwIvgxW5hHIQ4huntiZUYPUuf4m51dwyLs/GM1gSbzs9ciBKC5i4S21CQzuGp0QHpyOOn1kQZd0vYSGjpG3ewMYphJEfd60TQP74RcqASNoOaS3lU7+5SCQuiff1fSZYqYvIFmK3rcNrauTSryx6rh935ODSdYzQN0XA6g1WJK2hbBlBJJzeAj/CXXcBaw7aB1AoC7kjJ7XaYmHdC+7zIYhvNKcGtFhrMjoOVnJM9PiRMrk7ous7XAmKc6QIDAQABAoIBAC4qjm5Js1oqnfBpwJDrPVD7sfjJQ5t5azqjzQkwUrUMGF6zlZ06QhDhpY8QMlAjxkGd6JLpjE4nNVMiYeBA8Be7pjvs8zpG5qRBBf/MTP79dGFSitjGX+X6EjXi0P7JIuZ4+otybMLS8cV7ynKm/KBjzhMv28fT3oMAupSaA40MESKVD8BDR0bNQ6H3h1xrq2+81xViFsle9qcrZjJzCz/rttNi3DUct5IeJwc9Wai937L6H/BU5eBd9vQHM5raLL0iDSF5CQF2tE/j3hq8kdpRm9XRUm/0WaXOz8Il96GfSEUXLVvKnLdHu7qYbqKKBYI7B3xz8VYiHgDvBMqiBzUCgYEA9Sd/EijWpXAAaFOJk75BOu0sSjZHjoGbaLE1XWsQyM1fkFT9kxQ+8/kDiHSJal+utoEIrMWK/KdrrIjT0TXbWKCarV+ebgCt9dkTd6Or2SUku5k0TMSMoVEI2KxI6ZHvCz2Vxe8Ahbao28u8xOGRQYSs5ynvH0oBTex+RP3sv6UCgYEA0Xs55XdSn1PGazAuZYk9ZKJhCovdalYdjnJYxuSPfBgHV4CIHdhHvd/hohumMakQsnRDmJzbk/uFlqJecZtcQ/DukGylC/6dvfp6prUrVhghK+7+Bnry7zfQ9rMWslrlhf9ZTrQ8F9pssCtgAfs+Pfj0zF5DxQqFqF3wz12sJPUCgYATR5HkubV3uUEu8zLknZe/rJtJEs+501OHfjg2Ko9dW1linmx6vqLcyP6QIqoT5YZ179vgyoBNslTzcqdF0rh3VdoUPGrXN9J2fSXcyNBg+VzULA5C40oz/Y12jMYHKGTmO2el80/VNDI/Ztxnl123C1oVq+SUT1ue5zRe9KFDyQKBgBihnqsmnqZxWVFdNvdlbbyZg0OUMpLAUXVgaKPqWBzFToexa0/nEHh5DLTc/2uzb20sUo5tUzxRROHzcZt2IyEyATsmKzn/1Fh0TVuwzcmvyKa70U69wjbynzWC1VZfbcGVxtCETNSZMFJ+pylUe3sZ/N7S7rEKjbDAawJXB1jJAoGBAOZF4M9C1GLCZqt4RrF1MBI0Q+7Im45Hvr0FSck0y9xLpl9yolQREWoiCo5+WM54YMeSWu0rzBsLAjCoFpIX2cWcICsdPAnyyjIMPmuGt/uUaIWmq/ZRAsqkOW0sqxUMggjytNCtvdCyfQOcKsEHpBKrA6z+8l/3Z1RQFwan+VPs" ],
-          "certificate": [ "MIICpTCCAY0CBgGQcJfMUjANBgkqhkiG9w0BAQsFADAWMRQwEgYDVQQDDAtXZWF0aGVyU2hvcDAeFw0yNDA3MDEyMzE2NTRaFw0zNDA3MDEyMzE4MzRaMBYxFDASBgNVBAMMC1dlYXRoZXJTaG9wMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyJtAKWr1DdQmh9Nxp2LUGOrc5OA+rdXkV6+kOT21wVsIP/1bg6HekqfMySZhIxlALfegc90j0mrqkolb5s7axotTwwABwIvgxW5hHIQ4huntiZUYPUuf4m51dwyLs/GM1gSbzs9ciBKC5i4S21CQzuGp0QHpyOOn1kQZd0vYSGjpG3ewMYphJEfd60TQP74RcqASNoOaS3lU7+5SCQuiff1fSZYqYvIFmK3rcNrauTSryx6rh935ODSdYzQN0XA6g1WJK2hbBlBJJzeAj/CXXcBaw7aB1AoC7kjJ7XaYmHdC+7zIYhvNKcGtFhrMjoOVnJM9PiRMrk7ous7XAmKc6QIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQAeDhADaUkVzu1o8CvCfU9oa6hGsJa+2qFeUPQnG7HZAQ07MjQ/RZgMMOmdhspZIuaf+Yrx/My8VDphKzNtb2eNHgFVVQDy1F1jVy9z+t7xCwX3UfjtVNMp3tMmzWUEi0pckW0mq4Bz3w0+dKPw8z0K2c19dVN1NHDViqFghB+77tO8JguwTDE8fkmXjLixDCcenBCPXjxNWmhXgOMF1wKhlq1h0+SaKt/F2P/WzyoYu6tz8qVysQvv4knB/HEGjSji+DN+uJFE4RJG+B5X+vp5LHvlYKIROQ7/aSzvCjx7zrslmcTsSTL3F1k2Ox2Hz+rGIcA8sGqbj+W5+nKxRbad" ],
-          "priority": [ "100" ]
+          "privateKey": [
+            "MIIEowIBAAKCAQEAyJtAKWr1DdQmh9Nxp2LUGOrc5OA+rdXkV6+kOT21wVsIP/1bg6HekqfMySZhIxlALfegc90j0mrqkolb5s7axotTwwABwIvgxW5hHIQ4huntiZUYPUuf4m51dwyLs/GM1gSbzs9ciBKC5i4S21CQzuGp0QHpyOOn1kQZd0vYSGjpG3ewMYphJEfd60TQP74RcqASNoOaS3lU7+5SCQuiff1fSZYqYvIFmK3rcNrauTSryx6rh935ODSdYzQN0XA6g1WJK2hbBlBJJzeAj/CXXcBaw7aB1AoC7kjJ7XaYmHdC+7zIYhvNKcGtFhrMjoOVnJM9PiRMrk7ous7XAmKc6QIDAQABAoIBAC4qjm5Js1oqnfBpwJDrPVD7sfjJQ5t5azqjzQkwUrUMGF6zlZ06QhDhpY8QMlAjxkGd6JLpjE4nNVMiYeBA8Be7pjvs8zpG5qRBBf/MTP79dGFSitjGX+X6EjXi0P7JIuZ4+otybMLS8cV7ynKm/KBjzhMv28fT3oMAupSaA40MESKVD8BDR0bNQ6H3h1xrq2+81xViFsle9qcrZjJzCz/rttNi3DUct5IeJwc9Wai937L6H/BU5eBd9vQHM5raLL0iDSF5CQF2tE/j3hq8kdpRm9XRUm/0WaXOz8Il96GfSEUXLVvKnLdHu7qYbqKKBYI7B3xz8VYiHgDvBMqiBzUCgYEA9Sd/EijWpXAAaFOJk75BOu0sSjZHjoGbaLE1XWsQyM1fkFT9kxQ+8/kDiHSJal+utoEIrMWK/KdrrIjT0TXbWKCarV+ebgCt9dkTd6Or2SUku5k0TMSMoVEI2KxI6ZHvCz2Vxe8Ahbao28u8xOGRQYSs5ynvH0oBTex+RP3sv6UCgYEA0Xs55XdSn1PGazAuZYk9ZKJhCovdalYdjnJYxuSPfBgHV4CIHdhHvd/hohumMakQsnRDmJzbk/uFlqJecZtcQ/DukGylC/6dvfp6prUrVhghK+7+Bnry7zfQ9rMWslrlhf9ZTrQ8F9pssCtgAfs+Pfj0zF5DxQqFqF3wz12sJPUCgYATR5HkubV3uUEu8zLknZe/rJtJEs+501OHfjg2Ko9dW1linmx6vqLcyP6QIqoT5YZ179vgyoBNslTzcqdF0rh3VdoUPGrXN9J2fSXcyNBg+VzULA5C40oz/Y12jMYHKGTmO2el80/VNDI/Ztxnl123C1oVq+SUT1ue5zRe9KFDyQKBgBihnqsmnqZxWVFdNvdlbbyZg0OUMpLAUXVgaKPqWBzFToexa0/nEHh5DLTc/2uzb20sUo5tUzxRROHzcZt2IyEyATsmKzn/1Fh0TVuwzcmvyKa70U69wjbynzWC1VZfbcGVxtCETNSZMFJ+pylUe3sZ/N7S7rEKjbDAawJXB1jJAoGBAOZF4M9C1GLCZqt4RrF1MBI0Q+7Im45Hvr0FSck0y9xLpl9yolQREWoiCo5+WM54YMeSWu0rzBsLAjCoFpIX2cWcICsdPAnyyjIMPmuGt/uUaIWmq/ZRAsqkOW0sqxUMggjytNCtvdCyfQOcKsEHpBKrA6z+8l/3Z1RQFwan+VPs"
+          ],
+          "certificate": [
+            "MIICpTCCAY0CBgGQcJfMUjANBgkqhkiG9w0BAQsFADAWMRQwEgYDVQQDDAtXZWF0aGVyU2hvcDAeFw0yNDA3MDEyMzE2NTRaFw0zNDA3MDEyMzE4MzRaMBYxFDASBgNVBAMMC1dlYXRoZXJTaG9wMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyJtAKWr1DdQmh9Nxp2LUGOrc5OA+rdXkV6+kOT21wVsIP/1bg6HekqfMySZhIxlALfegc90j0mrqkolb5s7axotTwwABwIvgxW5hHIQ4huntiZUYPUuf4m51dwyLs/GM1gSbzs9ciBKC5i4S21CQzuGp0QHpyOOn1kQZd0vYSGjpG3ewMYphJEfd60TQP74RcqASNoOaS3lU7+5SCQuiff1fSZYqYvIFmK3rcNrauTSryx6rh935ODSdYzQN0XA6g1WJK2hbBlBJJzeAj/CXXcBaw7aB1AoC7kjJ7XaYmHdC+7zIYhvNKcGtFhrMjoOVnJM9PiRMrk7ous7XAmKc6QIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQAeDhADaUkVzu1o8CvCfU9oa6hGsJa+2qFeUPQnG7HZAQ07MjQ/RZgMMOmdhspZIuaf+Yrx/My8VDphKzNtb2eNHgFVVQDy1F1jVy9z+t7xCwX3UfjtVNMp3tMmzWUEi0pckW0mq4Bz3w0+dKPw8z0K2c19dVN1NHDViqFghB+77tO8JguwTDE8fkmXjLixDCcenBCPXjxNWmhXgOMF1wKhlq1h0+SaKt/F2P/WzyoYu6tz8qVysQvv4knB/HEGjSji+DN+uJFE4RJG+B5X+vp5LHvlYKIROQ7/aSzvCjx7zrslmcTsSTL3F1k2Ox2Hz+rGIcA8sGqbj+W5+nKxRbad"
+          ],
+          "priority": [
+            "100"
+          ]
         }
       },
       {
@@ -1488,9 +1719,15 @@
         "providerId": "aes-generated",
         "subComponents": {},
         "config": {
-          "kid": [ "eb1853e7-ac8c-4e8f-8b4f-9ea28a71da76" ],
-          "secret": [ "Jges9iPdpfx0aivf3RUUpw" ],
-          "priority": [ "100" ]
+          "kid": [
+            "eb1853e7-ac8c-4e8f-8b4f-9ea28a71da76"
+          ],
+          "secret": [
+            "Jges9iPdpfx0aivf3RUUpw"
+          ],
+          "priority": [
+            "100"
+          ]
         }
       },
       {
@@ -1499,10 +1736,18 @@
         "providerId": "rsa-enc-generated",
         "subComponents": {},
         "config": {
-          "privateKey": [ "MIIEowIBAAKCAQEAlP+NrT2KVZpdrbPoTsMO7MqeXYDeJNl7IXjY0hCb7p1iB6YLOr/lA5ryk/CIHI05HRt+AEYFac87mb51SEvAa9cHjQ00v7t6hoYV1esyRmB0Nnf8AAEq9GoZxX9nUsIMcExQ3gHkF56kidYtjQSgl5SlwgdvlsjRiDP9ZJlsWTBb+8v0OCCbQLZFl93IlTZ7QlaxXoB0dCuuLNyBpELFbc0+JeB+1P/Dw5azUKGdp3ng2K9IrtDBiMh+KicpLZeBpUlqdKqyI2WvwruL1SlqH/ymWCxseRH0Z9VZ30MfW8C5fHq3qnLQp0OWDa7Re/pRbCZPabivDkZCtuWUeAVbRwIDAQABAoIBAAoioBaKuyA7kefA9yp0Zk2BMuiVXYcQLCoIuGcBrjm7BvISP21NpFxsa9fYYsneaWYrepS2LqQV7q30oLG8RWiQhfj4TwBD1n/UGyQkDZVv9jfGTaQKcEuT9BDVK8gbXxE8f7u6UTOyHOsrYInZKLtm5yedrd+J5YboUnJHZXFjmCpuyap8zJQdczUpZeLkj4bRqEHYlM1a5vfMFpr2+k4/Nqo36CCaGzIcwtYxnC002rL7ra9MaR1fy5KHtcoYQeePuPvXu1UxBU01+W1QmIsw+KmXftdtWYAMcVFkHDs+22h3mCxRhQqcxmL1LUP9FfGzrWiX4eTduw4YOkzO7+ECgYEAx732U2G7Qdp1uXsVGE7ceFcrpl/LOTaL8eEtULBiFRdrn5LOTAptpoDPB8vYCwIQSNrBWXNqTiDubOBcL7sumBK2i4Omtzk/USuMcJmSiMcHaANa/ZNK9nqtwMACqXpIPEkpofzfgBSaRYY1KxaWLbepyLjqviADV98zOI4qY28CgYEAvvbNd+C0pi5u/EkUxhRdxwCxICfkDYjArcjPU3ZBjIyAzmJ08wU+3CDm2sgts1TX+D7MPsRLqsaM8vMB+BR1xo3FfP/nqNvjYkChACtHhvkWGVE/qf3/53NNa4lKeVz8h1iV18dvLICj+V+lvUyQPuER4cA8Kzs7dObl52V6OakCgYB5bSkvPW2aNhV1QbbsRRzQZ6XYicnAqUFgNRTYRbIKwmch5hxVq81G+G1jfu+CmamOsLX0DC7m+iwXsjk4pyFHP7ELlWgnYLz2OnQxC5tCXURKXifVmdJrjt7MG65Cm10IkS2nFVRFx8CVXWY7IIsBlfK4XHoQROPjaoP38K0iLwKBgQCho6RdkR04ANu+vllQJNMP7B0Be+KENjnpn60mF1X6kr9AcoRNZCZGC698hq5wOiOoo/ccNelafz+1MU58X00lqMD+QlojSySX+N6OlxOvQs2a1nQN/sqKbcWdfZNFURkLs0b6Y3xN7gFdxsEyj0kVgEszjBUh/rwgAoWdrP6dKQKBgD2b7GG1/TPTBfOvvE7q7xa5IlTMUbBU2yY8H6XvDgfG5KUXXFpqINTOE4OjuyVwJRwE2/GQGayfZvfa+LGkW8Hy6Iz/vaa1Brjodza/2PblM5v1t96xA0WQDime8okJN0q7ocbLfQnT0+3TVMbvCjeBtOqmMOJT3EijpAqVbR6N" ],
-          "certificate": [ "MIICpTCCAY0CBgGQcJfM/jANBgkqhkiG9w0BAQsFADAWMRQwEgYDVQQDDAtXZWF0aGVyU2hvcDAeFw0yNDA3MDEyMzE2NTVaFw0zNDA3MDEyMzE4MzVaMBYxFDASBgNVBAMMC1dlYXRoZXJTaG9wMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlP+NrT2KVZpdrbPoTsMO7MqeXYDeJNl7IXjY0hCb7p1iB6YLOr/lA5ryk/CIHI05HRt+AEYFac87mb51SEvAa9cHjQ00v7t6hoYV1esyRmB0Nnf8AAEq9GoZxX9nUsIMcExQ3gHkF56kidYtjQSgl5SlwgdvlsjRiDP9ZJlsWTBb+8v0OCCbQLZFl93IlTZ7QlaxXoB0dCuuLNyBpELFbc0+JeB+1P/Dw5azUKGdp3ng2K9IrtDBiMh+KicpLZeBpUlqdKqyI2WvwruL1SlqH/ymWCxseRH0Z9VZ30MfW8C5fHq3qnLQp0OWDa7Re/pRbCZPabivDkZCtuWUeAVbRwIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQAUIS+ce3NPCSk7iiA4vzm1hGrEq7Q+1CwE9hq/p8oKowOEVvg68tE+yzNsYw6qM+KKdzQfmiVeT8skDhNwL+5+Oxsg9dw7KW1me+g/pjiFx1eXt/rHN5aVDz7/F3QAP0G/CUF6dVNh0ggoGhwAH74iH91apmJgDUEBVzwaYCrHDJ81nWZOGZm4MF6FFvc8Kwf/+KEefL7psH5I4BqS+gRaPFWjBnABS7WkJ879gv0Q3tHE4KXF1b3eudGFrW4rG048pqNJgxAXdoDqFR5qIi9pfuE+HCmuhPv2Xq+I7S4PpUYnUM7o0Ng+1hJsRLhiG0Kmcepy7thiJJI619miVXdF" ],
-          "priority": [ "100" ],
-          "algorithm": [ "RSA-OAEP" ]
+          "privateKey": [
+            "MIIEowIBAAKCAQEAlP+NrT2KVZpdrbPoTsMO7MqeXYDeJNl7IXjY0hCb7p1iB6YLOr/lA5ryk/CIHI05HRt+AEYFac87mb51SEvAa9cHjQ00v7t6hoYV1esyRmB0Nnf8AAEq9GoZxX9nUsIMcExQ3gHkF56kidYtjQSgl5SlwgdvlsjRiDP9ZJlsWTBb+8v0OCCbQLZFl93IlTZ7QlaxXoB0dCuuLNyBpELFbc0+JeB+1P/Dw5azUKGdp3ng2K9IrtDBiMh+KicpLZeBpUlqdKqyI2WvwruL1SlqH/ymWCxseRH0Z9VZ30MfW8C5fHq3qnLQp0OWDa7Re/pRbCZPabivDkZCtuWUeAVbRwIDAQABAoIBAAoioBaKuyA7kefA9yp0Zk2BMuiVXYcQLCoIuGcBrjm7BvISP21NpFxsa9fYYsneaWYrepS2LqQV7q30oLG8RWiQhfj4TwBD1n/UGyQkDZVv9jfGTaQKcEuT9BDVK8gbXxE8f7u6UTOyHOsrYInZKLtm5yedrd+J5YboUnJHZXFjmCpuyap8zJQdczUpZeLkj4bRqEHYlM1a5vfMFpr2+k4/Nqo36CCaGzIcwtYxnC002rL7ra9MaR1fy5KHtcoYQeePuPvXu1UxBU01+W1QmIsw+KmXftdtWYAMcVFkHDs+22h3mCxRhQqcxmL1LUP9FfGzrWiX4eTduw4YOkzO7+ECgYEAx732U2G7Qdp1uXsVGE7ceFcrpl/LOTaL8eEtULBiFRdrn5LOTAptpoDPB8vYCwIQSNrBWXNqTiDubOBcL7sumBK2i4Omtzk/USuMcJmSiMcHaANa/ZNK9nqtwMACqXpIPEkpofzfgBSaRYY1KxaWLbepyLjqviADV98zOI4qY28CgYEAvvbNd+C0pi5u/EkUxhRdxwCxICfkDYjArcjPU3ZBjIyAzmJ08wU+3CDm2sgts1TX+D7MPsRLqsaM8vMB+BR1xo3FfP/nqNvjYkChACtHhvkWGVE/qf3/53NNa4lKeVz8h1iV18dvLICj+V+lvUyQPuER4cA8Kzs7dObl52V6OakCgYB5bSkvPW2aNhV1QbbsRRzQZ6XYicnAqUFgNRTYRbIKwmch5hxVq81G+G1jfu+CmamOsLX0DC7m+iwXsjk4pyFHP7ELlWgnYLz2OnQxC5tCXURKXifVmdJrjt7MG65Cm10IkS2nFVRFx8CVXWY7IIsBlfK4XHoQROPjaoP38K0iLwKBgQCho6RdkR04ANu+vllQJNMP7B0Be+KENjnpn60mF1X6kr9AcoRNZCZGC698hq5wOiOoo/ccNelafz+1MU58X00lqMD+QlojSySX+N6OlxOvQs2a1nQN/sqKbcWdfZNFURkLs0b6Y3xN7gFdxsEyj0kVgEszjBUh/rwgAoWdrP6dKQKBgD2b7GG1/TPTBfOvvE7q7xa5IlTMUbBU2yY8H6XvDgfG5KUXXFpqINTOE4OjuyVwJRwE2/GQGayfZvfa+LGkW8Hy6Iz/vaa1Brjodza/2PblM5v1t96xA0WQDime8okJN0q7ocbLfQnT0+3TVMbvCjeBtOqmMOJT3EijpAqVbR6N"
+          ],
+          "certificate": [
+            "MIICpTCCAY0CBgGQcJfM/jANBgkqhkiG9w0BAQsFADAWMRQwEgYDVQQDDAtXZWF0aGVyU2hvcDAeFw0yNDA3MDEyMzE2NTVaFw0zNDA3MDEyMzE4MzVaMBYxFDASBgNVBAMMC1dlYXRoZXJTaG9wMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlP+NrT2KVZpdrbPoTsMO7MqeXYDeJNl7IXjY0hCb7p1iB6YLOr/lA5ryk/CIHI05HRt+AEYFac87mb51SEvAa9cHjQ00v7t6hoYV1esyRmB0Nnf8AAEq9GoZxX9nUsIMcExQ3gHkF56kidYtjQSgl5SlwgdvlsjRiDP9ZJlsWTBb+8v0OCCbQLZFl93IlTZ7QlaxXoB0dCuuLNyBpELFbc0+JeB+1P/Dw5azUKGdp3ng2K9IrtDBiMh+KicpLZeBpUlqdKqyI2WvwruL1SlqH/ymWCxseRH0Z9VZ30MfW8C5fHq3qnLQp0OWDa7Re/pRbCZPabivDkZCtuWUeAVbRwIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQAUIS+ce3NPCSk7iiA4vzm1hGrEq7Q+1CwE9hq/p8oKowOEVvg68tE+yzNsYw6qM+KKdzQfmiVeT8skDhNwL+5+Oxsg9dw7KW1me+g/pjiFx1eXt/rHN5aVDz7/F3QAP0G/CUF6dVNh0ggoGhwAH74iH91apmJgDUEBVzwaYCrHDJ81nWZOGZm4MF6FFvc8Kwf/+KEefL7psH5I4BqS+gRaPFWjBnABS7WkJ879gv0Q3tHE4KXF1b3eudGFrW4rG048pqNJgxAXdoDqFR5qIi9pfuE+HCmuhPv2Xq+I7S4PpUYnUM7o0Ng+1hJsRLhiG0Kmcepy7thiJJI619miVXdF"
+          ],
+          "priority": [
+            "100"
+          ],
+          "algorithm": [
+            "RSA-OAEP"
+          ]
         }
       },
       {
@@ -1511,16 +1756,22 @@
         "providerId": "hmac-generated",
         "subComponents": {},
         "config": {
-          "kid": [ "f43f7c3d-e27c-4a86-bda1-e1f9fa0b2c0b" ],
-          "secret": [ "FAyCBV9_zIF2oQO0XqgwCJz09iJDMKPHORhWI1ZV4OA9cLFVJCA-z4tEXq2QNU48xDMwv_z_UYIEm73nnJEypuaVwacu6N7jexaKjhqROYidQyPzXAr7QwD6Du1LaLdCAHaBo7rRP3Pl5fDmcX6K3C1Qe1OK86fkZVuD_2TX6No" ],
-          "priority": [ "100" ],
-          "algorithm": [ "HS512" ]
+          "kid": [
+            "f43f7c3d-e27c-4a86-bda1-e1f9fa0b2c0b"
+          ],
+          "secret": [
+            "FAyCBV9_zIF2oQO0XqgwCJz09iJDMKPHORhWI1ZV4OA9cLFVJCA-z4tEXq2QNU48xDMwv_z_UYIEm73nnJEypuaVwacu6N7jexaKjhqROYidQyPzXAr7QwD6Du1LaLdCAHaBo7rRP3Pl5fDmcX6K3C1Qe1OK86fkZVuD_2TX6No"
+          ],
+          "priority": [
+            "100"
+          ],
+          "algorithm": [
+            "HS512"
+          ]
         }
       }
     ]
   },
-  "internationalizationEnabled": false,
-  "supportedLocales": [],
   "authenticationFlows": [
     {
       "id": "57c6972a-8262-4fdd-9a3d-6454f7e4804d",

@@ -1,32 +1,60 @@
 @using AspireAppTemplate.Web.Infrastructure.Themes
 @using AspireAppTemplate.Web.Infrastructure.Services
+@using AspireAppTemplate.Web.Infrastructure.Settings
+@using AspireAppTemplate.Web.Components.ThemeManager
 @implements IDisposable
 @inherits LayoutComponentBase
 @inject LayoutService LayoutService
 
-<MudThemeProvider @ref="_mudThemeProvider" Theme="_theme" @bind-IsDarkMode="LayoutService.IsDarkMode" />
+<MudThemeProvider @ref="_mudThemeProvider" Theme="_theme" @bind-IsDarkMode="_isDarkMode" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<MudLayout>
+<CascadingValue Value="this">
+    <ThemeDrawer @bind-ThemeDrawerOpen="_themeDrawerOpen" 
+                 ThemePreference="_themePreference"
+                 ThemePreferenceChanged="ThemePreferenceChanged" />
     @Body
-</MudLayout>
+</CascadingValue>
 
 @code {
     private MudThemeProvider? _mudThemeProvider;
     private AppTheme _theme = new();
+    private bool _isDarkMode;
+    private bool _themeDrawerOpen;
+    private UserPreferences _themePreference = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         LayoutService.MajorUpdateOccurred += LayoutServiceOnMajorUpdateOccurred;
+        
+        _themePreference = await LayoutService.GetPreferenceAsync();
+        _isDarkMode = _themePreference.IsDarkMode;
+        LayoutService.ApplyUserPreferences(_theme, _themePreference);
     }
 
     private async void LayoutServiceOnMajorUpdateOccurred(object? sender, EventArgs e)
     {
-        var prefs = await LayoutService.GetPreferenceAsync();
-        LayoutService.ApplyUserPreferences(_theme, prefs);
+        _themePreference = await LayoutService.GetPreferenceAsync();
+        _isDarkMode = _themePreference.IsDarkMode;
+        LayoutService.ApplyUserPreferences(_theme, _themePreference);
         await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task ThemePreferenceChanged(UserPreferences preference)
+    {
+        _themePreference = preference;
+        _isDarkMode = preference.IsDarkMode;
+        LayoutService.ApplyUserPreferences(_theme, preference);
+        await LayoutService.SetPreferenceAsync(preference);
+        StateHasChanged();
+    }
+
+    public void OpenThemeDrawer()
+    {
+        _themeDrawerOpen = true;
+        StateHasChanged();
     }
 
     public void Dispose()

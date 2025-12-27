@@ -1,0 +1,57 @@
+<MudExpansionPanel HideIcon="true">
+    <TitleContent>
+        <div class="d-flex">
+            <MudText Class="mt-1">自訂表格樣式</MudText>
+            <MudAvatar Color="Color.Primary" Class="d-flex ml-auto"
+                style="width: 30px;height:30px;font-size:small!important">T
+            </MudAvatar>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        <div @onclick:stopPropagation="true">
+            <MudSwitch T="bool" Label="緊湊" Color="Color.Info" @oninput="@ToggleDenseSwitch" @bind-Value="@IsDense" />
+            <MudSwitch T="bool" Label="條紋" Color="Color.Info" @oninput="@ToggleStripedSwitch"
+                       @bind-Value="@IsStriped" />
+            <MudSwitch T="bool" Label="邊框" Color="Color.Info" @oninput="@ToggleBorderedSwitch"
+                       @bind-Value="@HasBorder" />
+            <MudSwitch T="bool" Label="交錯顯示" Color="Color.Info" @oninput="@ToggleHoverableSwitch"
+                       @bind-Value="@IsHoverable" />
+        </div>
+    </ChildContent>
+</MudExpansionPanel>
+
+@code {
+    [Parameter] public bool IsDense { get; set; }
+    [Parameter] public bool IsStriped { get; set; }
+    [Parameter] public bool HasBorder { get; set; }
+    [Parameter] public bool IsHoverable { get; set; }
+
+    [Parameter] public EventCallback<bool> OnDenseSwitchToggled { get; set; }
+    [Parameter] public EventCallback<bool> OnStripedSwitchToggled { get; set; }
+    [Parameter] public EventCallback<bool> OnBorderdedSwitchToggled { get; set; }
+    [Parameter] public EventCallback<bool> OnHoverableSwitchToggled { get; set; }
+
+    private async Task ToggleDenseSwitch(ChangeEventArgs e)
+    {
+        if (bool.TryParse(e.Value?.ToString(), out var value))
+            await OnDenseSwitchToggled.InvokeAsync(value);
+    }
+
+    private async Task ToggleStripedSwitch(ChangeEventArgs e)
+    {
+        if (bool.TryParse(e.Value?.ToString(), out var value))
+            await OnStripedSwitchToggled.InvokeAsync(value);
+    }
+
+    private async Task ToggleBorderedSwitch(ChangeEventArgs e)
+    {
+        if (bool.TryParse(e.Value?.ToString(), out var value))
+            await OnBorderdedSwitchToggled.InvokeAsync(value);
+    }
+
+    private async Task ToggleHoverableSwitch(ChangeEventArgs e)
+    {
+        if (bool.TryParse(e.Value?.ToString(), out var value))
+            await OnHoverableSwitchToggled.InvokeAsync(value);
+    }
+}

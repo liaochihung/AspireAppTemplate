@@ -38,7 +38,7 @@ public class LayoutService
         }
         
         // Return default with drawer open
-        return new UserPreferences { IsDrawerOpen = true, IsDarkMode = false, PrimaryColor = "#409EFF", BorderRadius = 4 };
+        return new UserPreferences();
     }
 
     public async Task<bool> ToggleDrawerAsync()
@@ -80,7 +80,7 @@ public class LayoutService
         await SetPreferenceAsync(prefs);
     }
 
-    private async Task SetPreferenceAsync(UserPreferences prefs)
+    public async Task SetPreferenceAsync(UserPreferences prefs)
     {
         await _localStorageService.SetItemAsync(StorageKey, prefs);
         OnMajorUpdateOccurred();
@@ -89,7 +89,10 @@ public class LayoutService
     public void ApplyUserPreferences(MudTheme theme, UserPreferences prefs)
     {
         theme.PaletteLight.Primary = prefs.PrimaryColor;
+        theme.PaletteLight.Secondary = prefs.SecondaryColor;
         theme.PaletteDark.Primary = prefs.PrimaryColor;
+        theme.PaletteDark.Secondary = prefs.SecondaryColor;
         theme.LayoutProperties.DefaultBorderRadius = $"{prefs.BorderRadius}px";
     }
 }
+

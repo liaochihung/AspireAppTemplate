@@ -4,45 +4,48 @@
 @layout BaseLayout
 @inject LayoutService LayoutService
 
-<MudAppBar Color="Color.Surface" Elevation="0">
-    <MudTooltip Text="Toggle Drawer">
-        <MudIconButton Icon="@Icons.Material.Rounded.Notes" Color="Color.Inherit" Edge="Edge.Start"
-            OnClick="@DrawerToggle" />
-    </MudTooltip>
-    <MudButton Variant="Variant.Text" Color="Color.Transparent" Href="/" DropShadow="false">
-        首頁
-    </MudButton>
-    <MudSpacer />
-    
-    <MudTooltip Text="@(LayoutService.IsDarkMode ? "淺色模式" : "深色模式")">
-        <MudIconButton Icon="@(LayoutService.IsDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)"
-                       Color="Color.Inherit" OnClick="@ToggleDarkMode" />
-    </MudTooltip>
-    
-    <MudTooltip Text="主題設定">
-        <MudIconButton Icon="@Icons.Material.Filled.Palette" Color="Color.Inherit" 
-                       OnClick="@(() => _themeDrawerOpen = true)" />
-    </MudTooltip>
+<MudLayout>
+    <MudAppBar Color="Color.Surface" Elevation="0">
+        <MudTooltip Text="Toggle Drawer">
+            <MudIconButton Icon="@Icons.Material.Rounded.Notes" Color="Color.Inherit" Edge="Edge.Start"
+                OnClick="@DrawerToggle" />
+        </MudTooltip>
+        <MudButton Variant="Variant.Text" Color="Color.Transparent" Href="/" DropShadow="false">
+            首頁
+        </MudButton>
+        <MudSpacer />
+        
+        <MudTooltip Text="@(LayoutService.IsDarkMode ? "淺色模式" : "深色模式")">
+            <MudIconButton Icon="@(LayoutService.IsDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)"
+                           Color="Color.Inherit" OnClick="@ToggleDarkMode" />
+        </MudTooltip>
+        
+        <MudTooltip Text="主題設定">
+            <MudIconButton Icon="@Icons.Material.Filled.Palette" Color="Color.Inherit" 
+                           OnClick="@OpenThemeDrawer" />
+        </MudTooltip>
 
-    <LoginDisplay />
-</MudAppBar>
+        <LoginDisplay />
+    </MudAppBar>
 
-<MudDrawer @bind-Open="_drawerOpen" Variant="DrawerVariant.Mini" Outlined ClipMode="DrawerClipMode.Never">
-    <NavMenu IsOpen="_drawerOpen" />
-</MudDrawer>
+    <MudDrawer @bind-Open="_drawerOpen" Variant="DrawerVariant.Mini" Outlined 
+               ClipMode="DrawerClipMode.Always" Overlay="false">
+        <NavMenu IsOpen="_drawerOpen" />
+    </MudDrawer>
 
-<ThemeDrawer @bind-Open="_themeDrawerOpen" />
-
-<MudMainContent>
-    <MudContainer MaxWidth="MaxWidth.False" Class="px-6 py-6">
-        @Body
-    </MudContainer>
-</MudMainContent>
+    <MudMainContent Class="pt-16">
+        <MudContainer MaxWidth="MaxWidth.False" Class="px-6 py-6">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
 
 @code {
     private bool _drawerOpen;
     private bool _isDarkMode;
-    private bool _themeDrawerOpen;
+
+    [CascadingParameter]
+    public BaseLayout? ParentLayout { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -62,6 +65,11 @@
     {
         _isDarkMode = !_isDarkMode;
         await LayoutService.SetDarkModeAsync(_isDarkMode);
+    }
+
+    private void OpenThemeDrawer()
+    {
+        ParentLayout?.OpenThemeDrawer();
     }
 
     private void OnMajorUpdateOccurred(object? sender, EventArgs e)
