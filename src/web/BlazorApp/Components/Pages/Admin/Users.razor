@@ -94,7 +94,9 @@
         if (result == true)
         {
             try {
-                if(string.IsNullOrEmpty(user.Id)) throw new Exception("User ID is missing");
+                if (string.IsNullOrEmpty(user.Id)) 
+                    throw new InvalidOperationException("User ID is missing");
+                    
                 await IdentityClient.DeleteUserAsync(user.Id);
                 Snackbar.Add("User deleted successfully", Severity.Success);
                 await LoadUsers();

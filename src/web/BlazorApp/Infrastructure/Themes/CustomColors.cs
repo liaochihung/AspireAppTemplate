@@ -1,10 +1,11 @@
 using MudBlazor;
+using System.Collections.ObjectModel;
 
 namespace AspireAppTemplate.Web.Infrastructure.Themes;
 
 public static class CustomColors
 {
-    public static readonly List<string> ThemeColors = new()
+    public static IReadOnlyList<string> ThemeColors { get; } = new ReadOnlyCollection<string>(new List<string>
     {
         Light.Primary,
         Colors.Blue.Default,
@@ -18,7 +19,7 @@ public static class CustomColors
         Colors.LightBlue.Default,
         Colors.Cyan.Default,
         Colors.Green.Default,
-    };
+    });
 
     public static class Light
     {

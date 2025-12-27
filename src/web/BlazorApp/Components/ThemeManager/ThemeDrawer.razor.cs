@@ -22,7 +22,7 @@ public partial class ThemeDrawer
     [Parameter]
     public EventCallback<UserPreferences> ThemePreferenceChanged { get; set; }
 
-    private readonly List<string> _colors = CustomColors.ThemeColors;
+    private readonly IReadOnlyList<string> _colors = CustomColors.ThemeColors;
 
     protected override void OnParametersSet()
     {

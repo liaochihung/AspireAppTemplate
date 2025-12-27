@@ -71,6 +71,17 @@ if (app.Environment.IsDevelopment()) { app.UseSwaggerGen(); }
 
 app.MapDefaultEndpoints();
 
-try { Log.Information("Starting AspireAppTemplate.ApiService"); app.Run(); }
-catch (Exception ex) { Log.Fatal(ex, "AspireAppTemplate.ApiService terminated unexpectedly"); }
-finally { Log.Information("AspireAppTemplate.ApiService is shutting down"); Log.CloseAndFlush(); }
+try 
+{ 
+    Log.Information("Starting AspireAppTemplate.ApiService"); 
+    await app.RunAsync(); 
+}
+catch (Exception ex) 
+{ 
+    Log.Fatal(ex, "AspireAppTemplate.ApiService terminated unexpectedly"); 
+}
+finally 
+{ 
+    Log.Information("AspireAppTemplate.ApiService is shutting down"); 
+    await Log.CloseAndFlushAsync(); 
+}

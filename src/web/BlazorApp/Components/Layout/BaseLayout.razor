@@ -6,7 +6,7 @@
 @inherits LayoutComponentBase
 @inject LayoutService LayoutService
 
-<MudThemeProvider @ref="_mudThemeProvider" Theme="_theme" @bind-IsDarkMode="_isDarkMode" />
+<MudThemeProvider Theme="_theme" @bind-IsDarkMode="_isDarkMode" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
@@ -19,8 +19,7 @@
 </CascadingValue>
 
 @code {
-    private MudThemeProvider? _mudThemeProvider;
-    private AppTheme _theme = new();
+    private readonly AppTheme _theme = new();
     private bool _isDarkMode;
     private bool _themeDrawerOpen;
     private UserPreferences _themePreference = new();

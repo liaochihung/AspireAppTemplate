@@ -23,12 +23,19 @@ public class IdentityService
     private string? _cachedToken;
     private DateTime _tokenExpiry = DateTime.MinValue;
 
+    /// <summary>
+    /// Creates an instance of IdentityService
+    /// </summary>
+    /// <param name="httpClient">HTTP client for making requests</param>
+    /// <param name="options">Keycloak configuration options</param>
+    /// <exception cref="InvalidOperationException">Thrown when Keycloak BaseUrl is not configured</exception>
     public IdentityService(HttpClient httpClient, IOptions<KeycloakConfiguration> options)
     {
         _httpClient = httpClient;
         _config = options.Value;
         
-        if (string.IsNullOrEmpty(_config.BaseUrl)) throw new ArgumentNullException("Keycloak BaseUrl is not configured.");
+        if (string.IsNullOrEmpty(_config.BaseUrl)) 
+            throw new InvalidOperationException("Keycloak BaseUrl is not configured.");
         
         _httpClient.BaseAddress = new Uri(_config.BaseUrl.TrimEnd('/') + "/");
     }

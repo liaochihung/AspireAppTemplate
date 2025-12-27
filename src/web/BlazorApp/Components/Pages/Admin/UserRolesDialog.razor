@@ -18,10 +18,7 @@
                 <MudSelect T="string" Label="Select Role" @bind-Value="_selectedRole" AnchorOrigin="Origin.BottomCenter">
                     @foreach (var role in _availableRoles)
                     {
-                        if (!_assignedRoles.Any(r => r.Name == role.Name))
-                        {
-                            <MudSelectItem Value="@role.Name">@role.Name</MudSelectItem>
-                        }
+                        <MudSelectItem Value="@role.Name">@role.Name</MudSelectItem>
                     }
                 </MudSelect>
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddRole" Disabled="@string.IsNullOrEmpty(_selectedRole)">Add</MudButton>
@@ -29,9 +26,9 @@
 
             <MudText Typo="Typo.body2">Assigned Roles:</MudText>
             <MudChipSet T="string" AllClosable="true" OnClose="RemoveRole">
-                @foreach (var role in _assignedRoles)
+                @foreach (var role in _assignedRoles.Select(r => r.Name))
                 {
-                    <MudChip Text="@role.Name" Value="@role.Name" Color="Color.Info" />
+                    <MudChip Text="@role" Value="@role" Color="Color.Info" />
                 }
             </MudChipSet>
         }
@@ -60,13 +57,19 @@
         _loading = true;
         try
         {
+            if (string.IsNullOrEmpty(User.Id))
+            {
+                Snackbar.Add("User ID is missing", Severity.Error);
+                return;
+            }
+
             var assignedTask = IdentityClient.GetUserRolesAsync(User.Id);
             var availableTask = IdentityClient.GetRolesAsync();
 
             await Task.WhenAll(assignedTask, availableTask);
 
             _assignedRoles = (await assignedTask).ToList();
-            _availableRoles = (await availableTask).ToList();
+            _availableRoles = (await availableTask).Where(r => _assignedRoles.All(ar => ar.Name != r.Name)).ToList();
         }
         catch (Exception ex)
         {
@@ -81,6 +84,11 @@
     private async Task AddRole()
     {
         if (string.IsNullOrEmpty(_selectedRole)) return;
+        if (string.IsNullOrEmpty(User.Id))
+        {
+            Snackbar.Add("User ID is missing", Severity.Error);
+            return;
+        }
 
         try
         {
@@ -97,7 +105,19 @@
 
     private async Task RemoveRole(MudChip<string> chip)
     {
+        if (string.IsNullOrEmpty(User.Id))
+        {
+            Snackbar.Add("User ID is missing", Severity.Error);
+            return;
+        }
+
         var roleName = chip.Value;
+        if (string.IsNullOrEmpty(roleName))
+        {
+            Snackbar.Add("Role name is missing", Severity.Error);
+            return;
+        }
+
         try
         {
             await IdentityClient.RemoveRoleAsync(User.Id, roleName);
