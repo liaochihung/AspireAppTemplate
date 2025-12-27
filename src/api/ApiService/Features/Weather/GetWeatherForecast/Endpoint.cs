@@ -11,7 +11,7 @@ public class Endpoint : EndpointWithoutRequest<IEnumerable<WeatherForecast>>
     public override void Configure()
     {
         Get("/weatherforecast");
-        Options(x => x.RequireAuthorization());
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

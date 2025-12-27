@@ -7,14 +7,14 @@
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 
-<MudText Typo="Typo.h5" GutterBottom="true">Role Management</MudText>
+<MudText Typo="Typo.h5" GutterBottom="true">角色管理</MudText>
 
-<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="CreateRole" Class="mb-4">Create Role</MudButton>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="CreateRole" Class="mb-4">新增角色</MudButton>
 
 <MudDataGrid Items="@_roles" Loading="@_loading" Filterable="true">
     <Columns>
-        <PropertyColumn Property="x => x.Name" Title="Name" />
-        <PropertyColumn Property="x => x.Description" Title="Description" />
+        <PropertyColumn Property="x => x.Name" Title="名稱" />
+        <PropertyColumn Property="x => x.Description" Title="描述" />
         <TemplateColumn CellClass="d-flex justify-end">
             <CellTemplate>
                 <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => DeleteRole(context.Item))" />
@@ -38,7 +38,7 @@
         try {
             _roles = await IdentityClient.GetRolesAsync();
         } catch (Exception ex) {
-            Snackbar.Add($"Error loading roles: {ex.Message}", Severity.Error);
+            Snackbar.Add($"角色載入失敗: {ex.Message}", Severity.Error);
         } finally {
             _loading = false;
         }
@@ -46,16 +46,17 @@
 
     private async Task CreateRole()
     {
-        var dialog = await DialogService.ShowAsync<CreateRoleDialog>("Create Role");
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<CreateRoleDialog>("Create Role", options);
         var result = await dialog.Result;
         if (result is not null && !result.Canceled && result.Data is KeycloakRole role)
         {
             try {
                 await IdentityClient.CreateRoleAsync(role);
-                Snackbar.Add("Role created successfully", Severity.Success);
+                Snackbar.Add("角色已新增", Severity.Success);
                 await LoadRoles();
             } catch (Exception ex) {
-                Snackbar.Add($"Error creating role: {ex.Message}", Severity.Error);
+                Snackbar.Add($"角色新增失敗: {ex.Message}", Severity.Error);
             }
         }
     }
@@ -63,18 +64,18 @@
     private async Task DeleteRole(KeycloakRole role)
     {
          var result = await DialogService.ShowMessageBox(
-            "Delete Role", 
-            $"Are you sure you want to delete {role.Name}?", 
-            yesText: "Delete", cancelText: "Cancel");
+            "刪除角色", 
+            $"確定要刪除 {role.Name} 嗎?", 
+            yesText: "刪除", cancelText: "取消");
 
         if (result == true)
         {
              try {
                 await IdentityClient.DeleteRoleAsync(role.Name);
-                Snackbar.Add("Role deleted successfully", Severity.Success);
+                Snackbar.Add("角色已刪除", Severity.Success);
                 await LoadRoles();
             } catch (Exception ex) {
-                Snackbar.Add($"Error deleting role: {ex.Message}", Severity.Error);
+                Snackbar.Add($"角色刪除失敗: {ex.Message}", Severity.Error);
             }
         }
     }

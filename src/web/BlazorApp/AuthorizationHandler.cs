@@ -7,16 +7,16 @@ public class AuthorizationHandler(IHttpContextAccessor httpContextAccessor) : De
     {
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var httpContext = httpContextAccessor.HttpContext ??
-            throw new InvalidOperationException("""
-                No HttpContext available from the IHttpContextAccessor.
-                """);
+            var httpContext = httpContextAccessor.HttpContext;
 
-            var accessToken = await httpContext.GetTokenAsync("access_token");
-
-            if (!string.IsNullOrWhiteSpace(accessToken))
+            if (httpContext is not null)
             {
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                var accessToken = await httpContext.GetTokenAsync("access_token");
+
+                if (!string.IsNullOrWhiteSpace(accessToken))
+                {
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                }
             }
 
             return await base.SendAsync(request, cancellationToken);

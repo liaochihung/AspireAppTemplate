@@ -1,21 +1,15 @@
 @page "/weather"
-@using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.AspNetCore.Authorization
 @using AspireAppTemplate.Shared
 @attribute [StreamRendering(true)]
 @attribute [OutputCache(Duration = 5)]
-@attribute [Authorize(Policy = AppPolicies.CanViewWeather)]
 @inject WeatherApiClient WeatherApi
-@inject AuthenticationStateProvider AuthenticationStateProvider
-@inject IAuthorizationService AuthorizationService
 
 <PageTitle>Weather</PageTitle>
 
 <MudText Typo="Typo.h4" GutterBottom="true">Weather</MudText>
-<MudText Typo="Typo.body1" Class="mb-4">This component demonstrates showing data loaded from a backend API service.</MudText>
+<MudText Typo="Typo.body1" Class="mb-4">This component demonstrates showing data loaded from a backend API service. test</MudText>
 
-<AuthorizeView>
-    <Authorized>
+
         @if (forecasts == null)
         {
             <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
@@ -37,27 +31,12 @@
                 </RowTemplate>
             </MudTable>
         }
-    </Authorized>
-    <NotAuthorized>
-        <MudAlert Severity="Severity.Info">
-            Please <MudLink Href="authentication/login">log in</MudLink> to see the weather forecast.
-        </MudAlert>
-    </NotAuthorized>
-</AuthorizeView>
-
+   
 @code {
     private WeatherForecast[]? forecasts;
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
-        var authResult = await AuthorizationService.AuthorizeAsync(user, AppPolicies.CanViewWeather);
-
-        if (authResult.Succeeded)
-        {
-            forecasts = await WeatherApi.GetWeatherAsync();
-        }
+        forecasts = await WeatherApi.GetWeatherAsync();
     }
 }

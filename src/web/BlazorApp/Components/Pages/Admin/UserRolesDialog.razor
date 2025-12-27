@@ -5,36 +5,75 @@
 @inject ISnackbar Snackbar
 
 <MudDialog>
-    <DialogContent>
-        <MudText Typo="Typo.subtitle1" Class="mb-4">Manage roles for <b>@User.Username</b></MudText>
-
-        @if (_loading)
-        {
-            <MudProgressCircular Indeterminate="true" />
-        }
-        else
-        {
-            <div class="d-flex gap-2 mb-4">
-                <MudSelect T="string" Label="Select Role" @bind-Value="_selectedRole" AnchorOrigin="Origin.BottomCenter">
-                    @foreach (var role in _availableRoles)
-                    {
-                        <MudSelectItem Value="@role.Name">@role.Name</MudSelectItem>
-                    }
-                </MudSelect>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddRole" Disabled="@string.IsNullOrEmpty(_selectedRole)">Add</MudButton>
+    <TitleContent>
+        <div class="d-flex align-center">
+            <MudIcon Icon="@Icons.Material.Filled.Security" Class="mr-3" Color="Color.Primary" />
+            <div>
+                <MudText Typo="Typo.h6">分配角色</MudText>
+                <MudText Typo="Typo.caption">管理使用者 <b>@User.Username</b> 的權限</MudText>
             </div>
+        </div>
+    </TitleContent>
+    <DialogContent>
+        <div style="min-height: 300px;">
+            @if (_loading)
+            {
+                <div class="d-flex flex-column align-center justify-center py-12">
+                    <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large" />
+                    <MudText Typo="Typo.body2" Class="mt-4">載入權限中...</MudText>
+                </div>
+            }
+            else
+            {
+                <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="mb-2">新增權限</MudText>
+                <div class="d-flex align-end gap-2 mb-6">
+                    <MudSelect T="string" Label="選擇角色" 
+                               @bind-Value="_selectedRole" 
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               AnchorOrigin="Origin.BottomCenter">
+                        @foreach (var role in _availableRoles)
+                        {
+                            <MudSelectItem Value="@role.Name">@role.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                    <MudButton Variant="Variant.Filled" 
+                               Color="Color.Primary" 
+                               OnClick="AddRole" 
+                               Disabled="@string.IsNullOrEmpty(_selectedRole)"
+                               DisableElevation="true"
+                               Style="height: 40px;"
+                               StartIcon="@Icons.Material.Filled.Add">加入</MudButton>
+                </div>
 
-            <MudText Typo="Typo.body2">Assigned Roles:</MudText>
-            <MudChipSet T="string" AllClosable="true" OnClose="RemoveRole">
-                @foreach (var role in _assignedRoles.Select(r => r.Name))
+                <MudDivider Class="mb-4" />
+
+                <MudText Typo="Typo.subtitle2" Color="Color.Secondary" Class="mb-3">已持有的角色 (@_assignedRoles.Count)</MudText>
+                
+                @if (!_assignedRoles.Any())
                 {
-                    <MudChip Text="@role" Value="@role" Color="Color.Info" />
+                    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="mt-2">
+                        此使用者目前沒有任何角色。
+                    </MudAlert>
                 }
-            </MudChipSet>
-        }
+                else
+                {
+                    <div class="d-flex flex-wrap gap-2">
+                        @foreach (var role in _assignedRoles.Select(r => r.Name))
+                        {
+                            <MudChip T="string" 
+                                     Text="@role" 
+                                     OnClose="(() => RemoveRoleByName(role))" 
+                                     Color="Color.Info" 
+                                     Variant="Variant.Filled" />
+                        }
+                    </div>
+                }
+            }
+        </div>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Close">Close</MudButton>
+        <MudButton OnClick="Close" Variant="Variant.Filled" Class="px-8" DisableElevation="true">關閉</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -103,18 +142,11 @@
         }
     }
 
-    private async Task RemoveRole(MudChip<string> chip)
+    private async Task RemoveRoleByName(string roleName)
     {
         if (string.IsNullOrEmpty(User.Id))
         {
             Snackbar.Add("User ID is missing", Severity.Error);
-            return;
-        }
-
-        var roleName = chip.Value;
-        if (string.IsNullOrEmpty(roleName))
-        {
-            Snackbar.Add("Role name is missing", Severity.Error);
             return;
         }
 
@@ -128,6 +160,13 @@
         {
             Snackbar.Add($"Error removing role: {ex.Message}", Severity.Error);
         }
+    }
+
+    private async Task RemoveRole(MudChip<string> chip)
+    {
+        var roleName = chip.Value;
+        if (string.IsNullOrEmpty(roleName)) return;
+        await RemoveRoleByName(roleName);
     }
 
     private void Close() => MudDialog.Close();

@@ -3,17 +3,76 @@
 @inject ISnackbar Snackbar
 
 <MudDialog>
+    <TitleContent>
+        <div class="d-flex align-center">
+            <MudIcon Icon="@(string.IsNullOrEmpty(Model.Id) ? Icons.Material.Filled.PersonAdd : Icons.Material.Filled.Person)" 
+                     Class="mr-3" Color="Color.Primary" />
+            <MudText Typo="Typo.h6">@(string.IsNullOrEmpty(Model.Id) ? "新增使用者" : "編輯使用者")</MudText>
+        </div>
+    </TitleContent>
     <DialogContent>
-        <MudTextField T="string" Label="Username" @bind-Value="Model.Username" Required="true" />
-        <MudTextField T="string" Label="Email" @bind-Value="Model.Email" Required="true" InputType="InputType.Email" />
-        <MudTextField T="string" Label="First Name" @bind-Value="Model.FirstName" />
-        <MudTextField T="string" Label="Last Name" @bind-Value="Model.LastName" />
-        <MudTextField T="string" Label="@(string.IsNullOrEmpty(Model.Id) ? "Initial Password" : "Reset Password (Optional)")" 
-                      @bind-Value="Password" InputType="InputType.Password" Required="@string.IsNullOrEmpty(Model.Id)" />
+        <MudForm @ref="_form" @bind-IsValid="_isValid">
+            <MudGrid Spacing="2">
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string" Label="使用者名稱" 
+                                 @bind-Value="Model.Username" 
+                                 Required="true" 
+                                 RequiredError="請輸入使用者名稱"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense"
+                                 Disabled="@(!string.IsNullOrEmpty(Model.Id))" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string" Label="Email" 
+                                 @bind-Value="Model.Email" 
+                                 Required="true" 
+                                 RequiredError="請輸入 Email"
+                                 InputType="InputType.Email"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string" Label="姓" 
+                                 @bind-Value="Model.LastName" 
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string" Label="名" 
+                                 @bind-Value="Model.FirstName" 
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField T="string" 
+                                 Label="@(string.IsNullOrEmpty(Model.Id) ? "起始密碼" : "重設密碼 (可不填)")" 
+                                 @bind-Value="Password" 
+                                 InputType="@_passwordInput" 
+                                 Adornment="Adornment.End"
+                                 AdornmentIcon="@_passwordInputIcon"
+                                 OnAdornmentClick="TogglePasswordVisibility"
+                                 Required="@string.IsNullOrEmpty(Model.Id)" 
+                                 RequiredError="新建帳號必須輸入密碼"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense" />
+                </MudItem>
+                @if (!string.IsNullOrEmpty(Model.Id))
+                {
+                    <MudItem xs="12">
+                        <MudCheckBox T="bool" @bind-Value="Model.Enabled" Label="啟用帳戶" Color="Color.Primary" />
+                    </MudItem>
+                }
+            </MudGrid>
+        </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Primary" OnClick="Submit">Create</MudButton>
+        <MudButton OnClick="Cancel" Variant="Variant.Text" Class="px-6">取消</MudButton>
+        <MudButton Color="Color.Primary" 
+                   OnClick="Submit" 
+                   Variant="Variant.Filled" 
+                   Disabled="@(!_isValid)" 
+                   Class="px-8 ml-2"
+                   DisableElevation="true">儲存</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -23,33 +82,45 @@
     [Parameter] public KeycloakUser Model { get; set; } = new KeycloakUser();
     
     private string Password { get; set; } = string.Empty;
+    private MudForm _form = default!;
+    private bool _isValid;
+
+    private bool _passwordShow;
+    private InputType _passwordInput = InputType.Password;
+    private string _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    private void TogglePasswordVisibility()
+    {
+        if (_passwordShow)
+        {
+            _passwordShow = false;
+            _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
+            _passwordInput = InputType.Password;
+        }
+        else
+        {
+            _passwordShow = true;
+            _passwordInputIcon = Icons.Material.Filled.Visibility;
+            _passwordInput = InputType.Text;
+        }
+    }
 
     private void Cancel() => MudDialog.Cancel();
 
-    private void Submit()
+    private async Task Submit()
     {
-        // Validation
-        if (string.IsNullOrWhiteSpace(Model.Username) || string.IsNullOrWhiteSpace(Model.Email))
+        await _form.Validate();
+        if (_form.IsValid)
         {
-            Snackbar.Add("Please fill required fields", Severity.Warning);
-            return;
-        }
+            if (!string.IsNullOrEmpty(Password))
+            {
+                Model.Credentials = new List<KeycloakCredential> 
+                { 
+                    new KeycloakCredential { Type = "password", Value = Password, Temporary = false } 
+                };
+            }
 
-        // If creating new user, password is required
-        if (string.IsNullOrEmpty(Model.Id) && string.IsNullOrWhiteSpace(Password))
-        {
-             Snackbar.Add("Password is required for new users", Severity.Warning);
-             return;
+            MudDialog.Close(DialogResult.Ok(Model));
         }
-
-        if (!string.IsNullOrEmpty(Password))
-        {
-            Model.Credentials = new List<KeycloakCredential> 
-            { 
-                new KeycloakCredential { Type = "password", Value = Password, Temporary = false } 
-            };
-        }
-
-        MudDialog.Close(DialogResult.Ok(Model));
     }
 }

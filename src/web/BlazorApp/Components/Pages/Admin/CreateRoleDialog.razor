@@ -3,13 +3,43 @@
 @inject ISnackbar Snackbar
 
 <MudDialog>
+    <TitleContent>
+        <div class="d-flex align-center">
+            <MudIcon Icon="@Icons.Material.Filled.AdminPanelSettings" Class="mr-3" Color="Color.Primary" />
+            <MudText Typo="Typo.h6">新增角色</MudText>
+        </div>
+    </TitleContent>
     <DialogContent>
-        <MudTextField T="string" Label="Role Name" @bind-Value="Model.Name" Required="true" />
-        <MudTextField T="string" Label="Description" @bind-Value="Model.Description" />
+        <MudForm @ref="_form" @bind-IsValid="_isValid">
+            <MudGrid Spacing="2">
+                <MudItem xs="12">
+                    <MudTextField T="string" Label="角色名稱" 
+                                 @bind-Value="Model.Name" 
+                                 Required="true" 
+                                 RequiredError="請輸入角色名稱"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense"
+                                 Placeholder="例如: Admin, Editor" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField T="string" Label="描述" 
+                                 @bind-Value="Model.Description" 
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense"
+                                 Lines="3"
+                                 Placeholder="簡單說明此角色的權限或用途" />
+                </MudItem>
+            </MudGrid>
+        </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Primary" OnClick="Submit">Create</MudButton>
+        <MudButton OnClick="Cancel" Variant="Variant.Text" Class="px-6">取消</MudButton>
+        <MudButton Color="Color.Primary" 
+                   OnClick="Submit" 
+                   Variant="Variant.Filled" 
+                   Disabled="@(!_isValid)" 
+                   Class="px-8 ml-2"
+                   DisableElevation="true">儲存</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -17,16 +47,17 @@
     [CascadingParameter] MudBlazor.IMudDialogInstance MudDialog { get; set; } = default!;
 
     private KeycloakRole Model { get; set; } = new KeycloakRole();
+    private MudForm _form = default!;
+    private bool _isValid;
 
     private void Cancel() => MudDialog.Cancel();
 
-    private void Submit()
+    private async Task Submit()
     {
-        if (string.IsNullOrWhiteSpace(Model.Name))
+        await _form.Validate();
+        if (_form.IsValid)
         {
-            Snackbar.Add("Role Name is required", Severity.Warning);
-            return;
+            MudDialog.Close(DialogResult.Ok(Model));
         }
-        MudDialog.Close(DialogResult.Ok(Model));
     }
 }
