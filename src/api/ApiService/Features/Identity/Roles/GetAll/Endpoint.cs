@@ -9,7 +9,7 @@ public class Endpoint(IdentityService identityService) : EndpointWithoutRequest<
 {
     public override void Configure()
     {
-        Get("/identity/roles");
+        Get("/roles");
         Policies(AppPolicies.CanManageRoles);
     }
 

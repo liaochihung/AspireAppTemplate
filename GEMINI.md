@@ -1,5 +1,9 @@
 # AspireAppTemplate (AI Context)
 
+## Keycloak 測試帳號密碼
+keycloak console: admin/admin, http://localhost:8080
+login user: jack/0000, 
+
 ## 架構決策紀錄 (ADR - Architecture Decision Records)
 
 ### Project Structure Reorganization (2025-12-27)

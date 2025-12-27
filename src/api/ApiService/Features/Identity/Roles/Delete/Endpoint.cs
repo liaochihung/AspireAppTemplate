@@ -14,7 +14,7 @@ public class Endpoint(IdentityService identityService) : Endpoint<DeleteRoleRequ
 {
     public override void Configure()
     {
-        Delete("/identity/roles/{Name}");
+        Delete("/roles/{Name}");
         Policies(AppPolicies.CanManageRoles);
     }
 

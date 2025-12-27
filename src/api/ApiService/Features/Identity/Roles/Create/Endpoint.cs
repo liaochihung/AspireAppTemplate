@@ -8,7 +8,11 @@ namespace AspireAppTemplate.ApiService.Features.Identity.Roles.Create;
 
 public class CreateRoleRequest
 {
+    [System.Text.Json.Serialization.JsonPropertyName("name")]
     public string Name { get; set; } = default!;
+    
+    [System.Text.Json.Serialization.JsonPropertyName("description")]
+    public string? Description { get; set; }
 }
 
 public class CreateRoleValidator : Validator<CreateRoleRequest>
@@ -23,13 +27,17 @@ public class Endpoint(IdentityService identityService) : Endpoint<CreateRoleRequ
 {
     public override void Configure()
     {
-        Post("/identity/roles");
+        Post("/roles");
         Policies(AppPolicies.CanManageRoles);
     }
 
     public override async Task HandleAsync(CreateRoleRequest req, CancellationToken ct)
     {
-        var role = new KeycloakRole { Name = req.Name };
+        var role = new KeycloakRole 
+        { 
+            Name = req.Name,
+            Description = req.Description 
+        };
         var result = await identityService.CreateRoleAsync(role);
         await this.SendResultAsync(result, ct: ct);
     }
