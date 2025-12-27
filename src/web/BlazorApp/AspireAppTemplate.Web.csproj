@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <!-- Suppress MudBlazor analyzer errors -->
-    <NoWarn>$(NoWarn);MUD0001;MUD0002;MUD0003</NoWarn>
+    <NoWarn>$(NoWarn);MUD0001;MUD0002;MUD0003;S3267;S3881</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

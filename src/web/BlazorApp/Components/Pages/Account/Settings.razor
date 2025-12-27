@@ -41,13 +41,4 @@
     </MudItem>
 </MudGrid>
 
-@code {
-    [CascadingParameter]
-    private Task<AuthenticationState> AuthStateTask { get; set; } = default!;
-    private AuthenticationState? _authState;
 
-    protected override async Task OnInitializedAsync()
-    {
-        _authState = await AuthStateTask;
-    }
-}
