@@ -1,4 +1,5 @@
 @using AspireAppTemplate.Shared
+@using MudBlazor
 @inject ISnackbar Snackbar
 
 <MudDialog>
@@ -13,7 +14,7 @@
 </MudDialog>
 
 @code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+    [CascadingParameter] MudBlazor.IMudDialogInstance MudDialog { get; set; } = default!;
 
     private KeycloakRole Model { get; set; } = new KeycloakRole();
 

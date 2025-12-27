@@ -52,9 +52,8 @@
     {
         var dialog = await DialogService.ShowAsync<UserDialog>("Create User");
         var result = await dialog.Result;
-        if (!result.Canceled)
+        if (result is not null && !result.Canceled && result.Data is KeycloakUser user)
         {
-            var user = (KeycloakUser)result.Data;
             try {
                 await IdentityClient.CreateUserAsync(user);
                 Snackbar.Add("User created successfully", Severity.Success);

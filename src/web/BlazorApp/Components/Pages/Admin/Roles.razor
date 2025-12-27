@@ -48,9 +48,8 @@
     {
         var dialog = await DialogService.ShowAsync<CreateRoleDialog>("Create Role");
         var result = await dialog.Result;
-        if (!result.Canceled)
+        if (result is not null && !result.Canceled && result.Data is KeycloakRole role)
         {
-            var role = (KeycloakRole)result.Data;
             try {
                 await IdentityClient.CreateRoleAsync(role);
                 Snackbar.Add("Role created successfully", Severity.Success);
