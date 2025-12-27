@@ -1,4 +1,4 @@
-@using Keycloak.Net.Models.Roles
+@using AspireAppTemplate.Shared
 @inject ISnackbar Snackbar
 
 <MudDialog>
@@ -15,7 +15,7 @@
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
 
-    private Role Model { get; set; } = new Role();
+    private KeycloakRole Model { get; set; } = new KeycloakRole();
 
     private void Cancel() => MudDialog.Cancel();
 

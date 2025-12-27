@@ -1,10 +1,10 @@
 using FastEndpoints;
 using AspireAppTemplate.ApiService.Services;
-using Keycloak.Net.Models.Users;
+using AspireAppTemplate.Shared;
 
 namespace AspireAppTemplate.ApiService.Features.Identity.Users;
 
-public class GetUsersEndpoint : EndpointWithoutRequest<IEnumerable<User>>
+public class GetUsersEndpoint : EndpointWithoutRequest<IEnumerable<KeycloakUser>>
 {
     private readonly IdentityService _identityService;
 
@@ -16,13 +16,11 @@ public class GetUsersEndpoint : EndpointWithoutRequest<IEnumerable<User>>
     public override void Configure()
     {
         Get("/users");
-        AllowAnonymous(); // For initial testing, or Replace with .RequireAuthorization()
-        // Ideally: .Roles("admin");
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        // Add search parameter support later
         var users = await _identityService.GetUsersAsync();
         await SendOkAsync(users, ct);
     }

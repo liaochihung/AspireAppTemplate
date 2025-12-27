@@ -1,7 +1,6 @@
 @page "/admin/roles"
 @attribute [Authorize(Policy = AppPolicies.CanManageProducts)]
 @using AspireAppTemplate.Web
-@using Keycloak.Net.Models.Roles
 @using AspireAppTemplate.Shared
 @using Microsoft.AspNetCore.Authorization
 @inject IdentityApiClient IdentityClient
@@ -25,7 +24,7 @@
 </MudDataGrid>
 
 @code {
-    private IEnumerable<Role> _roles = new List<Role>();
+    private IEnumerable<KeycloakRole> _roles = new List<KeycloakRole>();
     private bool _loading = true;
 
     protected override async Task OnInitializedAsync()
@@ -51,7 +50,7 @@
         var result = await dialog.Result;
         if (!result.Canceled)
         {
-            var role = (Role)result.Data;
+            var role = (KeycloakRole)result.Data;
             try {
                 await IdentityClient.CreateRoleAsync(role);
                 Snackbar.Add("Role created successfully", Severity.Success);
@@ -62,7 +61,7 @@
         }
     }
 
-    private async Task DeleteRole(Role role)
+    private async Task DeleteRole(KeycloakRole role)
     {
          var result = await DialogService.ShowMessageBox(
             "Delete Role", 

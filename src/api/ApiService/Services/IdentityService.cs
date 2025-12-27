@@ -1,6 +1,5 @@
-using Keycloak.Net;
-using Keycloak.Net.Models.Roles;
-using Keycloak.Net.Models.Users;
+using System.Net.Http.Headers;
+using AspireAppTemplate.Shared;
 using Microsoft.Extensions.Options;
 
 namespace AspireAppTemplate.ApiService.Services;
@@ -15,81 +14,112 @@ public class KeycloakConfiguration
 
 public class IdentityService
 {
-    private readonly KeycloakClient _client;
-    private readonly string _realm;
+    private readonly HttpClient _httpClient;
+    private readonly KeycloakConfiguration _config;
+    private string? _cachedToken;
+    private DateTime _tokenExpiry = DateTime.MinValue;
 
-    public IdentityService(IOptions<KeycloakConfiguration> options)
+    public IdentityService(HttpClient httpClient, IOptions<KeycloakConfiguration> options)
     {
-        var config = options.Value;
-        _realm = config.Realm;
-        // Keycloak.Net configuration for Service Account
-        var kcOptions = new Keycloak.Net.Models.Clients.KeycloakOptions
-        {
-            AdminClientId = config.ClientId,
-        };
+        _httpClient = httpClient;
+        _config = options.Value;
         
-        _client = new KeycloakClient(config.BaseUrl, config.ClientSecret, kcOptions);
+        if (string.IsNullOrEmpty(_config.BaseUrl)) throw new ArgumentNullException("Keycloak BaseUrl is not configured.");
+        
+        _httpClient.BaseAddress = new Uri(_config.BaseUrl.TrimEnd('/') + "/");
+    }
+
+    private async Task<string> GetAccessTokenAsync()
+    {
+        if (_cachedToken != null && DateTime.UtcNow < _tokenExpiry)
+        {
+            return _cachedToken;
+        }
+
+        var content = new FormUrlEncodedContent(new[]
+        {
+            new KeyValuePair<string, string>("client_id", _config.ClientId),
+            new KeyValuePair<string, string>("client_secret", _config.ClientSecret),
+            new KeyValuePair<string, string>("grant_type", "client_credentials")
+        });
+
+        var response = await _httpClient.PostAsync($"realms/{_config.Realm}/protocol/openid-connect/token", content);
+        response.EnsureSuccessStatusCode();
+
+        var tokenData = await response.Content.ReadFromJsonAsync<TokenResponse>();
+        _cachedToken = tokenData!.access_token;
+        _tokenExpiry = DateTime.UtcNow.AddSeconds(tokenData.expires_in - 30); // Buffer of 30s
+
+        return _cachedToken;
+    }
+
+    private async Task SetAuthHeaderAsync()
+    {
+        var token = await GetAccessTokenAsync();
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
     }
 
     // --- Users ---
 
-    public Task<IEnumerable<User>> GetUsersAsync(string? search = null)
+    public async Task<IEnumerable<KeycloakUser>> GetUsersAsync(string? search = null)
     {
-        return _client.GetUsersAsync(_realm, search: search);
+        await SetAuthHeaderAsync();
+        var url = $"admin/realms/{_config.Realm}/users";
+        if (!string.IsNullOrEmpty(search)) url += $"?search={search}";
+        
+        var users = await _httpClient.GetFromJsonAsync<IEnumerable<KeycloakUser>>(url);
+        return users ?? Enumerable.Empty<KeycloakUser>();
     }
 
-    public Task<User> GetUserAsync(string id)
+    public async Task<bool> CreateUserAsync(KeycloakUser user)
     {
-        return _client.GetUserAsync(_realm, id);
+        await SetAuthHeaderAsync();
+        var response = await _httpClient.PostAsJsonAsync($"admin/realms/{_config.Realm}/users", user);
+        return response.IsSuccessStatusCode;
     }
 
-    public Task<bool> CreateUserAsync(User user)
+    public async Task<bool> DeleteUserAsync(string id)
     {
-        return _client.CreateUserAsync(_realm, user);
-    }
-
-    public Task<bool> UpdateUserAsync(string id, User user)
-    {
-        return _client.UpdateUserAsync(_realm, id, user);
-    }
-
-    public Task<bool> DeleteUserAsync(string id)
-    {
-        return _client.DeleteUserAsync(_realm, id);
+        await SetAuthHeaderAsync();
+        var response = await _httpClient.DeleteAsync($"admin/realms/{_config.Realm}/users/{id}");
+        return response.IsSuccessStatusCode;
     }
 
     // --- Roles ---
 
-    public Task<IEnumerable<Role>> GetRolesAsync()
+    public async Task<IEnumerable<KeycloakRole>> GetRolesAsync()
     {
-        return _client.GetRolesAsync(_realm);
+        await SetAuthHeaderAsync();
+        var roles = await _httpClient.GetFromJsonAsync<IEnumerable<KeycloakRole>>($"admin/realms/{_config.Realm}/roles");
+        return roles ?? Enumerable.Empty<KeycloakRole>();
     }
 
-    public Task<bool> CreateRoleAsync(Role role)
+    public async Task<bool> CreateRoleAsync(KeycloakRole role)
     {
-        return _client.CreateRoleAsync(_realm, role);
+        await SetAuthHeaderAsync();
+        var response = await _httpClient.PostAsJsonAsync($"admin/realms/{_config.Realm}/roles", role);
+        return response.IsSuccessStatusCode;
     }
 
-    public Task<bool> DeleteRoleAsync(string name)
+    public async Task<bool> DeleteRoleAsync(string name)
     {
-        return _client.DeleteRoleByNameAsync(_realm, name);
+        await SetAuthHeaderAsync();
+        var response = await _httpClient.DeleteAsync($"admin/realms/{_config.Realm}/roles/{name}");
+        return response.IsSuccessStatusCode;
     }
 
     // --- Mappings ---
 
-    public async Task<bool> AssignRoleTokenUserAsync(string userId, string roleName)
+    public async Task<bool> AssignRoleToUserAsync(string userId, string roleName)
     {
-        var role = await _client.GetRoleAsync(_realm, roleName);
+        await SetAuthHeaderAsync();
+        
+        // 1. Get role details to get its ID
+        var role = await _httpClient.GetFromJsonAsync<KeycloakRole>($"admin/realms/{_config.Realm}/roles/{roleName}");
         if (role == null) return false;
 
-        return await _client.AddRealmRoleMappingsToUserAsync(_realm, userId, new[] { role });
-    }
-
-    public async Task<bool> RemoveRoleFromUserAsync(string userId, string roleName)
-    {
-        var role = await _client.GetRoleAsync(_realm, roleName);
-        if (role == null) return false;
-
-        return await _client.DeleteRealmRoleMappingsFromUserAsync(_realm, userId, new[] { role });
+        // 2. Assign to user (POST to role-mappings)
+        var response = await _httpClient.PostAsJsonAsync($"admin/realms/{_config.Realm}/users/{userId}/role-mappings/realm", new[] { role });
+        return response.IsSuccessStatusCode;
     }
 }

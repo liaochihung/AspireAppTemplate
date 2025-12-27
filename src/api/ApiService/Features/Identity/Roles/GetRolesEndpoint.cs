@@ -1,10 +1,10 @@
 using FastEndpoints;
 using AspireAppTemplate.ApiService.Services;
-using Keycloak.Net.Models.Roles;
+using AspireAppTemplate.Shared;
 
 namespace AspireAppTemplate.ApiService.Features.Identity.Roles;
 
-public class GetRolesEndpoint : EndpointWithoutRequest<IEnumerable<Role>>
+public class GetRolesEndpoint : EndpointWithoutRequest<IEnumerable<KeycloakRole>>
 {
     private readonly IdentityService _identityService;
 

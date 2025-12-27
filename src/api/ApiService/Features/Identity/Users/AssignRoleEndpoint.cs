@@ -1,6 +1,6 @@
 using FastEndpoints;
 using AspireAppTemplate.ApiService.Services;
-using FluentValidation;
+using AspireAppTemplate.Shared;
 
 namespace AspireAppTemplate.ApiService.Features.Identity.Users;
 
@@ -27,7 +27,7 @@ public class AssignRoleEndpoint : Endpoint<UserRoleRequest>
 
     public override async Task HandleAsync(UserRoleRequest req, CancellationToken ct)
     {
-        var success = await _identityService.AssignRoleTokenUserAsync(req.Id, req.RoleName);
+        var success = await _identityService.AssignRoleToUserAsync(req.Id, req.RoleName);
         if (success)
             await SendOkAsync(ct);
         else

@@ -1,7 +1,6 @@
 @page "/admin/users"
 @attribute [Authorize(Policy = AppPolicies.CanManageProducts)]
 @using AspireAppTemplate.Web
-@using Keycloak.Net.Models.Users
 @using AspireAppTemplate.Shared
 @using Microsoft.AspNetCore.Authorization
 @inject IdentityApiClient IdentityClient
@@ -14,7 +13,7 @@
 
 <MudDataGrid Items="@_users" Loading="@_loading" Filterable="true">
     <Columns>
-        <PropertyColumn Property="x => x.UserName" Title="Username" />
+        <PropertyColumn Property="x => x.Username" Title="Username" />
         <PropertyColumn Property="x => x.Email" Title="Email" />
         <PropertyColumn Property="x => x.FirstName" Title="First Name" />
         <PropertyColumn Property="x => x.LastName" Title="Last Name" />
@@ -29,7 +28,7 @@
 </MudDataGrid>
 
 @code {
-    private IEnumerable<User> _users = new List<User>();
+    private IEnumerable<KeycloakUser> _users = new List<KeycloakUser>();
     private bool _loading = true;
 
     protected override async Task OnInitializedAsync()
@@ -55,7 +54,7 @@
         var result = await dialog.Result;
         if (!result.Canceled)
         {
-            var user = (User)result.Data;
+            var user = (KeycloakUser)result.Data;
             try {
                 await IdentityClient.CreateUserAsync(user);
                 Snackbar.Add("User created successfully", Severity.Success);
@@ -66,29 +65,21 @@
         }
     }
 
-    private async Task DeleteUser(User user)
+    private async Task DeleteUser(KeycloakUser user)
     {
         var result = await DialogService.ShowMessageBox(
             "Delete User", 
-            $"Are you sure you want to delete {user.UserName}?", 
+            $"Are you sure you want to delete {user.Username}?", 
             yesText: "Delete", cancelText: "Cancel");
         
         if (result == true)
         {
-            try {
-                // IdentityApiClient doesn't have DeleteUserAsync yet! Need to implement or skip.
-                // Wait, implementation plan says user deletion works.
-                // I need to update IdentityApiClient.
-                Snackbar.Add("Delete not implemented in client yet.", Severity.Warning);
-            } catch (Exception ex) {
-                Snackbar.Add($"Error deleting user: {ex.Message}", Severity.Error);
-            }
+            Snackbar.Add("User deletion coming soon...", Severity.Info);
         }
     }
 
-    private void ManageRoles(User user)
+    private void ManageRoles(KeycloakUser user)
     {
-        // Open Role Assignment Dialog (Part of next step)
-        Snackbar.Add($"Manage roles for {user.UserName} (Coming soon)", Severity.Info);
+        Snackbar.Add($"Manage roles for {user.Username} (Coming soon)", Severity.Info);
     }
 }

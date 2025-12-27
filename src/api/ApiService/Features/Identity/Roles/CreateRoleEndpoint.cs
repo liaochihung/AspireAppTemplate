@@ -1,6 +1,6 @@
 using FastEndpoints;
 using AspireAppTemplate.ApiService.Services;
-using Keycloak.Net.Models.Roles;
+using AspireAppTemplate.Shared;
 using FluentValidation;
 
 namespace AspireAppTemplate.ApiService.Features.Identity.Roles;
@@ -36,7 +36,7 @@ public class CreateRoleEndpoint : Endpoint<CreateRoleRequest>
 
     public override async Task HandleAsync(CreateRoleRequest req, CancellationToken ct)
     {
-        var role = new Role
+        var role = new KeycloakRole
         {
             Name = req.Name,
             Description = req.Description

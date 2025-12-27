@@ -1,6 +1,6 @@
 using FastEndpoints;
 using AspireAppTemplate.ApiService.Services;
-using Keycloak.Net.Models.Users;
+using AspireAppTemplate.Shared;
 using FluentValidation;
 
 namespace AspireAppTemplate.ApiService.Features.Identity.Users;
@@ -41,17 +41,17 @@ public class CreateUserEndpoint : Endpoint<CreateUserRequest>
 
     public override async Task HandleAsync(CreateUserRequest req, CancellationToken ct)
     {
-        var user = new User
+        var user = new KeycloakUser
         {
-            UserName = req.Username,
+            Username = req.Username,
             Email = req.Email,
             FirstName = req.FirstName,
             LastName = req.LastName,
             Enabled = true,
             EmailVerified = true,
-            Credentials = new List<Credential>
+            Credentials = new List<KeycloakCredential>
             {
-                new Credential { Type = "password", Value = req.Password, Temporary = false }
+                new KeycloakCredential { Type = "password", Value = req.Password, Temporary = false }
             }
         };
 
