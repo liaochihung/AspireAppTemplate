@@ -1,4 +1,4 @@
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using AspireAppTemplate.Web;
 using AspireAppTemplate.Web.Components;
@@ -52,11 +52,6 @@ builder.Services.AddHttpClient<ProductApiClient>(client =>
 {
     // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
     // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
-    client.BaseAddress = new("https+http://apiservice");
-}).AddHttpMessageHandler<AuthorizationHandler>();
-
-builder.Services.AddHttpClient<IdentityApiClient>(client =>
-{
     client.BaseAddress = new("https+http://apiservice");
 }).AddHttpMessageHandler<AuthorizationHandler>();
 

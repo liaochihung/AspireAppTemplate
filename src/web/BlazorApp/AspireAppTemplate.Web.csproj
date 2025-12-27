@@ -17,6 +17,7 @@
     <PackageReference Include="Aspire.Keycloak.Authentication" Version="13.1.0-preview.1.25616.3" />
     <PackageReference Include="Aspire.StackExchange.Redis.OutputCaching" Version="13.1.0" />
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
+    <PackageReference Include="Keycloak.Net" Version="1.0.18" />
     <PackageReference Include="MudBlazor" Version="8.2.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageReference Include="Serilog.Sinks.Async" Version="2.1.0" />

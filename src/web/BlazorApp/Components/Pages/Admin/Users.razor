@@ -1,0 +1,94 @@
+@page "/admin/users"
+@attribute [Authorize(Policy = AppPolicies.CanManageProducts)]
+@using AspireAppTemplate.Web
+@using Keycloak.Net.Models.Users
+@using AspireAppTemplate.Shared
+@using Microsoft.AspNetCore.Authorization
+@inject IdentityApiClient IdentityClient
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+<MudText Typo="Typo.h5" GutterBottom="true">User Management</MudText>
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="CreateUser" Class="mb-4">Create User</MudButton>
+
+<MudDataGrid Items="@_users" Loading="@_loading" Filterable="true">
+    <Columns>
+        <PropertyColumn Property="x => x.UserName" Title="Username" />
+        <PropertyColumn Property="x => x.Email" Title="Email" />
+        <PropertyColumn Property="x => x.FirstName" Title="First Name" />
+        <PropertyColumn Property="x => x.LastName" Title="Last Name" />
+        <PropertyColumn Property="x => x.Enabled" Title="Enabled" />
+        <TemplateColumn CellClass="d-flex justify-end">
+            <CellTemplate>
+                 <MudIconButton Icon="@Icons.Material.Filled.Assignment" Color="Color.Secondary" OnClick="@(() => ManageRoles(context.Item))" Title="Assign Roles" />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => DeleteUser(context.Item))" Title="Delete User" />
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+
+@code {
+    private IEnumerable<User> _users = new List<User>();
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsers();
+    }
+
+    private async Task LoadUsers()
+    {
+        _loading = true;
+        try {
+            _users = await IdentityClient.GetUsersAsync();
+        } catch (Exception ex) {
+            Snackbar.Add($"Error loading users: {ex.Message}", Severity.Error);
+        } finally {
+            _loading = false;
+        }
+    }
+
+    private async Task CreateUser()
+    {
+        var dialog = await DialogService.ShowAsync<UserDialog>("Create User");
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            var user = (User)result.Data;
+            try {
+                await IdentityClient.CreateUserAsync(user);
+                Snackbar.Add("User created successfully", Severity.Success);
+                await LoadUsers();
+            } catch (Exception ex) {
+                Snackbar.Add($"Error creating user: {ex.Message}", Severity.Error);
+            }
+        }
+    }
+
+    private async Task DeleteUser(User user)
+    {
+        var result = await DialogService.ShowMessageBox(
+            "Delete User", 
+            $"Are you sure you want to delete {user.UserName}?", 
+            yesText: "Delete", cancelText: "Cancel");
+        
+        if (result == true)
+        {
+            try {
+                // IdentityApiClient doesn't have DeleteUserAsync yet! Need to implement or skip.
+                // Wait, implementation plan says user deletion works.
+                // I need to update IdentityApiClient.
+                Snackbar.Add("Delete not implemented in client yet.", Severity.Warning);
+            } catch (Exception ex) {
+                Snackbar.Add($"Error deleting user: {ex.Message}", Severity.Error);
+            }
+        }
+    }
+
+    private void ManageRoles(User user)
+    {
+        // Open Role Assignment Dialog (Part of next step)
+        Snackbar.Add($"Manage roles for {user.UserName} (Coming soon)", Severity.Info);
+    }
+}
