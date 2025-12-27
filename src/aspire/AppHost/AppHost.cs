@@ -8,7 +8,7 @@ var password = builder.AddParameter("password", secret: true, value: "admin");
 var keycloak = builder.AddKeycloak("keycloak", 8080, username, password)
     .WithDataVolume("keycloak")
     .WithRealmImport("./Realms")
-    .WithBindMount("../../../keycloak-themes/my-company-theme", "/opt/keycloak/themes/my-company-theme");
+    .WithBindMount("./keycloak-themes/my-company-theme", "/opt/keycloak/themes/my-company-theme");
 
 var postgresPassword = builder.AddParameter("postgres-password", secret: true, value: "1111");
 var postgres = builder.AddPostgres("postgres", password: postgresPassword, port: 5436)

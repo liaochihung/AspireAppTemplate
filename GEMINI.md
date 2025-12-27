@@ -31,11 +31,12 @@
 *   **Health Check**: 已整合 `AddDbContextCheck<AppDbContext>()` 確保 `/health` 端點驗證資料庫連線。
 *   **Endpoints**: 所有 Product Endpoints 直接注入 `AppDbContext` 進行 CRUD 操作。
 
-### Identity Management
+### Identity Management (2025-12-27)
 *   **Keycloak**: 使用 Docker 容器運行。
     *   預設 Admin: `admin` / `admin`
-    *   Realm 設定由 `Realms/import-realmdata.json` 自動匯入。
-    *   自訂 Theme 位於 `keycloak-themes/my-company-theme/`，需在 Keycloak Admin 手動啟用。
+    *   Realm 設定位於 `src/aspire/AppHost/Realms/import-realmdata.json`，由 AppHost 自動匯入。
+    *   自訂 Theme 位於 `src/aspire/AppHost/keycloak-themes/my-company-theme/`，需在 Keycloak Admin 手動啟用。
+    *   *設計理念*: 所有 Keycloak 相關配置集中在 AppHost 目錄下，保持內聚性與一致性。
 
 ### UI Framework (2025-12-26)
 *   **MudBlazor 8.2.0**: 取代 Bootstrap CSS，提供完整 Material Design 元件庫。
