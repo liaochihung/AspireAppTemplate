@@ -53,6 +53,16 @@
     *   `Infrastructure/Settings/UserPreferences.cs` - 使用者偏好設定 (含 TablePreference)
     *   `Infrastructure/Services/LayoutService.cs` - 偏好設定持久化與套用
 
+### API Development Pattern (2025-12-27)
+*   **REPR Pattern (Request-Endpoint-Response)**: 採用 FastEndpoints 的 "Folder per Endpoint" 結構。
+    *   慣例: `src/api/ApiService/Features/<Feature>/<Action>/Endpoint.cs`
+    *   優點: 高內聚性，相關的 Request/Response/Validator/Mapper 放在同一個目錄下。
+    *   *範例*: `Features/Identity/Roles/Create/Endpoint.cs`
+*   **Authorization 策略**:
+    *   **Policy-Based**: 不要在 Endpoint 直接寫死角色 (`AllowAnonymous` 或 `Roles("Admin")`)，而是使用 Policy (`Policies(AppPolicies.CanManageRoles)`)。
+    *   **中央配置**: Policy 與角色的對應關係在 `Program.cs` 中定義 (e.g., `options.AddPolicy(...)`)。
+    *   **優點**: 解耦權限概念與具體角色，方便未來調整權限邏輯而不需修改每個 Endpoint。
+
 ## 常見任務 (Common Tasks)
 
 ### 1. 新增資料表

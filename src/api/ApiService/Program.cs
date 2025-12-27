@@ -40,6 +40,9 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy(AppPolicies.CanManageProducts, policy => 
         policy.RequireRole(AppRoles.Administrator));
+
+    options.AddPolicy(AppPolicies.CanManageRoles, policy => 
+        policy.RequireRole(AppRoles.Administrator));
 });
 
 var app = builder.Build();
