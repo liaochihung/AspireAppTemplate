@@ -1,6 +1,8 @@
 using System.Net.Http.Headers;
 using AspireAppTemplate.Shared;
+using ErrorOr;
 using Microsoft.Extensions.Options;
+using System.Net.Http.Json;
 
 namespace AspireAppTemplate.ApiService.Services;
 
@@ -71,89 +73,178 @@ public class IdentityService
 
     // --- Users ---
 
-    public async Task<IEnumerable<KeycloakUser>> GetUsersAsync(string? search = null)
+    public async Task<ErrorOr<IEnumerable<KeycloakUser>>> GetUsersAsync(string? search = null)
     {
         await SetAuthHeaderAsync();
         var url = $"admin/realms/{_config.Realm}/users";
         if (!string.IsNullOrEmpty(search)) url += $"?search={search}";
         
         var users = await _httpClient.GetFromJsonAsync<IEnumerable<KeycloakUser>>(url);
-        return users ?? Enumerable.Empty<KeycloakUser>();
+        return users?.ToList() ?? new List<KeycloakUser>();
     }
 
-    public async Task<bool> CreateUserAsync(KeycloakUser user)
+    public async Task<ErrorOr<Created>> CreateUserAsync(KeycloakUser user)
     {
         await SetAuthHeaderAsync();
         var response = await _httpClient.PostAsJsonAsync($"admin/realms/{_config.Realm}/users", user);
-        if (!response.IsSuccessStatusCode)
+        
+        if (response.IsSuccessStatusCode)
         {
-            var error = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"[IdentityService] Failed to create user: {response.StatusCode} - {error}");
+            return Result.Created;
         }
-        return response.IsSuccessStatusCode;
+
+        var error = await response.Content.ReadAsStringAsync();
+        if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            return Error.Conflict(description: error);
+        }
+        
+        return Error.Failure(description: $"Failed to create user: {response.StatusCode} - {error}");
     }
 
-    public async Task<bool> DeleteUserAsync(string id)
+    public async Task<ErrorOr<Deleted>> DeleteUserAsync(string id)
     {
         await SetAuthHeaderAsync();
         var response = await _httpClient.DeleteAsync($"admin/realms/{_config.Realm}/users/{id}");
-        if (!response.IsSuccessStatusCode)
+        
+        if (response.IsSuccessStatusCode)
         {
-             var error = await response.Content.ReadAsStringAsync();
-             Console.WriteLine($"[IdentityService] Failed to delete user: {response.StatusCode} - {error}");
+            return Result.Deleted;
         }
-        return response.IsSuccessStatusCode;
+
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return Error.NotFound(description: "User not found.");
+        }
+
+        var error = await response.Content.ReadAsStringAsync();
+        return Error.Failure(description: $"Failed to delete user: {response.StatusCode} - {error}");
     }
 
     // --- Roles ---
 
-    public async Task<IEnumerable<KeycloakRole>> GetRolesAsync()
+    public async Task<ErrorOr<IEnumerable<KeycloakRole>>> GetRolesAsync()
     {
-        await SetAuthHeaderAsync();
-        var roles = await _httpClient.GetFromJsonAsync<IEnumerable<KeycloakRole>>($"admin/realms/{_config.Realm}/roles");
-        return roles ?? Enumerable.Empty<KeycloakRole>();
-    }
-
-    public async Task<bool> CreateRoleAsync(KeycloakRole role)
-    {
-        await SetAuthHeaderAsync();
-        var response = await _httpClient.PostAsJsonAsync($"admin/realms/{_config.Realm}/roles", role);
-        if (!response.IsSuccessStatusCode)
+        try
         {
-            var error = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"[IdentityService] Failed to create role: {response.StatusCode} - {error}");
+            await SetAuthHeaderAsync();
+            var response = await _httpClient.GetAsync($"admin/realms/{_config.Realm}/roles");
+            
+            if (!response.IsSuccessStatusCode)
+            {
+               if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                   return Error.NotFound(description: "Roles or Realm not found.");
+               if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                   return Error.Unauthorized(description: "Keycloak unauthorized.");
+
+               return Error.Failure(description: $"Failed to get roles: {response.StatusCode}");
+            }
+
+            var roles = await response.Content.ReadFromJsonAsync<IEnumerable<KeycloakRole>>();
+            return roles?.ToList() ?? new List<KeycloakRole>();
         }
-        return response.IsSuccessStatusCode;
+        catch (Exception ex)
+        {
+            return Error.Unexpected(description: ex.Message);
+        }
     }
 
-    public async Task<bool> DeleteRoleAsync(string name)
+    public async Task<ErrorOr<Created>> CreateRoleAsync(KeycloakRole role)
+    {
+        try 
+        {
+            await SetAuthHeaderAsync();
+            var response = await _httpClient.PostAsJsonAsync($"admin/realms/{_config.Realm}/roles", role);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                return Result.Created;
+            }
+
+            var error = await response.Content.ReadAsStringAsync();
+            if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+            {
+                 return Error.Conflict(description: "Role already exists or conflict occurred.");
+            }
+
+            return Error.Failure(description: $"Failed to create role: {response.StatusCode} - {error}");
+        }
+        catch (Exception ex)
+        {
+            return Error.Unexpected(description: ex.Message);
+        }
+    }
+
+    public async Task<ErrorOr<Deleted>> DeleteRoleAsync(string name)
     {
         await SetAuthHeaderAsync();
         var response = await _httpClient.DeleteAsync($"admin/realms/{_config.Realm}/roles/{name}");
-        return response.IsSuccessStatusCode;
+        
+        if (response.IsSuccessStatusCode)
+        {
+            return Result.Deleted;
+        }
+        
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return Error.NotFound(description: "Role not found.");
+        }
+
+        return Error.Failure(description: $"Failed to delete role: {response.StatusCode}");
     }
 
     // --- Mappings ---
 
-    public async Task<bool> AssignRoleToUserAsync(string userId, string roleName)
+    public async Task<ErrorOr<Success>> AssignRoleToUserAsync(string userId, string roleName)
     {
         await SetAuthHeaderAsync();
         
         // 1. Get role details to get its ID
-        var role = await _httpClient.GetFromJsonAsync<KeycloakRole>($"admin/realms/{_config.Realm}/roles/{roleName}");
-        if (role == null) return false;
+        // Note: Ideally we should handle if this first call fails too.
+        // For simplicity, if GetFromJsonAsync fails (e.g. 404), it throws extension exception usually or returns null? 
+        // HttpClient.GetFromJsonAsync throws HttpRequestException on non-success status codes if not handled, 
+        // but here we might want to be safer. However, preserving structure:
+        
+        // Let's wrap this in try-catch or ensure check
+        KeycloakRole? role = null;
+        try 
+        {
+             role = await _httpClient.GetFromJsonAsync<KeycloakRole>($"admin/realms/{_config.Realm}/roles/{roleName}");
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+             return Error.NotFound(description: $"Role '{roleName}' not found.");
+        }
+
+        if (role == null) return Error.NotFound(description: $"Role '{roleName}' not found.");
 
         // 2. Assign to user (POST to role-mappings)
         var response = await _httpClient.PostAsJsonAsync($"admin/realms/{_config.Realm}/users/{userId}/role-mappings/realm", new[] { role });
-        return response.IsSuccessStatusCode;
+        
+        if (response.IsSuccessStatusCode)
+        {
+            return Result.Success;
+        }
+
+        var error = await response.Content.ReadAsStringAsync();
+        return Error.Failure(description: $"Failed to assign role: {response.StatusCode} - {error}");
     }
 
-    public async Task<bool> RemoveRoleFromUserAsync(string userId, string roleName)
+    public async Task<ErrorOr<Success>> RemoveRoleFromUserAsync(string userId, string roleName)
     {
         await SetAuthHeaderAsync();
         
-        var role = await _httpClient.GetFromJsonAsync<KeycloakRole>($"admin/realms/{_config.Realm}/roles/{roleName}");
-        if (role == null) return false;
+        KeycloakRole? role = null;
+        try 
+        {
+             role = await _httpClient.GetFromJsonAsync<KeycloakRole>($"admin/realms/{_config.Realm}/roles/{roleName}");
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+             return Error.NotFound(description: $"Role '{roleName}' not found.");
+        }
+
+        if (role == null) return Error.NotFound(description: $"Role '{roleName}' not found.");
 
         var request = new HttpRequestMessage(HttpMethod.Delete, $"admin/realms/{_config.Realm}/users/{userId}/role-mappings/realm")
         {
@@ -161,20 +252,49 @@ public class IdentityService
         };
         
         var response = await _httpClient.SendAsync(request);
-        return response.IsSuccessStatusCode;
+        
+        if (response.IsSuccessStatusCode)
+        {
+            return Result.Success;
+        }
+
+        return Error.Failure(description: $"Failed to remove role: {response.StatusCode}");
     }
 
-    public async Task<IEnumerable<KeycloakRole>> GetUserRolesAsync(string userId)
+    public async Task<ErrorOr<IEnumerable<KeycloakRole>>> GetUserRolesAsync(string userId)
     {
         await SetAuthHeaderAsync();
-        var roles = await _httpClient.GetFromJsonAsync<IEnumerable<KeycloakRole>>($"admin/realms/{_config.Realm}/users/{userId}/role-mappings/realm");
-        return roles ?? Enumerable.Empty<KeycloakRole>();
+        var response = await _httpClient.GetAsync($"admin/realms/{_config.Realm}/users/{userId}/role-mappings/realm");
+        
+        if (!response.IsSuccessStatusCode)
+        {
+             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+             {
+                 return Error.NotFound(description: "User not found.");
+             }
+             return Error.Failure(description: $"Failed to get user roles: {response.StatusCode}");
+        }
+
+        var roles = await response.Content.ReadFromJsonAsync<IEnumerable<KeycloakRole>>();
+        return roles?.ToList() ?? new List<KeycloakRole>();
     }
 
-    public async Task<bool> UpdateUserAsync(string id, KeycloakUser user)
+    public async Task<ErrorOr<Success>> UpdateUserAsync(string id, KeycloakUser user)
     {
         await SetAuthHeaderAsync();
         var response = await _httpClient.PutAsJsonAsync($"admin/realms/{_config.Realm}/users/{id}", user);
-        return response.IsSuccessStatusCode;
+
+        if (response.IsSuccessStatusCode)
+        {
+            return Result.Success;
+        }
+        
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+             return Error.NotFound(description: "User not found.");
+        }
+        
+        var error = await response.Content.ReadAsStringAsync();
+        return Error.Failure(description: $"Failed to update user: {response.StatusCode} - {error}");
     }
 }

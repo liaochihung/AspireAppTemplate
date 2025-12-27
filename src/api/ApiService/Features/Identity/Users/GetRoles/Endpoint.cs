@@ -1,6 +1,7 @@
 using FastEndpoints;
 using AspireAppTemplate.ApiService.Services;
 using AspireAppTemplate.Shared;
+using AspireAppTemplate.ApiService.Infrastructure.Extensions;
 
 namespace AspireAppTemplate.ApiService.Features.Identity.Users.GetRoles;
 
@@ -19,7 +20,7 @@ public class Endpoint(IdentityService identityService) : Endpoint<GetUserRolesRe
 
     public override async Task HandleAsync(GetUserRolesRequest req, CancellationToken ct)
     {
-        var roles = await identityService.GetUserRolesAsync(req.Id);
-        await SendOkAsync(roles, ct);
+        var result = await identityService.GetUserRolesAsync(req.Id);
+        await this.SendResultAsync(result);
     }
 }

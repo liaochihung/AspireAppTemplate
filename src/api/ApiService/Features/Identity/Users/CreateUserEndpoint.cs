@@ -2,6 +2,7 @@ using FastEndpoints;
 using AspireAppTemplate.ApiService.Services;
 using AspireAppTemplate.Shared;
 using FluentValidation;
+using AspireAppTemplate.ApiService.Infrastructure.Extensions;
 
 namespace AspireAppTemplate.ApiService.Features.Identity.Users;
 
@@ -55,15 +56,7 @@ public class CreateUserEndpoint : Endpoint<CreateUserRequest>
             }
         };
 
-        var success = await _identityService.CreateUserAsync(user);
-        if (success)
-        {
-            await SendOkAsync(ct);
-        }
-        else
-        {
-            AddError("Failed to create user in Keycloak");
-            await SendErrorsAsync(cancellation: ct);
-        }
+        var result = await _identityService.CreateUserAsync(user);
+        await this.SendResultAsync(result);
     }
 }

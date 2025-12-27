@@ -1,6 +1,7 @@
 using FastEndpoints;
 using AspireAppTemplate.ApiService.Services;
 using AspireAppTemplate.Shared;
+using AspireAppTemplate.ApiService.Infrastructure.Extensions;
 
 namespace AspireAppTemplate.ApiService.Features.Identity.Users;
 
@@ -27,13 +28,7 @@ public class AssignRoleEndpoint : Endpoint<UserRoleRequest>
 
     public override async Task HandleAsync(UserRoleRequest req, CancellationToken ct)
     {
-        var success = await _identityService.AssignRoleToUserAsync(req.Id, req.RoleName);
-        if (success)
-            await SendOkAsync(ct);
-        else
-        {
-            AddError("Failed to assign role or role not found");
-            await SendErrorsAsync(cancellation: ct);
-        }
+        var result = await _identityService.AssignRoleToUserAsync(req.Id, req.RoleName);
+        await this.SendResultAsync(result);
     }
 }

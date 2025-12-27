@@ -2,6 +2,7 @@ using FastEndpoints;
 using AspireAppTemplate.ApiService.Services;
 using AspireAppTemplate.Shared;
 using FluentValidation;
+using AspireAppTemplate.ApiService.Infrastructure.Extensions;
 
 namespace AspireAppTemplate.ApiService.Features.Identity.Roles.Create;
 
@@ -29,7 +30,7 @@ public class Endpoint(IdentityService identityService) : Endpoint<CreateRoleRequ
     public override async Task HandleAsync(CreateRoleRequest req, CancellationToken ct)
     {
         var role = new KeycloakRole { Name = req.Name };
-        await identityService.CreateRoleAsync(role);
-        await SendOkAsync(ct);
+        var result = await identityService.CreateRoleAsync(role);
+        await this.SendResultAsync(result);
     }
 }

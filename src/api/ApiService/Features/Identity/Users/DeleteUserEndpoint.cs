@@ -1,5 +1,6 @@
 using FastEndpoints;
 using AspireAppTemplate.ApiService.Services;
+using AspireAppTemplate.ApiService.Infrastructure.Extensions;
 
 namespace AspireAppTemplate.ApiService.Features.Identity.Users;
 
@@ -27,15 +28,7 @@ public class DeleteUserEndpoint : EndpointWithoutRequest
             return;
         }
 
-        var success = await _identityService.DeleteUserAsync(id);
-        if (success)
-        {
-            await SendOkAsync(ct);
-        }
-        else
-        {
-            AddError("Failed to delete user in Keycloak");
-            await SendErrorsAsync(500, ct);
-        }
+        var result = await _identityService.DeleteUserAsync(id);
+        await this.SendResultAsync(result);
     }
 }

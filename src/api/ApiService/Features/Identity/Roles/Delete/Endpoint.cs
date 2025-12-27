@@ -1,6 +1,7 @@
 using FastEndpoints;
 using AspireAppTemplate.ApiService.Services;
 using AspireAppTemplate.Shared;
+using AspireAppTemplate.ApiService.Infrastructure.Extensions;
 
 namespace AspireAppTemplate.ApiService.Features.Identity.Roles.Delete;
 
@@ -19,7 +20,7 @@ public class Endpoint(IdentityService identityService) : Endpoint<DeleteRoleRequ
 
     public override async Task HandleAsync(DeleteRoleRequest req, CancellationToken ct)
     {
-        await identityService.DeleteRoleAsync(req.Name);
-        await SendOkAsync(ct);
+        var result = await identityService.DeleteRoleAsync(req.Name);
+        await this.SendResultAsync(result);
     }
 }

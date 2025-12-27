@@ -1,6 +1,7 @@
 using FastEndpoints;
 using AspireAppTemplate.ApiService.Services;
 using AspireAppTemplate.Shared;
+using AspireAppTemplate.ApiService.Infrastructure.Extensions;
 
 namespace AspireAppTemplate.ApiService.Features.Identity.Users.RemoveRole;
 
@@ -20,13 +21,7 @@ public class Endpoint(IdentityService identityService) : Endpoint<RemoveUserRole
 
     public override async Task HandleAsync(RemoveUserRoleRequest req, CancellationToken ct)
     {
-        var success = await identityService.RemoveRoleFromUserAsync(req.Id, req.RoleName);
-        if (success)
-            await SendOkAsync(ct);
-        else
-        {
-            AddError("Failed to remove role");
-            await SendErrorsAsync(cancellation: ct);
-        }
+        var result = await identityService.RemoveRoleFromUserAsync(req.Id, req.RoleName);
+        await this.SendResultAsync(result);
     }
 }

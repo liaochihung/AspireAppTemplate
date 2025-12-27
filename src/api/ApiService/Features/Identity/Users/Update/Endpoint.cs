@@ -2,6 +2,7 @@ using FastEndpoints;
 using AspireAppTemplate.ApiService.Services;
 using AspireAppTemplate.Shared;
 using FluentValidation;
+using AspireAppTemplate.ApiService.Infrastructure.Extensions;
 
 namespace AspireAppTemplate.ApiService.Features.Identity.Users.Update;
 
@@ -35,14 +36,7 @@ public class Endpoint(IdentityService identityService) : Endpoint<UpdateUserRequ
             Enabled = req.Enabled
         };
 
-        var success = await identityService.UpdateUserAsync(req.Id, user);
-        
-        if (success)
-            await SendOkAsync(ct);
-        else
-        {
-            AddError("Failed to update user");
-            await SendErrorsAsync(cancellation: ct);
-        }
+        var result = await identityService.UpdateUserAsync(req.Id, user);
+        await this.SendResultAsync(result);
     }
 }

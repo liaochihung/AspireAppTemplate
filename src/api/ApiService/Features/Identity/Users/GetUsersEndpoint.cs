@@ -1,6 +1,7 @@
 using FastEndpoints;
 using AspireAppTemplate.ApiService.Services;
 using AspireAppTemplate.Shared;
+using AspireAppTemplate.ApiService.Infrastructure.Extensions;
 
 namespace AspireAppTemplate.ApiService.Features.Identity.Users;
 
@@ -21,7 +22,7 @@ public class GetUsersEndpoint : EndpointWithoutRequest<IEnumerable<KeycloakUser>
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var users = await _identityService.GetUsersAsync();
-        await SendOkAsync(users, ct);
+        var result = await _identityService.GetUsersAsync();
+        await this.SendResultAsync(result);
     }
 }
