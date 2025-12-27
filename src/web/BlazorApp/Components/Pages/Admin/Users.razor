@@ -9,7 +9,7 @@
 
 <MudText Typo="Typo.h5" GutterBottom="true">User Management</MudText>
 
-<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="CreateUser" Class="mb-4">Create User</MudButton>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="@(() => OpenUserDialog())" Class="mb-4">Create User</MudButton>
 
 <MudDataGrid Items="@_users" Loading="@_loading" Filterable="true">
     <Columns>
@@ -21,7 +21,8 @@
         <TemplateColumn CellClass="d-flex justify-end">
             <CellTemplate>
                  <MudIconButton Icon="@Icons.Material.Filled.Assignment" Color="Color.Secondary" OnClick="@(() => ManageRoles(context.Item))" Title="Assign Roles" />
-                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => DeleteUser(context.Item))" Title="Delete User" />
+                 <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" OnClick="@(() => OpenUserDialog(context.Item))" Title="Edit User" />
+                 <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => DeleteUser(context.Item))" Title="Delete User" />
             </CellTemplate>
         </TemplateColumn>
     </Columns>
@@ -48,18 +49,37 @@
         }
     }
 
-    private async Task CreateUser()
+    private async Task OpenUserDialog(KeycloakUser? user = null)
     {
-        var dialog = await DialogService.ShowAsync<UserDialog>("Create User");
+        var title = user == null ? "Create User" : "Edit User";
+        // Clone if editing to avoid mutating grid item directly before save
+        var model = user == null ? new KeycloakUser() : new KeycloakUser 
+        { 
+            Id = user.Id, Username = user.Username, Email = user.Email, 
+            FirstName = user.FirstName, LastName = user.LastName, Enabled = user.Enabled 
+        };
+
+        var parameters = new DialogParameters<UserDialog> { { x => x.Model, model } };
+        
+        var dialog = await DialogService.ShowAsync<UserDialog>(title, parameters);
         var result = await dialog.Result;
-        if (result is not null && !result.Canceled && result.Data is KeycloakUser user)
+        
+        if (result is not null && !result.Canceled && result.Data is KeycloakUser savedModel)
         {
             try {
-                await IdentityClient.CreateUserAsync(user);
-                Snackbar.Add("User created successfully", Severity.Success);
+                if (string.IsNullOrEmpty(savedModel.Id))
+                {
+                    await IdentityClient.CreateUserAsync(savedModel);
+                    Snackbar.Add("User created successfully", Severity.Success);
+                }
+                else 
+                {
+                    await IdentityClient.UpdateUserAsync(savedModel);
+                    Snackbar.Add("User updated successfully", Severity.Success);
+                }
                 await LoadUsers();
             } catch (Exception ex) {
-                Snackbar.Add($"Error creating user: {ex.Message}", Severity.Error);
+                Snackbar.Add($"Error saving user: {ex.Message}", Severity.Error);
             }
         }
     }
@@ -84,8 +104,9 @@
         }
     }
 
-    private void ManageRoles(KeycloakUser user)
+    private async Task ManageRoles(KeycloakUser user)
     {
-        Snackbar.Add($"Manage roles for {user.Username} (Coming soon)", Severity.Info);
+        var parameters = new DialogParameters<UserRolesDialog> { { x => x.User, user } };
+        await DialogService.ShowAsync<UserRolesDialog>($"Roles for {user.Username}", parameters);
     }
 }

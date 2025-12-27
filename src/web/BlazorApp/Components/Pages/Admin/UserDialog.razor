@@ -8,7 +8,8 @@
         <MudTextField T="string" Label="Email" @bind-Value="Model.Email" Required="true" InputType="InputType.Email" />
         <MudTextField T="string" Label="First Name" @bind-Value="Model.FirstName" />
         <MudTextField T="string" Label="Last Name" @bind-Value="Model.LastName" />
-        <MudTextField T="string" Label="Initial Password" @bind-Value="Password" InputType="InputType.Password" Required="true" />
+        <MudTextField T="string" Label="@(string.IsNullOrEmpty(Model.Id) ? "Initial Password" : "Reset Password (Optional)")" 
+                      @bind-Value="Password" InputType="InputType.Password" Required="@string.IsNullOrEmpty(Model.Id)" />
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>
@@ -18,24 +19,36 @@
 
 @code {
     [CascadingParameter] MudBlazor.IMudDialogInstance MudDialog { get; set; } = default!;
-
-    private KeycloakUser Model { get; set; } = new KeycloakUser();
+    
+    [Parameter] public KeycloakUser Model { get; set; } = new KeycloakUser();
+    
     private string Password { get; set; } = string.Empty;
 
     private void Cancel() => MudDialog.Cancel();
 
     private void Submit()
     {
-        if (string.IsNullOrWhiteSpace(Model.Username) || string.IsNullOrWhiteSpace(Model.Email) || string.IsNullOrWhiteSpace(Password))
+        // Validation
+        if (string.IsNullOrWhiteSpace(Model.Username) || string.IsNullOrWhiteSpace(Model.Email))
         {
             Snackbar.Add("Please fill required fields", Severity.Warning);
             return;
         }
 
-        Model.Credentials = new List<KeycloakCredential> 
-        { 
-            new KeycloakCredential { Type = "password", Value = Password, Temporary = false } 
-        };
+        // If creating new user, password is required
+        if (string.IsNullOrEmpty(Model.Id) && string.IsNullOrWhiteSpace(Password))
+        {
+             Snackbar.Add("Password is required for new users", Severity.Warning);
+             return;
+        }
+
+        if (!string.IsNullOrEmpty(Password))
+        {
+            Model.Credentials = new List<KeycloakCredential> 
+            { 
+                new KeycloakCredential { Type = "password", Value = Password, Temporary = false } 
+            };
+        }
 
         MudDialog.Close(DialogResult.Ok(Model));
     }

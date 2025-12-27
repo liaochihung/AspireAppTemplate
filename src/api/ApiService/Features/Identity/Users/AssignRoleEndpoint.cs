@@ -22,7 +22,7 @@ public class AssignRoleEndpoint : Endpoint<UserRoleRequest>
     public override void Configure()
     {
         Post("/users/{id}/roles");
-        AllowAnonymous();
+        Policies(AppPolicies.CanManageUsers);
     }
 
     public override async Task HandleAsync(UserRoleRequest req, CancellationToken ct)

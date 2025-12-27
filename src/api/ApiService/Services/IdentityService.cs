@@ -147,4 +147,34 @@ public class IdentityService
         var response = await _httpClient.PostAsJsonAsync($"admin/realms/{_config.Realm}/users/{userId}/role-mappings/realm", new[] { role });
         return response.IsSuccessStatusCode;
     }
+
+    public async Task<bool> RemoveRoleFromUserAsync(string userId, string roleName)
+    {
+        await SetAuthHeaderAsync();
+        
+        var role = await _httpClient.GetFromJsonAsync<KeycloakRole>($"admin/realms/{_config.Realm}/roles/{roleName}");
+        if (role == null) return false;
+
+        var request = new HttpRequestMessage(HttpMethod.Delete, $"admin/realms/{_config.Realm}/users/{userId}/role-mappings/realm")
+        {
+            Content = JsonContent.Create(new[] { role })
+        };
+        
+        var response = await _httpClient.SendAsync(request);
+        return response.IsSuccessStatusCode;
+    }
+
+    public async Task<IEnumerable<KeycloakRole>> GetUserRolesAsync(string userId)
+    {
+        await SetAuthHeaderAsync();
+        var roles = await _httpClient.GetFromJsonAsync<IEnumerable<KeycloakRole>>($"admin/realms/{_config.Realm}/users/{userId}/role-mappings/realm");
+        return roles ?? Enumerable.Empty<KeycloakRole>();
+    }
+
+    public async Task<bool> UpdateUserAsync(string id, KeycloakUser user)
+    {
+        await SetAuthHeaderAsync();
+        var response = await _httpClient.PutAsJsonAsync($"admin/realms/{_config.Realm}/users/{id}", user);
+        return response.IsSuccessStatusCode;
+    }
 }

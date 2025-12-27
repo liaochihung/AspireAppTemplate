@@ -1,17 +1,17 @@
 ## 1. Backend Implementation
-- [ ] 1.1 Add `Keycloak.Net` package to ApiService
-- [ ] 1.2 Create `IdentityService` in ApiService to interact with Keycloak Admin API (Users & Roles)
-- [ ] 1.3 Add Role Endpoints: `GET /roles`, `POST /roles`, `DELETE /roles/{name}`
-- [ ] 1.4 Add User Endpoints: `GET /users`, `POST /users`, `GET /users/{id}`, `PUT /users/{id}`, `DELETE /users/{id}`
-- [ ] 1.5 Add User Role Endpoints: `POST /users/{id}/roles`, `DELETE /users/{id}/roles`
+- [x] 1.1 Implement `IdentityService` in ApiService (Native HttpClient, no Keycloak.Net)
+- [x] 1.2 Add Role Endpoints (REPR): `Create`, `Delete`, `GetAll` in `Features/Identity/Roles`
+- [x] 1.3 Add User Endpoints: `Create`, `Delete`, `GetAll` in `Features/Identity/Users`
+- [x] 1.4 Add User Role Endpoints: `AssignRoleEndpoint`
+- [x] 1.5 Implement Policy Authority (`CanManageRoles`)
 
 ## 2. Frontend Implementation
-- [ ] 2.1 Create `IdentityClient` (or separate Users/Roles clients) in BlazorApp
-- [ ] 2.2 Create `Users.razor` page with list and search
-- [ ] 2.3 Create `UserDialog.razor` for creating/editing users
-- [ ] 2.4 Create `Roles.razor` page with standard table layout
-- [ ] 2.5 Create `CreateRoleDialog.razor`
-- [ ] 2.6 Update `UserDetail.razor` to include Role management tab
+- [ ] 2.1 Create `IdentityClient` in BlazorApp (Verify implementation)
+- [x] 2.2 Create `Users.razor` page with list and search
+- [x] 2.3 Create `UserDialog.razor` for creating users
+- [x] 2.4 Create `Roles.razor` page with standard table layout
+- [x] 2.5 Create `CreateRoleDialog.razor`
+- [ ] 2.6 Implement Role Assignment UI (Button/Dialog in Users list or User Detail)
 
 ## 3. Verification
 - [ ] 3.1 Verify User creation via UI syncs to Keycloak

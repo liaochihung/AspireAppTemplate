@@ -34,11 +34,38 @@ public class IdentityApiClient(HttpClient httpClient)
         response.EnsureSuccessStatusCode();
     }
 
+    public async Task UpdateUserAsync(KeycloakUser user, CancellationToken ct = default)
+    {
+        var request = new 
+        {
+            Id = user.Id,
+            Username = user.Username,
+            Email = user.Email,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Enabled = user.Enabled
+        };
+        var response = await httpClient.PutAsJsonAsync($"/api/users/{user.Id}", request, ct);
+        response.EnsureSuccessStatusCode();
+    }
+
     public async Task AssignRoleAsync(string userId, string roleName, CancellationToken ct = default)
     {
         var request = new { RoleName = roleName };
         var response = await httpClient.PostAsJsonAsync($"/api/users/{userId}/roles", request, ct);
         response.EnsureSuccessStatusCode();
+    }
+
+    public async Task RemoveRoleAsync(string userId, string roleName, CancellationToken ct = default)
+    {
+        var response = await httpClient.DeleteAsync($"/api/users/{userId}/roles/{roleName}", ct);
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<KeycloakRole[]> GetUserRolesAsync(string userId, CancellationToken ct = default)
+    {
+        var roles = await httpClient.GetFromJsonAsync<KeycloakRole[]>($"/api/users/{userId}/roles", ct);
+        return roles ?? [];
     }
 
     // --- Roles ---
