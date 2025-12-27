@@ -10,6 +10,8 @@ public class KeycloakConfiguration
     public string Realm { get; set; } = string.Empty;
     public string ClientId { get; set; } = string.Empty;
     public string ClientSecret { get; set; } = string.Empty;
+    public string AdminUsername { get; set; } = string.Empty;
+    public string AdminPassword { get; set; } = string.Empty;
 }
 
 public class IdentityService
@@ -36,14 +38,22 @@ public class IdentityService
             return _cachedToken;
         }
 
-        var content = new FormUrlEncodedContent(new[]
+        var param = new List<KeyValuePair<string, string>>
         {
             new KeyValuePair<string, string>("client_id", _config.ClientId),
-            new KeyValuePair<string, string>("client_secret", _config.ClientSecret),
-            new KeyValuePair<string, string>("grant_type", "client_credentials")
-        });
+            new KeyValuePair<string, string>("grant_type", "password"),
+            new KeyValuePair<string, string>("username", _config.AdminUsername),
+            new KeyValuePair<string, string>("password", _config.AdminPassword)
+        };
 
-        var response = await _httpClient.PostAsync($"realms/{_config.Realm}/protocol/openid-connect/token", content);
+        if (!string.IsNullOrEmpty(_config.ClientSecret))
+        {
+            param.Add(new KeyValuePair<string, string>("client_secret", _config.ClientSecret));
+        }
+
+        var content = new FormUrlEncodedContent(param);
+
+        var response = await _httpClient.PostAsync($"realms/master/protocol/openid-connect/token", content);
         response.EnsureSuccessStatusCode();
 
         var tokenData = await response.Content.ReadFromJsonAsync<TokenResponse>();
@@ -75,6 +85,11 @@ public class IdentityService
     {
         await SetAuthHeaderAsync();
         var response = await _httpClient.PostAsJsonAsync($"admin/realms/{_config.Realm}/users", user);
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"[IdentityService] Failed to create user: {response.StatusCode} - {error}");
+        }
         return response.IsSuccessStatusCode;
     }
 
@@ -82,6 +97,11 @@ public class IdentityService
     {
         await SetAuthHeaderAsync();
         var response = await _httpClient.DeleteAsync($"admin/realms/{_config.Realm}/users/{id}");
+        if (!response.IsSuccessStatusCode)
+        {
+             var error = await response.Content.ReadAsStringAsync();
+             Console.WriteLine($"[IdentityService] Failed to delete user: {response.StatusCode} - {error}");
+        }
         return response.IsSuccessStatusCode;
     }
 
@@ -98,6 +118,11 @@ public class IdentityService
     {
         await SetAuthHeaderAsync();
         var response = await _httpClient.PostAsJsonAsync($"admin/realms/{_config.Realm}/roles", role);
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"[IdentityService] Failed to create role: {response.StatusCode} - {error}");
+        }
         return response.IsSuccessStatusCode;
     }
 

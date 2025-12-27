@@ -73,7 +73,14 @@
         
         if (result == true)
         {
-            Snackbar.Add("User deletion coming soon...", Severity.Info);
+            try {
+                if(string.IsNullOrEmpty(user.Id)) throw new Exception("User ID is missing");
+                await IdentityClient.DeleteUserAsync(user.Id);
+                Snackbar.Add("User deleted successfully", Severity.Success);
+                await LoadUsers();
+            } catch (Exception ex) {
+                Snackbar.Add($"Error deleting user: {ex.Message}", Severity.Error);
+            }
         }
     }
 

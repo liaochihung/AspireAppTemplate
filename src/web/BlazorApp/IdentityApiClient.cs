@@ -28,6 +28,12 @@ public class IdentityApiClient(HttpClient httpClient)
         response.EnsureSuccessStatusCode();
     }
 
+    public async Task DeleteUserAsync(string id, CancellationToken ct = default)
+    {
+        var response = await httpClient.DeleteAsync($"/api/users/{id}", ct);
+        response.EnsureSuccessStatusCode();
+    }
+
     public async Task AssignRoleAsync(string userId, string roleName, CancellationToken ct = default)
     {
         var request = new { RoleName = roleName };
