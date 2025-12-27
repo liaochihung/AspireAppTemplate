@@ -11,44 +11,37 @@
 
 <PageTitle>Weather</PageTitle>
 
-<h1>Weather</h1>
-
-<p>This component demonstrates showing data loaded from a backend API service.</p>
+<MudText Typo="Typo.h4" GutterBottom="true">Weather</MudText>
+<MudText Typo="Typo.body1" Class="mb-4">This component demonstrates showing data loaded from a backend API service.</MudText>
 
 <AuthorizeView>
     <Authorized>
         @if (forecasts == null)
         {
-            <p><em>Loading...</em></p>
+            <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
         }
         else
         {
-
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th aria-label="Temperature in Celsius">Temp. (C)</th>
-                        <th aria-label="Temperature in Farenheit">Temp. (F)</th>
-                        <th>Summary</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var forecast in forecasts)
-                    {
-                        <tr>
-                            <td>@forecast.Date.ToShortDateString()</td>
-                            <td>@forecast.TemperatureC</td>
-                            <td>@forecast.TemperatureF</td>
-                            <td>@forecast.Summary</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+            <MudTable Items="@forecasts" Hover="true" Dense="true" Striped="true" Context="forecast">
+                <HeaderContent>
+                    <MudTh>Date</MudTh>
+                    <MudTh>Temp. (C)</MudTh>
+                    <MudTh>Temp. (F)</MudTh>
+                    <MudTh>Summary</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Date">@forecast.Date.ToShortDateString()</MudTd>
+                    <MudTd DataLabel="Temp. (C)">@forecast.TemperatureC</MudTd>
+                    <MudTd DataLabel="Temp. (F)">@forecast.TemperatureF</MudTd>
+                    <MudTd DataLabel="Summary">@forecast.Summary</MudTd>
+                </RowTemplate>
+            </MudTable>
         }
     </Authorized>
     <NotAuthorized>
-        <p><strong>Please <a href="authentication/login">log in</a> to see the weather forecast.</strong></p>
+        <MudAlert Severity="Severity.Info">
+            Please <MudLink Href="authentication/login">log in</MudLink> to see the weather forecast.
+        </MudAlert>
     </NotAuthorized>
 </AuthorizeView>
 
@@ -60,7 +53,6 @@
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
-        // 使用 Policy 檢查取代直接檢查 Role
         var authResult = await AuthorizationService.AuthorizeAsync(user, AppPolicies.CanViewWeather);
 
         if (authResult.Succeeded)

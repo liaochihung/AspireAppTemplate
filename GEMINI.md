@@ -19,6 +19,22 @@
 *   **Keycloak**: 使用 Docker 容器運行。
     *   預設 Admin: `admin` / `admin`
     *   Realm 設定由 `Realms/import-realmdata.json` 自動匯入。
+    *   自訂 Theme 位於 `keycloak-themes/my-company-theme/`，需在 Keycloak Admin 手動啟用。
+
+### UI Framework (2025-12-26)
+*   **MudBlazor 8.2.0**: 取代 Bootstrap CSS，提供完整 Material Design 元件庫。
+*   **Element Plus 風格配色**: 主色 `#409EFF`，使用 4px 圓角，支援中文字體。
+*   **深色/淺色切換**: 內建於 `MainLayout.razor`，AppBar 右側有切換按鈕。
+*   **Theme 設定架構** (對齊 MyDotnetStarterKit):
+    *   `Components/ThemeManager/` - 模組化主題元件
+        *   `ThemeDrawer.razor` - 主題設定抽屜容器
+        *   `DarkModePanel.razor` - 深色模式切換
+        *   `ColorPanel.razor` - 主色/輔色選擇器 (可重用)
+        *   `RadiusPanel.razor` - 圓角調整
+        *   `TableCustomizationPanel.razor` - 表格樣式設定
+    *   `Infrastructure/Themes/CustomColors.cs` - 預設顏色清單
+    *   `Infrastructure/Settings/UserPreferences.cs` - 使用者偏好設定 (含 TablePreference)
+    *   `Infrastructure/Services/LayoutService.cs` - 偏好設定持久化與套用
 
 ## 常見任務 (Common Tasks)
 

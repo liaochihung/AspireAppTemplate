@@ -1,41 +1,51 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">AspireAppTemplate</a>
-    </div>
-</div>
+﻿@using Microsoft.AspNetCore.Components.Authorization
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+<MudDrawerHeader Class="px-4 py-2 d-flex align-center" Style="min-height: 64px;">
+    <AuthorizeView>
+        <Authorized>
+            <MudAvatar Color="Color.Primary" Size="Size.Small">
+                <MudIcon Icon="@Icons.Material.Filled.Person" Size="Size.Small" />
+            </MudAvatar>
+            @if (IsOpen)
+            {
+                <div class="ml-3">
+                    <MudText Typo="Typo.subtitle1">@context.User.Identity?.Name</MudText>
+                    <MudText Typo="Typo.caption" Class="mud-text-secondary">使用者</MudText>
+                </div>
+            }
+        </Authorized>
+        <NotAuthorized>
+            <MudAvatar Size="Size.Small">
+                <MudIcon Icon="@Icons.Material.Filled.Person" Size="Size.Small" />
+            </MudAvatar>
+            @if (IsOpen)
+            {
+                <div class="ml-3">
+                    <MudText Typo="Typo.subtitle1">訪客</MudText>
+                </div>
+            }
+        </NotAuthorized>
+    </AuthorizeView>
+</MudDrawerHeader>
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
+<MudNavMenu>
+    @if (IsOpen)
+    {
+        <MudText Typo="Typo.subtitle2" Color="Color.Surface" Class="ml-4 my-3">主要導覽</MudText>
+    }
+    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">首頁</MudNavLink>
+    <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddCircle">計數器</MudNavLink>
+    <MudNavLink Href="products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ShoppingCart">產品清單</MudNavLink>
+    <MudNavLink Href="weather" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Cloud">天氣預報</MudNavLink>
+    
+    @if (IsOpen)
+    {
+        <MudText Typo="Typo.subtitle2" Color="Color.Surface" Class="ml-4 my-3">技術測試</MudText>
+    }
+    <MudNavLink Href="token" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Token">存取權杖</MudNavLink>
+</MudNavMenu>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="products">
-                <span class="bi bi-plus-square-fill" aria-hidden="true"></span> Product list
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="token">
-                <span class="bi bi-list-nested" aria-hidden="true"></span> Access Token
-            </NavLink>
-        </div>
-    </nav>
-</div>
+@code {
+    [Parameter]
+    public bool IsOpen { get; set; }
+}

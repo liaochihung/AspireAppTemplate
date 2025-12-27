@@ -1,21 +1,43 @@
 @using Microsoft.AspNetCore.Components.Authorization
-@using System.Security.Claims;
-@using System.Security.Principal;
-@using System.Security.Cryptography
-@using System.Text
-@using System.IdentityModel.Tokens.Jwt
 
 <AuthorizeView>
     <Authorized>
-        <div>
-            <span>Welcome @context.User.Identity?.Name!</span>
-            <form method="post" action="/authentication/logout" style="display:inline;">
-                <AntiforgeryToken />
-                <button type="submit" class="btn btn-link">Logout</button>
-            </form>
-        </div>
+        <MudMenu AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" Dense="true" Class="ml-2">
+            <ActivatorContent>
+                <MudIconButton Icon="@Icons.Material.Filled.Person" Color="Color.Inherit" />
+            </ActivatorContent>
+            <ChildContent>
+                <div class="py-2" style="min-width: 220px">
+                    <MudMenuItem Icon="@Icons.Material.Filled.Person" href="/account/settings">
+                        <div class="d-flex">
+                            <MudText>帳戶</MudText>
+                        </div>
+                    </MudMenuItem>
+                    <MudMenuItem Icon="@Icons.Material.Filled.Dashboard" href="/">
+                        <div class="d-flex">
+                            <MudText>導覽頁</MudText>
+                        </div>
+                    </MudMenuItem>
+                    <div class="mt-4 mx-4">
+                        <form method="post" action="/authentication/logout" id="logout-form">
+                            <AntiforgeryToken />
+                            <MudButton ButtonType="ButtonType.Submit" 
+                                       FullWidth="true" 
+                                       StartIcon="@Icons.Material.Filled.Logout" 
+                                       Color="Color.Error" 
+                                       Variant="Variant.Filled"
+                                       DropShadow="false">
+                                登出
+                            </MudButton>
+                        </form>
+                    </div>
+                </div>
+            </ChildContent>
+        </MudMenu>
     </Authorized>
     <NotAuthorized>
-        <a href="/authentication/login" class="btn btn-primary">Login</a>
+        <MudButton Href="/authentication/login" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small">
+            登入
+        </MudButton>
     </NotAuthorized>
 </AuthorizeView>

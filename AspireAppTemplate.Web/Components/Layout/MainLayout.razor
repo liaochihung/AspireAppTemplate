@@ -1,23 +1,84 @@
-﻿@inherits LayoutComponentBase
+﻿@using AspireAppTemplate.Web.Infrastructure.Services
+@inherits LayoutComponentBase
+@implements IDisposable
+@layout BaseLayout
+@inject LayoutService LayoutService
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<MudLayout>
+    <MudAppBar Color="Color.Surface" Elevation="0">
+        <MudTooltip Text="Toggle Drawer">
+            <MudIconButton Icon="@Icons.Material.Rounded.Notes" Color="Color.Inherit" Edge="Edge.Start"
+                OnClick="@DrawerToggle" />
+        </MudTooltip>
+        <MudButton Variant="Variant.Text" Color="Color.Transparent" Href="/" DropShadow="false">
+            首頁
+        </MudButton>
+        <MudSpacer />
+        
+        <MudTooltip Text="@(LayoutService.IsDarkMode ? "淺色模式" : "深色模式")">
+            <MudIconButton Icon="@(LayoutService.IsDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)"
+                           Color="Color.Inherit" OnClick="@ToggleDarkMode" />
+        </MudTooltip>
+        
+        <MudTooltip Text="主題設定">
+            <MudIconButton Icon="@Icons.Material.Filled.Palette" Color="Color.Inherit" 
+                           OnClick="@OpenThemeDrawer" />
+        </MudTooltip>
 
-    <main>
-        <div class="top-row px-4">
-            <LoginDisplay />
-        </div>
+        <LoginDisplay />
+    </MudAppBar>
 
-        <article class="content px-4">
+    <MudDrawer @bind-Open="_drawerOpen" Variant="DrawerVariant.Mini" Outlined 
+               ClipMode="DrawerClipMode.Always" Overlay="false">
+        <NavMenu IsOpen="_drawerOpen" />
+    </MudDrawer>
+
+    <MudMainContent Class="pt-16">
+        <MudContainer MaxWidth="MaxWidth.False" Class="px-6 py-6">
             @Body
-        </article>
-    </main>
-</div>
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
 
-<div id="blazor-error-ui">
-    An unhandled error has occurred.
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
-</div>
+@code {
+    private bool _drawerOpen;
+    private bool _isDarkMode;
+
+    [CascadingParameter]
+    public BaseLayout? ParentLayout { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var prefs = await LayoutService.GetPreferenceAsync();
+        _drawerOpen = prefs.IsDrawerOpen;
+        _isDarkMode = prefs.IsDarkMode;
+        
+        LayoutService.MajorUpdateOccurred += OnMajorUpdateOccurred;
+    }
+
+    private async Task DrawerToggle()
+    {
+        _drawerOpen = await LayoutService.ToggleDrawerAsync();
+    }
+
+    private async Task ToggleDarkMode()
+    {
+        _isDarkMode = !_isDarkMode;
+        await LayoutService.SetDarkModeAsync(_isDarkMode);
+    }
+
+    private void OpenThemeDrawer()
+    {
+        ParentLayout?.OpenThemeDrawer();
+    }
+
+    private void OnMajorUpdateOccurred(object? sender, EventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        LayoutService.MajorUpdateOccurred -= OnMajorUpdateOccurred;
+    }
+}
