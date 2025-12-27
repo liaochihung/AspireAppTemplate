@@ -1,7 +1,7 @@
 using AspireAppTemplate.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace AspireAppTemplate.Database;
+namespace AspireAppTemplate.ApiService.Data;
 
 public class AppDbContext : DbContext
 {

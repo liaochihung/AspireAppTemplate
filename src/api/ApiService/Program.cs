@@ -2,7 +2,7 @@ using FastEndpoints;
 using FastEndpoints.Swagger;
 using AspireAppTemplate.Shared;
 using Serilog;
-using AspireAppTemplate.Database;
+using AspireAppTemplate.ApiService.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +12,7 @@ builder.Logging.ClearProviders();
 
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
-builder.AddNpgsqlDbContext<AppDbContext>("aspiredb"); // 已內建 Health Check
+builder.AddNpgsqlDbContext<AppDbContext>("aspiredb"); // 已內�?Health Check
 
 builder.Host.UseSerilog((context, services, configuration) => configuration
     .ReadFrom.Configuration(context.Configuration)
@@ -23,7 +23,7 @@ builder.Host.UseSerilog((context, services, configuration) => configuration
 // Add services to the container.
 builder.Services.AddProblemDetails();
 builder.Services.AddFastEndpoints();
-builder.Services.SwaggerDocument(); // FastEndpoints 的 Swagger 整合
+builder.Services.SwaggerDocument(); // FastEndpoints ??Swagger ?��?
 
 builder.Services.AddAuthentication()
     .AddKeycloakJwtBearer(
@@ -67,10 +67,10 @@ app.UseFastEndpoints(c =>
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwaggerGen(); // 使用 FastEndpoints 的 Swagger UI
+    app.UseSwaggerGen(); // 使用 FastEndpoints ??Swagger UI
 }
 
-// 保留原本的 Minimal API 範例，或者將其也遷移到 FastEndpoints
+// 保�??�本??Minimal API 範�?，�??��??��??�移??FastEndpoints
 app.MapGet("/weatherforecast", () =>
 {
     string[] summaries = ["Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"];

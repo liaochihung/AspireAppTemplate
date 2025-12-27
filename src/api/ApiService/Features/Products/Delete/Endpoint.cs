@@ -1,6 +1,6 @@
 using FastEndpoints;
 using AspireAppTemplate.Shared;
-using AspireAppTemplate.Database;
+using AspireAppTemplate.ApiService.Data;
 
 namespace AspireAppTemplate.ApiService.Features.Products.Delete;
 

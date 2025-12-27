@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AspireAppTemplate.ApiService\AspireAppTemplate.ApiService.csproj" />
-    <ProjectReference Include="..\AspireAppTemplate.Web\AspireAppTemplate.Web.csproj" />
+    <ProjectReference Include="..\..\api\ApiService\AspireAppTemplate.ApiService.csproj" />
+    <ProjectReference Include="..\..\web\BlazorApp\AspireAppTemplate.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,7 +1,7 @@
 using FastEndpoints;
 using FluentValidation;
 using AspireAppTemplate.Shared;
-using AspireAppTemplate.Database;
+using AspireAppTemplate.ApiService.Data;
 
 namespace AspireAppTemplate.ApiService.Features.Products.Update;
 
@@ -17,8 +17,8 @@ public class Validator : Validator<Request>
 {
     public Validator()
     {
-        RuleFor(x => x.Name).NotEmpty().WithMessage("名稱不能為空");
-        RuleFor(x => x.Price).GreaterThan(0).WithMessage("價格必須大於 0");
+        RuleFor(x => x.Name).NotEmpty().WithMessage("?�稱不能?�空");
+        RuleFor(x => x.Price).GreaterThan(0).WithMessage("?�格必�?大於 0");
     }
 }
 

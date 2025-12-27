@@ -1,6 +1,6 @@
 using FastEndpoints;
 using AspireAppTemplate.Shared;
-using AspireAppTemplate.Database;
+using AspireAppTemplate.ApiService.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace AspireAppTemplate.ApiService.Features.Products.GetAll;

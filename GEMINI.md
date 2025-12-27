@@ -2,6 +2,22 @@
 
 ## 架構決策紀錄 (ADR - Architecture Decision Records)
 
+### Project Structure Reorganization (2025-12-27)
+*   **`src/` 統一管理**: 所有專案程式碼移至 `src/` 目錄，清楚區分原始碼與配置檔案。
+*   **分類目錄結構**:
+    *   `src/api/` - 後端 API 服務 (ApiService)
+    *   `src/web/` - 前端應用 (BlazorApp，未來可加 Vue/React)
+    *   `src/aspire/` - Aspire 編排 (AppHost, ServiceDefaults)
+    *   `src/shared/` - 跨專案共用程式碼 (Shared)
+    *   `src/tests/` - 測試專案
+*   **設計理念**: 參考 MyDotnetStarterKit 的組織結構，但**不採用 Clean Architecture**，保持 KISS 原則。
+*   **未來擴展性**:
+    *   多前端支援: `src/web/VueApp/`, `src/web/ReactApp/`
+    *   模組化 API: 未來可在 `src/api/` 下建立多個模組 (Products, Orders)
+    *   微服務準備: 模組可輕鬆拆分成獨立服務
+*   **Database 整合**: ~~獨立專案已移除~~，DbContext 已合併到 `src/api/ApiService/Data/`，符合 KISS 原則。
+
+
 ### Database Integration (2025-12-25)
 *   **獨立專案**: 資料庫邏輯被拆分至獨立的 Class Library (`AspireAppTemplate.Database`) 以保持關注點分離 (Separation of Concerns)。
 *   **固定埠口**: 開發環境下，PostgreSQL 容器強制映射至主機的 `5436` 埠口。
