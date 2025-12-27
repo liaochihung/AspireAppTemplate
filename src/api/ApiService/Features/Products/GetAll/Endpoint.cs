@@ -1,29 +1,24 @@
 using FastEndpoints;
 using AspireAppTemplate.Shared;
 using AspireAppTemplate.ApiService.Data;
+using AspireAppTemplate.ApiService.Infrastructure.Extensions;
+using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 
 namespace AspireAppTemplate.ApiService.Features.Products.GetAll;
 
-public class Endpoint : EndpointWithoutRequest<List<Product>>
+public class Endpoint(AppDbContext dbContext) : EndpointWithoutRequest<IEnumerable<Product>>
 {
-    private readonly AppDbContext _db;
-
-    public Endpoint(AppDbContext db) => _db = db;
-
     public override void Configure()
     {
-        Get("products");
+        Get("/products");
         AllowAnonymous();
-        Description(x => x
-            .WithName("GetAllProducts")
-            .WithTags("Products"));
     }
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var products = await _db.Products.ToListAsync(ct);
-        Logger.LogInformation("Retrieving all products. Count: {Count}", products.Count);
-        await SendAsync(products, cancellation: ct);
+        var products = await dbContext.Products.ToListAsync(ct);
+        ErrorOr<IEnumerable<Product>> result = products;
+        await this.SendResultAsync(result, ct: ct);
     }
 }
