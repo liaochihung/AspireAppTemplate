@@ -1,0 +1,32 @@
+@using AspireAppTemplate.Shared
+@using MudBlazor
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField T="string" Label="Role Name" @bind-Value="Model.Name" Required="true" />
+        <MudTextField T="string" Label="Description" @bind-Value="Model.Description" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Create</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudBlazor.IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private KeycloakRole Model { get; set; } = new KeycloakRole();
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private void Submit()
+    {
+        if (string.IsNullOrWhiteSpace(Model.Name))
+        {
+            Snackbar.Add("Role Name is required", Severity.Warning);
+            return;
+        }
+        MudDialog.Close(DialogResult.Ok(Model));
+    }
+}

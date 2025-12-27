@@ -1,18 +1,15 @@
-using FastEndpoints;
+ï»¿using FastEndpoints;
 using FastEndpoints.Swagger;
 using AspireAppTemplate.Shared;
 using Serilog;
 using AspireAppTemplate.ApiService.Data;
+using AspireAppTemplate.ApiService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Clear default logging providers (like Console) to avoid duplicate logs,
-// but keep Serilog flowing to OpenTelemetry via writeToProviders: true.
 builder.Logging.ClearProviders();
-
-// Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
-builder.AddNpgsqlDbContext<AppDbContext>("aspiredb"); // å·²å…§å»?Health Check
+builder.AddNpgsqlDbContext<AppDbContext>("aspiredb");
 
 builder.Host.UseSerilog((context, services, configuration) => configuration
     .ReadFrom.Configuration(context.Configuration)
@@ -20,10 +17,12 @@ builder.Host.UseSerilog((context, services, configuration) => configuration
     .Enrich.FromLogContext(),
     writeToProviders: true);
 
-// Add services to the container.
 builder.Services.AddProblemDetails();
 builder.Services.AddFastEndpoints();
-builder.Services.SwaggerDocument(); // FastEndpoints ??Swagger ?´å?
+builder.Services.SwaggerDocument();
+
+builder.Services.Configure<KeycloakConfiguration>(builder.Configuration.GetSection("Keycloak"));
+builder.Services.AddHttpClient<IdentityService>();
 
 builder.Services.AddAuthentication()
     .AddKeycloakJwtBearer(
@@ -41,11 +40,15 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy(AppPolicies.CanManageProducts, policy => 
         policy.RequireRole(AppRoles.Administrator));
+
+    options.AddPolicy(AppPolicies.CanManageRoles, policy => 
+        policy.RequireRole(AppRoles.Administrator));
+
+    options.AddPolicy(AppPolicies.CanManageUsers, policy => 
+        policy.RequireRole(AppRoles.Administrator));
 });
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
 app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
@@ -60,46 +63,25 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseFastEndpoints(c =>
-{
-    c.Endpoints.RoutePrefix = "api";
-});
+app.UseFastEndpoints(c => { c.Endpoints.RoutePrefix = "api"; });
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwaggerGen(); // ä½¿ç”¨ FastEndpoints ??Swagger UI
-}
+if (app.Environment.IsDevelopment()) { app.UseSwaggerGen(); }
 
-// ä¿ç??Ÿæœ¬??Minimal API ç¯„ä?ï¼Œæ??…å??¶ä??·ç§»??FastEndpoints
-app.MapGet("/weatherforecast", () =>
-{
-    string[] summaries = ["Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"];
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.RequireAuthorization();
+
 
 app.MapDefaultEndpoints();
 
-try
-{
-    Log.Information("Starting AspireAppTemplate.ApiService");
-    app.Run();
+try 
+{ 
+    Log.Information("Starting AspireAppTemplate.ApiService"); 
+    await app.RunAsync(); 
 }
-catch (Exception ex)
-{
-    Log.Fatal(ex, "AspireAppTemplate.ApiService terminated unexpectedly");
+catch (Exception ex) 
+{ 
+    Log.Fatal(ex, "AspireAppTemplate.ApiService terminated unexpectedly"); 
 }
-finally
-{
-    Log.Information("AspireAppTemplate.ApiService is shutting down");
-    Log.CloseAndFlush();
+finally 
+{ 
+    Log.Information("AspireAppTemplate.ApiService is shutting down"); 
+    await Log.CloseAndFlushAsync(); 
 }

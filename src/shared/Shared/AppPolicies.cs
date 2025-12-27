@@ -7,4 +7,7 @@ public static class AppPolicies
     
     // 定義「查看天氣」的策略名稱
     public const string CanViewWeather = "CanViewWeather";
+
+    public const string CanManageUsers = "CanManageUsers";
+    public const string CanManageRoles = "CanManageRoles";
 }

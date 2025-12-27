@@ -86,7 +86,7 @@ public class LayoutService
         OnMajorUpdateOccurred();
     }
 
-    public void ApplyUserPreferences(MudTheme theme, UserPreferences prefs)
+    public static void ApplyUserPreferences(MudTheme theme, UserPreferences prefs)
     {
         theme.PaletteLight.Primary = prefs.PrimaryColor;
         theme.PaletteLight.Secondary = prefs.SecondaryColor;

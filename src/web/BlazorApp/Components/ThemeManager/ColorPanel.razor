@@ -30,7 +30,7 @@
 
 @code {
     [Parameter]
-    public List<string> Colors { get; set; } = new();
+    public IReadOnlyList<string> Colors { get; set; } = Array.Empty<string>();
 
     [Parameter]
     public string ColorType { get; set; } = "主色調";

@@ -2,62 +2,53 @@ using FastEndpoints;
 using FluentValidation;
 using AspireAppTemplate.Shared;
 using AspireAppTemplate.ApiService.Data;
+using AspireAppTemplate.ApiService.Infrastructure.Extensions;
+using ErrorOr;
 
 namespace AspireAppTemplate.ApiService.Features.Products.Update;
 
-public class Request
+public class UpdateProductRequest
 {
-    public int Id { get; set; }
     public string Name { get; set; } = default!;
     public decimal Price { get; set; }
     public string? Description { get; set; }
 }
 
-public class Validator : Validator<Request>
+public class UpdateProductValidator : Validator<UpdateProductRequest>
 {
-    public Validator()
+    public UpdateProductValidator()
     {
-        RuleFor(x => x.Name).NotEmpty().WithMessage("?�稱不能?�空");
-        RuleFor(x => x.Price).GreaterThan(0).WithMessage("?�格必�?大於 0");
+        RuleFor(x => x.Name).NotEmpty();
+        RuleFor(x => x.Price).GreaterThan(0).WithMessage("Price must be greater than 0");
     }
 }
 
-public class Endpoint : Endpoint<Request>
+public class Endpoint(AppDbContext dbContext) : Endpoint<UpdateProductRequest, Product>
 {
-    private readonly AppDbContext _db;
-
-    public Endpoint(AppDbContext db) => _db = db;
-
     public override void Configure()
     {
-        Put("products/{Id}");
+        Put("/products/{id}");
         Policies(AppPolicies.CanManageProducts);
-        Description(x => x
-            .WithName("UpdateProduct")
-            .WithTags("Products"));
     }
 
-    public override async Task HandleAsync(Request req, CancellationToken ct)
+    public override async Task HandleAsync(UpdateProductRequest req, CancellationToken ct)
     {
-        Logger.LogInformation("Updating product with ID: {Id}", req.Id);
+        var id = Route<int>("id");
+        var product = await dbContext.Products.FindAsync([id], cancellationToken: ct);
 
-        var existing = await _db.Products.FindAsync([req.Id], ct);
-
-        if (existing is null)
+        if (product is null)
         {
-            Logger.LogWarning("Product with ID: {Id} not found for update", req.Id);
-            await SendNotFoundAsync(ct);
+            await this.SendResultAsync<Product>(Error.NotFound("Product.NotFound", "The product was not found."), ct: ct);
             return;
         }
 
-        existing.Name = req.Name;
-        existing.Price = req.Price;
-        existing.Description = req.Description;
+        product.Name = req.Name;
+        product.Price = req.Price;
+        product.Description = req.Description;
 
-        await _db.SaveChangesAsync(ct);
-        
-        Logger.LogInformation("Product updated: {Id}", req.Id);
+        await dbContext.SaveChangesAsync(ct);
 
-        await SendNoContentAsync(ct);
+        ErrorOr<Product> result = product!;
+        await this.SendResultAsync(result, ct: ct);
     }
 }

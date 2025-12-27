@@ -1,5 +1,9 @@
 # AspireAppTemplate (AI Context)
 
+## Keycloak 測試帳號密碼
+keycloak console: admin/admin, http://localhost:8080
+login user: jack/0000, 
+
 ## 架構決策紀錄 (ADR - Architecture Decision Records)
 
 ### Project Structure Reorganization (2025-12-27)
@@ -31,11 +35,12 @@
 *   **Health Check**: 已整合 `AddDbContextCheck<AppDbContext>()` 確保 `/health` 端點驗證資料庫連線。
 *   **Endpoints**: 所有 Product Endpoints 直接注入 `AppDbContext` 進行 CRUD 操作。
 
-### Identity Management
+### Identity Management (2025-12-27)
 *   **Keycloak**: 使用 Docker 容器運行。
     *   預設 Admin: `admin` / `admin`
-    *   Realm 設定由 `Realms/import-realmdata.json` 自動匯入。
-    *   自訂 Theme 位於 `keycloak-themes/my-company-theme/`，需在 Keycloak Admin 手動啟用。
+    *   Realm 設定位於 `src/aspire/AppHost/Realms/import-realmdata.json`，由 AppHost 自動匯入。
+    *   自訂 Theme 位於 `src/aspire/AppHost/keycloak-themes/my-company-theme/`，需在 Keycloak Admin 手動啟用。
+    *   *設計理念*: 所有 Keycloak 相關配置集中在 AppHost 目錄下，保持內聚性與一致性。
 
 ### UI Framework (2025-12-26)
 *   **MudBlazor 8.2.0**: 取代 Bootstrap CSS，提供完整 Material Design 元件庫。
@@ -51,6 +56,16 @@
     *   `Infrastructure/Themes/CustomColors.cs` - 預設顏色清單
     *   `Infrastructure/Settings/UserPreferences.cs` - 使用者偏好設定 (含 TablePreference)
     *   `Infrastructure/Services/LayoutService.cs` - 偏好設定持久化與套用
+
+### API Development Pattern (2025-12-27)
+*   **REPR Pattern (Request-Endpoint-Response)**: 採用 FastEndpoints 的 "Folder per Endpoint" 結構。
+    *   慣例: `src/api/ApiService/Features/<Feature>/<Action>/Endpoint.cs`
+    *   優點: 高內聚性，相關的 Request/Response/Validator/Mapper 放在同一個目錄下。
+    *   *範例*: `Features/Identity/Roles/Create/Endpoint.cs`
+*   **Authorization 策略**:
+    *   **Policy-Based**: 不要在 Endpoint 直接寫死角色 (`AllowAnonymous` 或 `Roles("Admin")`)，而是使用 Policy (`Policies(AppPolicies.CanManageRoles)`)。
+    *   **中央配置**: Policy 與角色的對應關係在 `Program.cs` 中定義 (e.g., `options.AddPolicy(...)`)。
+    *   **優點**: 解耦權限概念與具體角色，方便未來調整權限邏輯而不需修改每個 Endpoint。
 
 ## 常見任務 (Common Tasks)
 

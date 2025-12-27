@@ -1,42 +1,31 @@
 using FastEndpoints;
 using AspireAppTemplate.Shared;
 using AspireAppTemplate.ApiService.Data;
+using AspireAppTemplate.ApiService.Infrastructure.Extensions;
+using ErrorOr;
 
 namespace AspireAppTemplate.ApiService.Features.Products.GetById;
 
-public class Request
+public class Endpoint(AppDbContext dbContext) : EndpointWithoutRequest<Product>
 {
-    public int Id { get; set; }
-}
-
-public class Endpoint : Endpoint<Request, Product>
-{
-    private readonly AppDbContext _db;
-
-    public Endpoint(AppDbContext db) => _db = db;
-
     public override void Configure()
     {
-        Get("products/{Id}");
+        Get("/products/{id}");
         AllowAnonymous();
-        Description(x => x
-            .WithName("GetProductById")
-            .WithTags("Products"));
     }
 
-    public override async Task HandleAsync(Request req, CancellationToken ct)
+    public override async Task HandleAsync(CancellationToken ct)
     {
-        Logger.LogInformation("Retrieving product with ID: {Id}", req.Id);
-        
-        var product = await _db.Products.FindAsync([req.Id], ct);
+        var id = Route<int>("id");
+        var product = await dbContext.Products.FindAsync([id], cancellationToken: ct);
 
         if (product is null)
         {
-            Logger.LogWarning("Product with ID: {Id} not found", req.Id);
-            await SendNotFoundAsync(ct);
-            return;
+             await this.SendResultAsync<Product>(Error.NotFound("Product.NotFound", "The product was not found."), ct: ct);
+             return;
         }
 
-        await SendAsync(product, cancellation: ct);
+        ErrorOr<Product> result = product!;
+        await this.SendResultAsync(result, ct: ct);
     }
 }

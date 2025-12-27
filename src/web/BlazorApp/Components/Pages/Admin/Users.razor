@@ -1,0 +1,114 @@
+@page "/admin/users"
+@attribute [Authorize(Policy = AppPolicies.CanManageProducts)]
+@using AspireAppTemplate.Web
+@using AspireAppTemplate.Shared
+@using Microsoft.AspNetCore.Authorization
+@inject IdentityApiClient IdentityClient
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+<MudText Typo="Typo.h5" GutterBottom="true">User Management</MudText>
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="@(() => OpenUserDialog())" Class="mb-4">Create User</MudButton>
+
+<MudDataGrid Items="@_users" Loading="@_loading" Filterable="true">
+    <Columns>
+        <PropertyColumn Property="x => x.Username" Title="Username" />
+        <PropertyColumn Property="x => x.Email" Title="Email" />
+        <PropertyColumn Property="x => x.FirstName" Title="First Name" />
+        <PropertyColumn Property="x => x.LastName" Title="Last Name" />
+        <PropertyColumn Property="x => x.Enabled" Title="Enabled" />
+        <TemplateColumn CellClass="d-flex justify-end">
+            <CellTemplate>
+                 <MudIconButton Icon="@Icons.Material.Filled.Assignment" Color="Color.Secondary" OnClick="@(() => ManageRoles(context.Item))" Title="Assign Roles" />
+                 <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" OnClick="@(() => OpenUserDialog(context.Item))" Title="Edit User" />
+                 <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => DeleteUser(context.Item))" Title="Delete User" />
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+
+@code {
+    private IEnumerable<KeycloakUser> _users = new List<KeycloakUser>();
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsers();
+    }
+
+    private async Task LoadUsers()
+    {
+        _loading = true;
+        try {
+            _users = await IdentityClient.GetUsersAsync();
+        } catch (Exception ex) {
+            Snackbar.Add($"Error loading users: {ex.Message}", Severity.Error);
+        } finally {
+            _loading = false;
+        }
+    }
+
+    private async Task OpenUserDialog(KeycloakUser? user = null)
+    {
+        var title = user == null ? "Create User" : "Edit User";
+        // Clone if editing to avoid mutating grid item directly before save
+        var model = user == null ? new KeycloakUser() : new KeycloakUser 
+        { 
+            Id = user.Id, Username = user.Username, Email = user.Email, 
+            FirstName = user.FirstName, LastName = user.LastName, Enabled = user.Enabled 
+        };
+
+        var parameters = new DialogParameters<UserDialog> { { x => x.Model, model } };
+        
+        var dialog = await DialogService.ShowAsync<UserDialog>(title, parameters);
+        var result = await dialog.Result;
+        
+        if (result is not null && !result.Canceled && result.Data is KeycloakUser savedModel)
+        {
+            try {
+                if (string.IsNullOrEmpty(savedModel.Id))
+                {
+                    await IdentityClient.CreateUserAsync(savedModel);
+                    Snackbar.Add("User created successfully", Severity.Success);
+                }
+                else 
+                {
+                    await IdentityClient.UpdateUserAsync(savedModel);
+                    Snackbar.Add("User updated successfully", Severity.Success);
+                }
+                await LoadUsers();
+            } catch (Exception ex) {
+                Snackbar.Add($"Error saving user: {ex.Message}", Severity.Error);
+            }
+        }
+    }
+
+    private async Task DeleteUser(KeycloakUser user)
+    {
+        var result = await DialogService.ShowMessageBox(
+            "Delete User", 
+            $"Are you sure you want to delete {user.Username}?", 
+            yesText: "Delete", cancelText: "Cancel");
+        
+        if (result == true)
+        {
+            try {
+                if (string.IsNullOrEmpty(user.Id)) 
+                    throw new InvalidOperationException("User ID is missing");
+                    
+                await IdentityClient.DeleteUserAsync(user.Id);
+                Snackbar.Add("User deleted successfully", Severity.Success);
+                await LoadUsers();
+            } catch (Exception ex) {
+                Snackbar.Add($"Error deleting user: {ex.Message}", Severity.Error);
+            }
+        }
+    }
+
+    private async Task ManageRoles(KeycloakUser user)
+    {
+        var parameters = new DialogParameters<UserRolesDialog> { { x => x.User, user } };
+        await DialogService.ShowAsync<UserRolesDialog>($"Roles for {user.Username}", parameters);
+    }
+}

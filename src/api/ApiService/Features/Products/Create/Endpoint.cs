@@ -2,44 +2,37 @@ using FastEndpoints;
 using FluentValidation;
 using AspireAppTemplate.Shared;
 using AspireAppTemplate.ApiService.Data;
+using AspireAppTemplate.ApiService.Infrastructure.Extensions;
+using ErrorOr;
 
 namespace AspireAppTemplate.ApiService.Features.Products.Create;
 
-public class Request
+public class CreateProductRequest
 {
     public string Name { get; set; } = default!;
     public decimal Price { get; set; }
     public string? Description { get; set; }
 }
 
-public class Validator : Validator<Request>
+public class CreateProductValidator : Validator<CreateProductRequest>
 {
-    public Validator()
+    public CreateProductValidator()
     {
-        RuleFor(x => x.Name).NotEmpty().WithMessage("?¢å??ç¨±ä¸èƒ½?ºç©º");
-        RuleFor(x => x.Price).GreaterThan(0).WithMessage("?¹æ ¼å¿…é?å¤§æ–¼ 0");
+        RuleFor(x => x.Name).NotEmpty();
+        RuleFor(x => x.Price).GreaterThan(0).WithMessage("Price must be greater than 0");
     }
 }
 
-public class Endpoint : Endpoint<Request, Product>
+public class Endpoint(AppDbContext dbContext) : Endpoint<CreateProductRequest, Product>
 {
-    private readonly AppDbContext _db;
-
-    public Endpoint(AppDbContext db) => _db = db;
-
     public override void Configure()
     {
-        Post("products");
-        Policies(AppPolicies.CanManageProducts); 
-        Description(x => x
-            .WithName("CreateProduct")
-            .WithTags("Products"));
+        Post("/products");
+        Policies(AppPolicies.CanManageProducts);
     }
 
-    public override async Task HandleAsync(Request req, CancellationToken ct)
+    public override async Task HandleAsync(CreateProductRequest req, CancellationToken ct)
     {
-        Logger.LogInformation("Creating product: {Name}", req.Name);
-
         var product = new Product
         {
             Name = req.Name,
@@ -47,11 +40,14 @@ public class Endpoint : Endpoint<Request, Product>
             Description = req.Description
         };
 
-        _db.Products.Add(product);
-        await _db.SaveChangesAsync(ct);
-        
-        Logger.LogInformation("Product created with ID: {Id}", product.Id);
+        dbContext.Products.Add(product);
+        await dbContext.SaveChangesAsync(ct);
 
-        await SendCreatedAtAsync<GetAll.Endpoint>(new { }, product, cancellation: ct);
+        // We wrap the result in ErrorOr, explicitly casting or letting implicit conversion handle it if supported, 
+        // but here we are sending the result using the extension method which expects ErrorOr<T>
+        
+        ErrorOr<Product> result = product;
+
+        await this.SendResultAsync(result, ct: ct);
     }
 }

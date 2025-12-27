@@ -55,6 +55,11 @@ builder.Services.AddHttpClient<ProductApiClient>(client =>
     client.BaseAddress = new("https+http://apiservice");
 }).AddHttpMessageHandler<AuthorizationHandler>();
 
+builder.Services.AddHttpClient<IdentityApiClient>(client =>
+{
+    client.BaseAddress = new("https+http://apiservice");
+}).AddHttpMessageHandler<AuthorizationHandler>();
+
 
 var oidcScheme = OpenIdConnectDefaults.AuthenticationScheme;
 builder.Services.AddAuthentication(oidcScheme)
@@ -72,37 +77,6 @@ builder.Services.AddAuthentication(oidcScheme)
         {
             options.RequireHttpsMetadata = false;
         }
-
-        // --- Role Configuration ---
-        // options.Events = new OpenIdConnectEvents
-        // {
-        //    OnTicketReceived = context =>
-        //    {
-        //        var claimsPrincipal = context.Principal;
-        //        if (claimsPrincipal != null)
-        //        {
-        //            var identity = claimsPrincipal.Identity as ClaimsIdentity;
-        //            if (identity != null)
-        //            {
-        //                // Find all incoming claims where the type is "role" (from the token JSON key)
-        //                var roleClaims = claimsPrincipal.FindAll("role").ToList();
-
-        //                if (roleClaims.Any())
-        //                {
-        //                    // Remove the old "role" claims
-        //                    roleClaims.ForEach(c => identity.RemoveClaim(c));
-
-        //                    // Add new claims using the standard ClaimTypes.Role type
-        //                    foreach (var roleClaim in roleClaims)
-        //                    {
-        //                        identity.AddClaim(new Claim(ClaimTypes.Role, roleClaim.Value, ClaimValueTypes.String, context.Options.Authority));
-        //                    }
-        //                }
-        //            }
-        //        }
-        //        return Task.CompletedTask;
-        //    }
-        // };
     }).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme);
 builder.Services.AddCascadingAuthenticationState();
 
@@ -141,7 +115,7 @@ app.MapLoginAndLogout();
 try
 {
     Log.Information("Starting AspireAppTemplate.Web");
-    app.Run();
+    await app.RunAsync();
 }
 catch (Exception ex)
 {
@@ -150,5 +124,5 @@ catch (Exception ex)
 finally
 {
     Log.Information("AspireAppTemplate.Web is shutting down");
-    Log.CloseAndFlush();
+    await Log.CloseAndFlushAsync();
 }
