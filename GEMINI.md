@@ -67,6 +67,12 @@ login user: jack/0000,
     *   **中央配置**: Policy 與角色的對應關係在 `Program.cs` 中定義 (e.g., `options.AddPolicy(...)`)。
     *   **優點**: 解耦權限概念與具體角色，方便未來調整權限邏輯而不需修改每個 Endpoint。
 
+### API Documentation (2025-12-27)
+*   **Scalar**: 取代 Swagger UI 作為主要的 API 文件介面。
+    *   *原因*: 提供更好的視覺體驗 (Rich Aesthetics) 與 DX (Developer Experience)，符合專案的 Premium 定位。
+    *   *整合方式*: 使用 `Scalar.AspNetCore` 並對接 FastEndpoints 生成的 OpenAPI JSON (`/swagger/v1/swagger.json`)。
+    *   *主題*: 預設使用 `Moon` (深色) 主題。
+
 ## 常見任務 (Common Tasks)
 
 ### 1. 新增資料表

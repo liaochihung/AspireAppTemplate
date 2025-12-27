@@ -4,6 +4,7 @@ using AspireAppTemplate.Shared;
 using Serilog;
 using AspireAppTemplate.ApiService.Data;
 using AspireAppTemplate.ApiService.Services;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,7 +66,16 @@ app.UseAuthorization();
 
 app.UseFastEndpoints(c => { c.Endpoints.RoutePrefix = "api"; });
 
-if (app.Environment.IsDevelopment()) { app.UseSwaggerGen(); }
+if (app.Environment.IsDevelopment()) 
+{ 
+    app.UseSwaggerGen();
+    app.MapScalarApiReference(options =>
+    {
+        options.WithTitle("Aspire App API")
+               .WithTheme(ScalarTheme.Moon)
+               .WithOpenApiRoutePattern("/swagger/v1/swagger.json");
+    });
+}
 
 
 

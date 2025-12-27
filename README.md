@@ -39,6 +39,7 @@
 *   **Keycloak**: 身分與存取管理。
 *   **Blazor**: 互動式 Web UI。
 *   **FastEndpoints**: API 開發框架。
+*   **Scalar**: 現代化 API 文件與測試介面。
 *   **Serilog**: 結構化日誌。
 
 ## 快速開始 (Getting Started)
@@ -59,6 +60,7 @@ run.bat
 1.  瀏覽器會自動開啟 **Aspire Dashboard**。
 2.  Dashboard 中將顯示所有服務 (`webfrontend`, `apiservice`, `postgres`, `keycloak`, `cache`) 的狀態。
 3.  資料庫 `aspiredb` 會在 `ApiService` 啟動時自動建立 (Development 環境)。
+4.  API 文件可透過 `/scalar/v1` 存取 (例如: `https://localhost:<port>/scalar/v1`)。
 
 ## 開發指南 (Development Guidelines)
 
