@@ -4,6 +4,7 @@ using AspireAppTemplate.Shared;
 using AspireAppTemplate.ApiService.Data;
 using AspireAppTemplate.ApiService.Infrastructure.Extensions;
 using ErrorOr;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace AspireAppTemplate.ApiService.Features.Products.Update;
 
@@ -23,7 +24,7 @@ public class UpdateProductValidator : Validator<UpdateProductRequest>
     }
 }
 
-public class Endpoint(AppDbContext dbContext) : Endpoint<UpdateProductRequest, Product>
+public class Endpoint(AppDbContext dbContext, IOutputCacheStore cacheStore) : Endpoint<UpdateProductRequest, Product>
 {
     public override void Configure()
     {
@@ -47,6 +48,7 @@ public class Endpoint(AppDbContext dbContext) : Endpoint<UpdateProductRequest, P
         product.Description = req.Description;
 
         await dbContext.SaveChangesAsync(ct);
+        await cacheStore.EvictByTagAsync("products", ct);
 
         ErrorOr<Product> result = product!;
         await this.SendResultAsync(result, ct: ct);

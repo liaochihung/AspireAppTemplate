@@ -3,6 +3,7 @@ using AspireAppTemplate.ApiService.Services;
 using AspireAppTemplate.Shared;
 using FluentValidation;
 using AspireAppTemplate.ApiService.Infrastructure.Extensions;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace AspireAppTemplate.ApiService.Features.Identity.Roles.Create;
 
@@ -23,7 +24,7 @@ public class CreateRoleValidator : Validator<CreateRoleRequest>
     }
 }
 
-public class Endpoint(IdentityService identityService) : Endpoint<CreateRoleRequest>
+public class Endpoint(IdentityService identityService, IOutputCacheStore cacheStore) : Endpoint<CreateRoleRequest>
 {
     public override void Configure()
     {
@@ -39,6 +40,7 @@ public class Endpoint(IdentityService identityService) : Endpoint<CreateRoleRequ
             Description = req.Description 
         };
         var result = await identityService.CreateRoleAsync(role);
+        await cacheStore.EvictByTagAsync("roles", ct);
         await this.SendResultAsync(result, ct: ct);
     }
 }

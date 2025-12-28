@@ -2,6 +2,7 @@ using FastEndpoints;
 using AspireAppTemplate.ApiService.Services;
 using AspireAppTemplate.Shared;
 using AspireAppTemplate.ApiService.Infrastructure.Extensions;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace AspireAppTemplate.ApiService.Features.Identity.Users.AssignRole;
 
@@ -11,15 +12,8 @@ public class UserRoleRequest
     public string RoleName { get; set; } = string.Empty; // From Body
 }
 
-public class Endpoint : Endpoint<UserRoleRequest>
+public class Endpoint(IdentityService identityService, IOutputCacheStore cacheStore) : Endpoint<UserRoleRequest>
 {
-    private readonly IdentityService _identityService;
-
-    public Endpoint(IdentityService identityService)
-    {
-        _identityService = identityService;
-    }
-
     public override void Configure()
     {
         Post("/users/{id}/roles");
@@ -28,7 +22,8 @@ public class Endpoint : Endpoint<UserRoleRequest>
 
     public override async Task HandleAsync(UserRoleRequest req, CancellationToken ct)
     {
-        var result = await _identityService.AssignRoleToUserAsync(req.Id, req.RoleName);
+        var result = await identityService.AssignRoleToUserAsync(req.Id, req.RoleName);
+        await cacheStore.EvictByTagAsync("users", ct);
         await this.SendResultAsync(result, ct: ct);
     }
 }

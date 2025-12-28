@@ -3,6 +3,7 @@ using AspireAppTemplate.ApiService.Services;
 using AspireAppTemplate.Shared;
 using FluentValidation;
 using AspireAppTemplate.ApiService.Infrastructure.Extensions;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace AspireAppTemplate.ApiService.Features.Identity.Users.Update;
 
@@ -27,7 +28,7 @@ public class UpdateUserRequest
     public bool Enabled { get; set; }
 }
 
-public class Endpoint(IdentityService identityService) : Endpoint<UpdateUserRequest>
+public class Endpoint(IdentityService identityService, IOutputCacheStore cacheStore) : Endpoint<UpdateUserRequest>
 {
     public override void Configure()
     {
@@ -48,6 +49,7 @@ public class Endpoint(IdentityService identityService) : Endpoint<UpdateUserRequ
         };
 
         var result = await identityService.UpdateUserAsync(req.Id, user);
+        await cacheStore.EvictByTagAsync("users", ct);
         await this.SendResultAsync(result, ct: ct);
     }
 }

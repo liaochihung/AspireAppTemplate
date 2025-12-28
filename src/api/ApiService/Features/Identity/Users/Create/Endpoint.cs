@@ -3,6 +3,7 @@ using AspireAppTemplate.ApiService.Services;
 using AspireAppTemplate.Shared;
 using FluentValidation;
 using AspireAppTemplate.ApiService.Infrastructure.Extensions;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace AspireAppTemplate.ApiService.Features.Identity.Users.Create;
 
@@ -34,15 +35,8 @@ public class CreateUserValidator : Validator<CreateUserRequest>
     }
 }
 
-public class Endpoint : Endpoint<CreateUserRequest>
+public class Endpoint(IdentityService identityService, IOutputCacheStore cacheStore) : Endpoint<CreateUserRequest>
 {
-    private readonly IdentityService _identityService;
-
-    public Endpoint(IdentityService identityService)
-    {
-        _identityService = identityService;
-    }
-
     public override void Configure()
     {
         Post("/users");
@@ -65,7 +59,8 @@ public class Endpoint : Endpoint<CreateUserRequest>
             }
         };
 
-        var result = await _identityService.CreateUserAsync(user);
+        var result = await identityService.CreateUserAsync(user);
+        await cacheStore.EvictByTagAsync("users", ct);
         await this.SendResultAsync(result, ct: ct);
     }
 }

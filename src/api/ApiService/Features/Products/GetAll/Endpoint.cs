@@ -4,6 +4,7 @@ using AspireAppTemplate.ApiService.Data;
 using AspireAppTemplate.ApiService.Infrastructure.Extensions;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace AspireAppTemplate.ApiService.Features.Products.GetAll;
 
@@ -13,6 +14,7 @@ public class Endpoint(AppDbContext dbContext) : EndpointWithoutRequest<IEnumerab
     {
         Get("/products");
         AllowAnonymous();
+        Options(x => x.CacheOutput(c => c.Expire(TimeSpan.FromMinutes(5)).Tag("products")));
     }
 
     public override async Task HandleAsync(CancellationToken ct)

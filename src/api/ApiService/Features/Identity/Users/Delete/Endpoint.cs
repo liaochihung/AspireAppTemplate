@@ -2,18 +2,12 @@ using AspireAppTemplate.ApiService.Infrastructure.Extensions;
 using AspireAppTemplate.ApiService.Services;
 using AspireAppTemplate.Shared;
 using FastEndpoints;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace AspireAppTemplate.ApiService.Features.Identity.Users.Delete;
 
-public class Endpoint : EndpointWithoutRequest
+public class Endpoint(IdentityService identityService, IOutputCacheStore cacheStore) : EndpointWithoutRequest
 {
-    private readonly IdentityService _identityService;
-
-    public Endpoint(IdentityService identityService)
-    {
-        _identityService = identityService;
-    }
-
     public override void Configure()
     {
         Delete("/users/{id}");
@@ -29,7 +23,8 @@ public class Endpoint : EndpointWithoutRequest
             return;
         }
 
-        var result = await _identityService.DeleteUserAsync(id);
+        var result = await identityService.DeleteUserAsync(id);
+        await cacheStore.EvictByTagAsync("users", ct);
         await this.SendResultAsync(result);
     }
 }

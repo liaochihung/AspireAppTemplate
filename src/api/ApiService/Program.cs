@@ -13,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
 builder.AddServiceDefaults();
 builder.AddNpgsqlDbContext<AppDbContext>("aspiredb");
+builder.AddRedisOutputCache("cache");
 
 builder.Host.UseSerilog((context, services, configuration) => configuration
     .ReadFrom.Configuration(context.Configuration)
@@ -119,6 +120,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseOutputCache();
 
 app.Use(async (context, next) =>
 {

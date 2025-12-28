@@ -4,6 +4,7 @@ using AspireAppTemplate.Shared;
 using AspireAppTemplate.ApiService.Data;
 using AspireAppTemplate.ApiService.Infrastructure.Extensions;
 using ErrorOr;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace AspireAppTemplate.ApiService.Features.Products.Create;
 
@@ -23,7 +24,7 @@ public class CreateProductValidator : Validator<CreateProductRequest>
     }
 }
 
-public class Endpoint(AppDbContext dbContext) : Endpoint<CreateProductRequest, Product>
+public class Endpoint(AppDbContext dbContext, IOutputCacheStore cacheStore) : Endpoint<CreateProductRequest, Product>
 {
     public override void Configure()
     {
@@ -42,10 +43,8 @@ public class Endpoint(AppDbContext dbContext) : Endpoint<CreateProductRequest, P
 
         dbContext.Products.Add(product);
         await dbContext.SaveChangesAsync(ct);
+        await cacheStore.EvictByTagAsync("products", ct);
 
-        // We wrap the result in ErrorOr, explicitly casting or letting implicit conversion handle it if supported, 
-        // but here we are sending the result using the extension method which expects ErrorOr<T>
-        
         ErrorOr<Product> result = product;
 
         await this.SendResultAsync(result, ct: ct);

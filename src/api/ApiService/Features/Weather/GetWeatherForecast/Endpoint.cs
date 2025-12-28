@@ -3,6 +3,7 @@ using AspireAppTemplate.Shared;
 using ErrorOr;
 using FastEndpoints;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace AspireAppTemplate.ApiService.Features.Weather.GetWeatherForecast;
 
@@ -12,6 +13,7 @@ public class Endpoint : EndpointWithoutRequest<IEnumerable<WeatherForecast>>
     {
         Get("/weatherforecast");
         AllowAnonymous();
+        Options(x => x.CacheOutput(c => c.Expire(TimeSpan.FromSeconds(30))));
     }
 
     public override async Task HandleAsync(CancellationToken ct)

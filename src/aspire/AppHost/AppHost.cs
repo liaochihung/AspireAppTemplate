@@ -22,6 +22,8 @@ var apiService = builder.AddProject<Projects.AspireAppTemplate_ApiService>("apis
     .WaitFor(keycloak)
     .WithReference(aspiredb)
     .WaitFor(aspiredb)
+    .WithReference(cache)
+    .WaitFor(cache)
     .WithEnvironment("Keycloak__BaseUrl", "http://keycloak:8080")
     .WithEnvironment("Keycloak__Realm", "WeatherShop")
     .WithEnvironment("Keycloak__ClientId", "admin-cli")
