@@ -16,8 +16,9 @@
     <PackageReference Include="ErrorOr" Version="2.0.1" />
     <PackageReference Include="FastEndpoints" Version="5.34.0" />
     <PackageReference Include="FastEndpoints.Swagger" Version="5.34.0" />
+    <PackageReference Include="Keycloak.AuthServices.Authentication" Version="2.8.0" />
+    <PackageReference Include="Keycloak.AuthServices.Sdk" Version="2.8.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0-rc.1.25451.107" />
-    <PackageReference Include="Aspire.Keycloak.Authentication" Version="13.1.0-preview.1.25616.3" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="10.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.1">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

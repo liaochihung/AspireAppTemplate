@@ -67,6 +67,16 @@ login user: jack/0000,
     *   **中央配置**: Policy 與角色的對應關係在 `Program.cs` 中定義 (e.g., `options.AddPolicy(...)`)。
     *   **優點**: 解耦權限概念與具體角色，方便未來調整權限邏輯而不需修改每個 Endpoint。
 
+### Identity Management Improvements (2025-12-28)
+*   **Authentication Flow Optimization**:
+    *   **Service Discovery**: ApiService 優先使用 Aspire 注入的 `services:keycloak:http` 端點連接 Keycloak，解決 JWKS 簽章驗證失敗問題 (`IDX10500`)。
+    *   **Claim Mapping 簡化**: 在 `JwtBearerOptions` 中設置 `MapInboundClaims = false`，停用微軟預設的 Claim Type 轉換。
+        *   *原因*: 確保 Token 中的 `role` 宣告保持原樣 (e.g., `"role": "Administrator"` -> `type: "role", value: "Administrator"`)，而非被轉換為 `http://schemas.microsoft.com/ws/2008/06/identity/claims/role`。這簡化了前後端對 Claims 的認知一致性。
+    *   **Refresh Token**: 前端 `AuthorizationHandler` 實作了 Access Token 自動刷新機制 (小於 1 分鐘過期時自動刷新)。
+*   **Token Audience Security**: 
+    *   **Realm Config**: 在 `import-realmdata.json` 為 `WeatherWeb` 客戶端添加了 `oidc-hardcoded-audience-mapper`，強制將 `weather.api` 加入 Token 的 Audience (`aud`)。
+    *   *未來啟用*: 待 Keycloak 容器重建生效後，即可在 API 端啟用 `VerifyTokenAudience: true` 以增強安全性。
+
 ### API Documentation (2025-12-27)
 *   **Scalar**: 取代 Swagger UI 作為主要的 API 文件介面。
     *   *原因*: 提供更好的視覺體驗 (Rich Aesthetics) 與 DX (Developer Experience)，符合專案的 Premium 定位。
