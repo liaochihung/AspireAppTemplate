@@ -16,9 +16,72 @@
 </head>
 
 <body>
+    <div id="app-loader">
+        <style>
+            @@keyframes fadeIn {
+                0% { opacity: 0; }
+                100% { opacity: 1; }
+            }
+            .loader-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+                z-index: 9999;
+                font-family: 'Roboto', sans-serif;
+            }
+            .loading-text {
+                font-size: 14px;
+                color: #666;
+                letter-spacing: 2px;
+                text-transform: uppercase;
+                animation: fadeIn 1s ease-in 0.3s both;
+            }
+            .spinner {
+                width: 4px;
+                height: 4px;
+                background: #666;
+                border-radius: 50%;
+                display: inline-block;
+                margin-left: 6px;
+                animation: blink 1.4s infinite;
+            }
+            .spinner:nth-child(2) { animation-delay: 0.2s; }
+            .spinner:nth-child(3) { animation-delay: 0.4s; }
+            @@keyframes blink {
+                0%, 60%, 100% { opacity: 0.3; }
+                30% { opacity: 1; }
+            }
+        </style>
+        <div class="loader-container">
+            <div class="loading-text">
+                Loading
+                <span class="spinner"></span>
+                <span class="spinner"></span>
+                <span class="spinner"></span>
+            </div>
+        </div>
+    </div>
+
     <Routes @rendermode="new InteractiveServerRenderMode(prerender: false)" />
     <script src="@Assets["_framework/blazor.web.js"]"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    <script>
+        window.hideLoader = () => {
+            const loader = document.getElementById('app-loader');
+            if (loader) {
+                loader.style.opacity = '0';
+                loader.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => loader.remove(), 500);
+            }
+        };
+    </script>
 </body>
 
 </html>
