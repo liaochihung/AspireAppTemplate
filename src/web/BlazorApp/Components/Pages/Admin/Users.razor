@@ -7,25 +7,95 @@
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 
-<MudText Typo="Typo.h5" GutterBottom="true">使用者管理</MudText>
+<PageHeader Icon="@Icons.Material.Filled.People" 
+            Title="使用者管理" 
+            Description="管理系統使用者帳號、權限與角色分配">
+    <MudButton Variant="Variant.Filled" 
+               Color="Color.Primary" 
+               StartIcon="@Icons.Material.Filled.PersonAdd" 
+               OnClick="@(() => OpenUserDialog())"
+               DropShadow="false">
+        新增使用者
+    </MudButton>
+</PageHeader>
 
-<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="@(() => OpenUserDialog())" Class="mb-4">新增使用者</MudButton>
-
-<MudDataGrid Items="@_users" Loading="@_loading" Filterable="true">
-    <Columns>
-        <PropertyColumn Property="x => x.Username" Title="使用者名稱" />
-        <PropertyColumn Property="x => x.Email" Title="Email" />
-        <PropertyColumn Property="x => x.FirstName" Title="名" />
-        <PropertyColumn Property="x => x.LastName" Title="姓" />
-        <PropertyColumn Property="x => x.Enabled" Title="啟用" />
-        <TemplateColumn CellClass="d-flex justify-end">
-            <CellTemplate>
-                 <MudIconButton Icon="@Icons.Material.Filled.Assignment" Color="Color.Secondary" OnClick="@(() => ManageRoles(context.Item))" Title="分配角色" />
-                 <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" OnClick="@(() => OpenUserDialog(context.Item))" Title="編輯使用者" />
-                 <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => DeleteUser(context.Item))" Title="刪除使用者" />
-            </CellTemplate>
-        </TemplateColumn>
-    </Columns>
-</MudDataGrid>
-
-
+<MudPaper Elevation="2" Class="pa-0">
+    <MudDataGrid T="KeycloakUser" Items="@_users" Loading="@_loading" Filterable="true" QuickFilter="@_quickFilter" Hover="true">
+        <ToolBarContent>
+            <MudSpacer />
+            <DebouncedSearchField @bind-Value="_searchString" 
+                                  Placeholder="搜尋使用者..."
+                                  DebounceMs="300" />
+        </ToolBarContent>
+        <Columns>
+            <TemplateColumn T="KeycloakUser" Title="使用者名稱">
+                <CellTemplate Context="cellContext">
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                        <MudAvatar Size="Size.Small" Color="Color.Primary">
+                            @(cellContext.Item.Username?.FirstOrDefault().ToString().ToUpper() ?? "?")
+                        </MudAvatar>
+                        <MudText Typo="Typo.body2">@cellContext.Item.Username</MudText>
+                    </MudStack>
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="KeycloakUser" Title="Email">
+                <CellTemplate Context="cellContext">
+                    <MudText Typo="Typo.body2">@cellContext.Item.Email</MudText>
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="KeycloakUser" Title="名">
+                <CellTemplate Context="cellContext">
+                    <MudText Typo="Typo.body2">@cellContext.Item.FirstName</MudText>
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="KeycloakUser" Title="姓">
+                <CellTemplate Context="cellContext">
+                    <MudText Typo="Typo.body2">@cellContext.Item.LastName</MudText>
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="KeycloakUser" Title="狀態">
+                <CellTemplate Context="cellContext">
+                    @if (cellContext.Item.Enabled)
+                    {
+                        <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Filled">啟用</MudChip>
+                    }
+                    else
+                    {
+                        <MudChip T="string" Size="Size.Small" Color="Color.Default" Variant="Variant.Outlined">停用</MudChip>
+                    }
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="KeycloakUser" Title="操作">
+                <CellTemplate Context="cellContext">
+                    <MudTooltip Text="分配角色">
+                        <MudIconButton Icon="@Icons.Material.Filled.Assignment" 
+                                       Color="Color.Secondary" 
+                                       Size="Size.Small"
+                                       OnClick="@(() => ManageRoles(cellContext.Item))" />
+                    </MudTooltip>
+                    <MudTooltip Text="編輯使用者">
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit" 
+                                       Color="Color.Primary" 
+                                       Size="Size.Small"
+                                       OnClick="@(() => OpenUserDialog(cellContext.Item))" />
+                    </MudTooltip>
+                    <MudTooltip Text="刪除使用者">
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                                       Color="Color.Error" 
+                                       Size="Size.Small"
+                                       OnClick="@(() => DeleteUser(cellContext.Item))" />
+                    </MudTooltip>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="KeycloakUser" />
+        </PagerContent>
+        <NoRecordsContent>
+            <MudStack AlignItems="AlignItems.Center" Class="pa-8">
+                <MudIcon Icon="@Icons.Material.Filled.PersonOff" Size="Size.Large" Color="Color.Default" />
+                <MudText Typo="Typo.body1" Color="Color.Default">目前沒有使用者資料</MudText>
+            </MudStack>
+        </NoRecordsContent>
+    </MudDataGrid>
+</MudPaper>

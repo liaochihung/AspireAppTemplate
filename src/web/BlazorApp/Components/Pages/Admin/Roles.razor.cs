@@ -8,6 +8,21 @@ namespace AspireAppTemplate.Web.Components.Pages.Admin
     {
         private IEnumerable<KeycloakRole> _roles = new List<KeycloakRole>();
         private bool _loading = true;
+        private string _searchString = string.Empty;
+
+        private Func<KeycloakRole, bool> _quickFilter => role =>
+        {
+            if (string.IsNullOrWhiteSpace(_searchString))
+                return true;
+
+            if (role.Name?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true)
+                return true;
+
+            if (role.Description?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true)
+                return true;
+
+            return false;
+        };
 
         protected override async Task OnInitializedAsync()
         {

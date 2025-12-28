@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.OutputCaching;
 
 namespace AspireAppTemplate.ApiService.Features.Products.GetAll;
 
-public class Endpoint(AppDbContext dbContext) : EndpointWithoutRequest<IEnumerable<Product>>
+public class Endpoint(AppDbContext dbContext) : Endpoint<PaginationRequest, PaginatedResult<Product>>
 {
     public override void Configure()
     {
@@ -17,10 +17,23 @@ public class Endpoint(AppDbContext dbContext) : EndpointWithoutRequest<IEnumerab
         Options(x => x.CacheOutput(c => c.Expire(TimeSpan.FromMinutes(5)).Tag("products")));
     }
 
-    public override async Task HandleAsync(CancellationToken ct)
+    public override async Task HandleAsync(PaginationRequest req, CancellationToken ct)
     {
-        var products = await dbContext.Products.ToListAsync(ct);
-        ErrorOr<IEnumerable<Product>> result = products;
-        await this.SendResultAsync(result, ct: ct);
+        var query = dbContext.Products.AsQueryable();
+
+        // Apply search if provided
+        if (!string.IsNullOrWhiteSpace(req.SearchTerm))
+        {
+            var term = req.SearchTerm.ToLower();
+            query = query.Where(p => 
+                p.Name.ToLower().Contains(term) || 
+                (p.Description != null && p.Description.ToLower().Contains(term)));
+        }
+
+        var result = await query
+            .OrderBy(p => p.Id)
+            .ToPaginatedResultAsync(req, ct);
+
+        await SendAsync(result, cancellation: ct);
     }
 }

@@ -8,6 +8,7 @@ public class LayoutService
 {
     private readonly ILocalStorageService _localStorageService;
     private const string StorageKey = "userPreferences";
+    private UserPreferences? _cachedPreferences;
 
     public LayoutService(ILocalStorageService localStorageService)
     {
@@ -16,6 +17,11 @@ public class LayoutService
 
     public bool ThemeDrawerOpen { get; set; }
     public bool IsDarkMode { get; set; }
+    
+    /// <summary>
+    /// Cached user preferences for synchronous access. May be null until first async load.
+    /// </summary>
+    public UserPreferences? UserPreferences => _cachedPreferences;
 
     public event EventHandler? MajorUpdateOccurred;
 
@@ -29,6 +35,7 @@ public class LayoutService
             if (prefs != null)
             {
                 IsDarkMode = prefs.IsDarkMode;
+                _cachedPreferences = prefs;
                 return prefs;
             }
         }
@@ -38,7 +45,8 @@ public class LayoutService
         }
         
         // Return default with drawer open
-        return new UserPreferences();
+        _cachedPreferences = new UserPreferences();
+        return _cachedPreferences;
     }
 
     public async Task<bool> ToggleDrawerAsync()
@@ -82,6 +90,7 @@ public class LayoutService
 
     public async Task SetPreferenceAsync(UserPreferences prefs)
     {
+        _cachedPreferences = prefs;
         await _localStorageService.SetItemAsync(StorageKey, prefs);
         OnMajorUpdateOccurred();
     }
@@ -95,4 +104,3 @@ public class LayoutService
         theme.LayoutProperties.DefaultBorderRadius = $"{prefs.BorderRadius}px";
     }
 }
-

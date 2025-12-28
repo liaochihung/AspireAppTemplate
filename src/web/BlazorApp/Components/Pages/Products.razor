@@ -10,94 +10,185 @@
 @inject PersistentComponentState ApplicationState
 @implements IDisposable
 
-<MudText Typo="Typo.h4" GutterBottom="true">Products</MudText>
-
-<AuthorizeView>
+<AuthorizeView Context="authContext">
     <Authorized>
+        <PageHeader Icon="@Icons.Material.Filled.Inventory2"
+                    Title="產品管理"
+                    Description="管理產品資料，包含新增、編輯與刪除功能">
+            @if (_canManage)
+            {
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Add"
+                           OnClick="@(() => OpenAddForm())"
+                           DropShadow="false">
+                    新增產品
+                </MudButton>
+            }
+        </PageHeader>
+
         @if (!string.IsNullOrEmpty(errorMessage))
         {
-            <MudAlert Severity="Severity.Error" Class="mb-4">@errorMessage</MudAlert>
+            <MudAlert Severity="Severity.Error" Class="mb-4" ShowCloseIcon="true" CloseIconClicked="@(() => errorMessage = null)">
+                @errorMessage
+            </MudAlert>
         }
-        @if (isLoading)
-        {
-            <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
-        }
-        else
-        {
-            <MudGrid>
-                <MudItem xs="12" lg="7">
-                    <MudPaper Class="pa-4" Elevation="1">
-                        <MudText Typo="Typo.h6" GutterBottom="true">Product List</MudText>
-                        <MudTable Items="@products" Hover="true" Dense="true" Striped="true" Context="product">
-                            <HeaderContent>
-                                <MudTh>Name</MudTh>
-                                <MudTh Style="text-align: right">Price</MudTh>
-                                <MudTh>Description</MudTh>
-                                <AuthorizeView Policy="@AppPolicies.CanManageProducts" Context="authContext">
-                                    <Authorized>
-                                        <MudTh Style="text-align: right">Actions</MudTh>
-                                    </Authorized>
-                                </AuthorizeView>
-                            </HeaderContent>
-                            <RowTemplate>
-                                <MudTd DataLabel="Name">@product.Name</MudTd>
-                                <MudTd DataLabel="Price" Style="text-align: right">@product.Price.ToString("C")</MudTd>
-                                <MudTd DataLabel="Description">@product.Description</MudTd>
-                                <AuthorizeView Policy="@AppPolicies.CanManageProducts" Context="authContext2">
-                                    <Authorized>
-                                        <MudTd DataLabel="Actions" Style="text-align: right">
-                                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Primary" OnClick="@(() => StartEdit(product))" />
-                                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" OnClick="@(() => ConfirmDelete(product.Id))" />
-                                        </MudTd>
-                                    </Authorized>
-                                </AuthorizeView>
-                            </RowTemplate>
+
+        <MudGrid Spacing="4">
+            <MudItem xs="12" lg="@(showForm ? 7 : 12)">
+                <MudPaper Elevation="2" Class="pa-0">
+                    @if (isLoading)
+                    {
+                        <div class="pa-6 d-flex justify-center">
+                            <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+                        </div>
+                    }
+                    else
+                    {
+                        <MudDataGrid T="Product" Items="@products" Filterable="true" QuickFilter="@_quickFilter"
+                                     Hover="true" Dense="false">
+                            <ToolBarContent>
+                                <MudText Typo="Typo.subtitle1" Class="mud-text-secondary">
+                                    共 @(products?.Length ?? 0) 項產品
+                                </MudText>
+                                <MudSpacer />
+                                <DebouncedSearchField @bind-Value="_searchString"
+                                                      Placeholder="搜尋產品..."
+                                                      DebounceMs="300"
+                                                      Style="max-width: 250px;" />
+                            </ToolBarContent>
+                            <Columns>
+                                <TemplateColumn T="Product" Title="名稱">
+                                    <CellTemplate Context="cellContext">
+                                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                                            <MudIcon Icon="@Icons.Material.Filled.Category" Size="Size.Small" Color="Color.Primary" />
+                                            <MudText Typo="Typo.body2" Style="font-weight: 500;">@cellContext.Item.Name</MudText>
+                                        </MudStack>
+                                    </CellTemplate>
+                                </TemplateColumn>
+                                <TemplateColumn T="Product" Title="價格">
+                                    <CellTemplate Context="cellContext">
+                                        <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Filled">
+                                            @cellContext.Item.Price.ToString("C")
+                                        </MudChip>
+                                    </CellTemplate>
+                                </TemplateColumn>
+                                <TemplateColumn T="Product" Title="描述">
+                                    <CellTemplate Context="cellContext">
+                                        @if (!string.IsNullOrWhiteSpace(cellContext.Item.Description))
+                                        {
+                                            <MudText Typo="Typo.body2" Class="mud-text-secondary" Style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                @cellContext.Item.Description
+                                            </MudText>
+                                        }
+                                        else
+                                        {
+                                            <MudText Typo="Typo.body2" Class="mud-text-disabled">—</MudText>
+                                        }
+                                    </CellTemplate>
+                                </TemplateColumn>
+                                <TemplateColumn T="Product" Title="操作" Hidden="@(!_canManage)">
+                                    <CellTemplate Context="cellContext">
+                                        <MudTooltip Text="編輯">
+                                            <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                                           Size="Size.Small"
+                                                           Color="Color.Primary"
+                                                           OnClick="@(() => StartEdit(cellContext.Item))" />
+                                        </MudTooltip>
+                                        <MudTooltip Text="刪除">
+                                            <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                                           Size="Size.Small"
+                                                           Color="Color.Error"
+                                                           OnClick="@(() => ConfirmDelete(cellContext.Item.Id))" />
+                                        </MudTooltip>
+                                    </CellTemplate>
+                                </TemplateColumn>
+                            </Columns>
+                            <PagerContent>
+                                <MudDataGridPager T="Product" />
+                            </PagerContent>
                             <NoRecordsContent>
-                                <MudText>No products found.</MudText>
-                            </NoRecordsContent>
-                        </MudTable>
-                    </MudPaper>
-                </MudItem>
-
-                <AuthorizeView Policy="@AppPolicies.CanManageProducts" Context="authContext">
-                    <Authorized>
-                        <MudItem xs="12" lg="5">
-                            <MudPaper Class="pa-4" Elevation="1">
-                                <MudText Typo="Typo.h6" GutterBottom="true">@((isEditing) ? "Edit Product" : "Add Product")</MudText>
-
-                                <MudTextField @bind-Value="formModel.Name" Label="Name" Variant="Variant.Outlined" Margin="Margin.Dense" Class="mb-3" />
-                                <MudNumericField @bind-Value="formModel.Price" Label="Price" Variant="Variant.Outlined" Margin="Margin.Dense" Class="mb-3" Format="N2" />
-                                <MudTextField @bind-Value="formModel.Description" Label="Description" Variant="Variant.Outlined" Margin="Margin.Dense" Class="mb-3" />
-
-                                <MudStack Row="true" Justify="Justify.FlexEnd" Spacing="2">
-                                    @if (isEditing)
+                                <MudStack AlignItems="AlignItems.Center" Class="pa-8">
+                                    <MudIcon Icon="@Icons.Material.Filled.Inventory" Size="Size.Large" Color="Color.Default" />
+                                    <MudText Typo="Typo.body1" Color="Color.Default">目前沒有產品資料</MudText>
+                                    @if (_canManage)
                                     {
-                                        <MudButton Variant="Variant.Text" Color="Color.Default" OnClick="CancelEdit">Cancel</MudButton>
-                                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveForm">Save Changes</MudButton>
-                                    }
-                                    else
-                                    {
-                                        <MudButton Variant="Variant.Outlined" Color="Color.Default" OnClick="ClearForm">Clear</MudButton>
-                                        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="SaveForm">Add Product</MudButton>
+                                        <MudButton Variant="Variant.Outlined"
+                                                   Color="Color.Primary"
+                                                   StartIcon="@Icons.Material.Filled.Add"
+                                                   OnClick="@(() => OpenAddForm())"
+                                                   Class="mt-2">
+                                            新增第一個產品
+                                        </MudButton>
                                     }
                                 </MudStack>
-                            </MudPaper>
+                            </NoRecordsContent>
+                        </MudDataGrid>
+                    }
+                </MudPaper>
+            </MudItem>
 
-                            <MudText Typo="Typo.caption" Class="mt-2 mud-text-secondary">
-                                Tip: Click edit to load a product into the form.
-                            </MudText>
-                        </MudItem>
-                    </Authorized>
-                </AuthorizeView>
-            </MudGrid>
-        }
+            @if (showForm && _canManage)
+            {
+                <MudItem xs="12" lg="5">
+                    <MudPaper Elevation="2" Class="pa-4">
+                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-4">
+                            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                                <MudIcon Icon="@(isEditing ? Icons.Material.Filled.Edit : Icons.Material.Filled.Add)"
+                                         Color="Color.Primary" />
+                                <MudText Typo="Typo.h6">@(isEditing ? "編輯產品" : "新增產品")</MudText>
+                            </MudStack>
+                            <MudIconButton Icon="@Icons.Material.Filled.Close"
+                                           Size="Size.Small"
+                                           OnClick="CloseForm" />
+                        </MudStack>
 
+                        <MudDivider Class="mb-4" />
+
+                        <MudTextField @bind-Value="formModel.Name"
+                                      Label="產品名稱"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Class="mb-3"
+                                      Required="true"
+                                      RequiredError="產品名稱為必填" />
+
+                        <MudNumericField @bind-Value="formModel.Price"
+                                         Label="價格"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Class="mb-3"
+                                         Format="N2"
+                                         Adornment="Adornment.Start"
+                                         AdornmentIcon="@Icons.Material.Filled.AttachMoney" />
+
+                        <MudTextField @bind-Value="formModel.Description"
+                                      Label="描述"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Class="mb-4"
+                                      Lines="3" />
+
+                        <MudStack Row="true" Justify="Justify.FlexEnd" Spacing="2">
+                            @if (isEditing)
+                            {
+                                <MudButton Variant="Variant.Text" Color="Color.Default" OnClick="CancelEdit">取消</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveForm" DropShadow="false">儲存變更</MudButton>
+                            }
+                            else
+                            {
+                                <MudButton Variant="Variant.Outlined" Color="Color.Default" OnClick="ClearForm">清除</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="SaveForm" DropShadow="false">新增產品</MudButton>
+                            }
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
+            }
+        </MudGrid>
     </Authorized>
     <NotAuthorized>
         <MudAlert Severity="Severity.Info">
-            Please <MudLink Href="authentication/login">log in</MudLink> to view the product data.
+            請 <MudLink Href="authentication/login">登入</MudLink> 以查看產品資料。
         </MudAlert>
     </NotAuthorized>
 </AuthorizeView>
-
-

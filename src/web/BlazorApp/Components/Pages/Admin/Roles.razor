@@ -7,20 +7,66 @@
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 
-<MudText Typo="Typo.h5" GutterBottom="true">角色管理</MudText>
+<PageHeader Icon="@Icons.Material.Filled.Security" 
+            Title="角色管理" 
+            Description="管理系統角色與權限設定">
+    <MudButton Variant="Variant.Filled" 
+               Color="Color.Primary" 
+               StartIcon="@Icons.Material.Filled.Add" 
+               OnClick="CreateRole"
+               DropShadow="false">
+        新增角色
+    </MudButton>
+</PageHeader>
 
-<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="CreateRole" Class="mb-4">新增角色</MudButton>
-
-<MudDataGrid Items="@_roles" Loading="@_loading" Filterable="true">
-    <Columns>
-        <PropertyColumn Property="x => x.Name" Title="名稱" />
-        <PropertyColumn Property="x => x.Description" Title="描述" />
-        <TemplateColumn CellClass="d-flex justify-end">
-            <CellTemplate>
-                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => DeleteRole(context.Item))" />
-            </CellTemplate>
-        </TemplateColumn>
-    </Columns>
-</MudDataGrid>
-
-
+<MudPaper Elevation="2" Class="pa-0">
+    <MudDataGrid T="KeycloakRole" Items="@_roles" Loading="@_loading" Filterable="true" QuickFilter="@_quickFilter" Hover="true">
+        <ToolBarContent>
+            <MudSpacer />
+            <DebouncedSearchField @bind-Value="_searchString" 
+                                  Placeholder="搜尋角色..."
+                                  DebounceMs="300" />
+        </ToolBarContent>
+        <Columns>
+            <TemplateColumn T="KeycloakRole" Title="名稱">
+                <CellTemplate Context="cellContext">
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                        <MudIcon Icon="@Icons.Material.Filled.Shield" Size="Size.Small" Color="Color.Primary" />
+                        <MudText Typo="Typo.body2" Style="font-weight: 500;">@cellContext.Item.Name</MudText>
+                    </MudStack>
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="KeycloakRole" Title="描述">
+                <CellTemplate Context="cellContext">
+                    @if (!string.IsNullOrWhiteSpace(cellContext.Item.Description))
+                    {
+                        <MudText Typo="Typo.body2" Class="mud-text-secondary">@cellContext.Item.Description</MudText>
+                    }
+                    else
+                    {
+                        <MudText Typo="Typo.body2" Class="mud-text-disabled">—</MudText>
+                    }
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="KeycloakRole" Title="操作">
+                <CellTemplate Context="cellContext">
+                    <MudTooltip Text="刪除角色">
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                                       Color="Color.Error" 
+                                       Size="Size.Small"
+                                       OnClick="@(() => DeleteRole(cellContext.Item))" />
+                    </MudTooltip>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="KeycloakRole" />
+        </PagerContent>
+        <NoRecordsContent>
+            <MudStack AlignItems="AlignItems.Center" Class="pa-8">
+                <MudIcon Icon="@Icons.Material.Filled.GppBad" Size="Size.Large" Color="Color.Default" />
+                <MudText Typo="Typo.body1" Color="Color.Default">目前沒有角色資料</MudText>
+            </MudStack>
+        </NoRecordsContent>
+    </MudDataGrid>
+</MudPaper>

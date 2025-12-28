@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Web;
 using AspireAppTemplate.Shared;
 
 namespace AspireAppTemplate.Web;
@@ -9,8 +10,20 @@ public class IdentityApiClient(HttpClient httpClient)
 
     public async Task<KeycloakUser[]> GetUsersAsync(CancellationToken ct = default)
     {
-        var users = await httpClient.GetFromJsonAsync<KeycloakUser[]>("/api/users", ct);
-        return users ?? [];
+        var result = await GetUsersPaginatedAsync(new PaginationRequest { Page = 1, PageSize = 1000 }, ct);
+        return result.Items.ToArray();
+    }
+
+    public async Task<PaginatedResult<KeycloakUser>> GetUsersPaginatedAsync(PaginationRequest request, CancellationToken ct = default)
+    {
+        var query = HttpUtility.ParseQueryString(string.Empty);
+        query["page"] = request.Page.ToString();
+        query["pageSize"] = request.PageSize.ToString();
+        if (!string.IsNullOrEmpty(request.SearchTerm))
+            query["searchTerm"] = request.SearchTerm;
+
+        var result = await httpClient.GetFromJsonAsync<PaginatedResult<KeycloakUser>>($"/api/users?{query}", ct);
+        return result ?? new PaginatedResult<KeycloakUser>();
     }
 
     public async Task CreateUserAsync(KeycloakUser user, CancellationToken ct = default)
@@ -72,8 +85,20 @@ public class IdentityApiClient(HttpClient httpClient)
 
     public async Task<KeycloakRole[]> GetRolesAsync(CancellationToken ct = default)
     {
-        var roles = await httpClient.GetFromJsonAsync<KeycloakRole[]>("/api/roles", ct);
-        return roles ?? [];
+        var result = await GetRolesPaginatedAsync(new PaginationRequest { Page = 1, PageSize = 1000 }, ct);
+        return result.Items.ToArray();
+    }
+
+    public async Task<PaginatedResult<KeycloakRole>> GetRolesPaginatedAsync(PaginationRequest request, CancellationToken ct = default)
+    {
+        var query = HttpUtility.ParseQueryString(string.Empty);
+        query["page"] = request.Page.ToString();
+        query["pageSize"] = request.PageSize.ToString();
+        if (!string.IsNullOrEmpty(request.SearchTerm))
+            query["searchTerm"] = request.SearchTerm;
+
+        var result = await httpClient.GetFromJsonAsync<PaginatedResult<KeycloakRole>>($"/api/roles?{query}", ct);
+        return result ?? new PaginatedResult<KeycloakRole>();
     }
 
     public async Task CreateRoleAsync(KeycloakRole role, CancellationToken ct = default)

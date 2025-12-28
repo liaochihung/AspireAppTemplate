@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.OutputCaching;
 
 namespace AspireAppTemplate.ApiService.Features.Identity.Users.GetAll;
 
-public class Endpoint(IdentityService identityService) : EndpointWithoutRequest<IEnumerable<KeycloakUser>>
+public class Endpoint(IdentityService identityService) : Endpoint<PaginationRequest, PaginatedResult<KeycloakUser>>
 {
     public override void Configure()
     {
@@ -15,9 +15,17 @@ public class Endpoint(IdentityService identityService) : EndpointWithoutRequest<
         Options(x => x.CacheOutput(c => c.Expire(TimeSpan.FromMinutes(5)).Tag("users")));
     }
 
-    public override async Task HandleAsync(CancellationToken ct)
+    public override async Task HandleAsync(PaginationRequest req, CancellationToken ct)
     {
-        var result = await identityService.GetUsersAsync();
-        await this.SendResultAsync(result);
+        var result = await identityService.GetUsersAsync(req.SearchTerm);
+        
+        if (result.IsError)
+        {
+            await SendAsync(new PaginatedResult<KeycloakUser>(), cancellation: ct);
+            return;
+        }
+
+        var paginated = result.Value.ToPaginatedResult(req);
+        await SendAsync(paginated, cancellation: ct);
     }
 }

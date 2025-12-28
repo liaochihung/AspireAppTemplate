@@ -6,29 +6,69 @@
 
 <PageTitle>Weather</PageTitle>
 
-<MudText Typo="Typo.h4" GutterBottom="true">Weather</MudText>
-<MudText Typo="Typo.body1" Class="mb-4">This component demonstrates showing data loaded from a backend API service. test</MudText>
+<PageHeader Icon="@Icons.Material.Filled.Cloud" 
+            Title="天氣預報" 
+            Description="此頁面展示從後端 API 服務載入的天氣資料">
+    <MudButton Variant="Variant.Outlined" 
+               Color="Color.Primary" 
+               StartIcon="@Icons.Material.Filled.Refresh"
+               OnClick="LoadData"
+               Disabled="@(forecasts == null)">
+        重新整理
+    </MudButton>
+</PageHeader>
 
-
-        @if (forecasts == null)
-        {
+<MudPaper Elevation="2" Class="pa-0">
+    @if (forecasts == null)
+    {
+        <div class="pa-6 d-flex justify-center">
             <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
-        }
-        else
-        {
-            <MudTable Items="@forecasts" Hover="true" Dense="true" Striped="true" Context="forecast">
-                <HeaderContent>
-                    <MudTh>Date</MudTh>
-                    <MudTh>Temp. (C)</MudTh>
-                    <MudTh>Temp. (F)</MudTh>
-                    <MudTh>Summary</MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd DataLabel="Date">@forecast.Date.ToShortDateString()</MudTd>
-                    <MudTd DataLabel="Temp. (C)">@forecast.TemperatureC</MudTd>
-                    <MudTd DataLabel="Temp. (F)">@forecast.TemperatureF</MudTd>
-                    <MudTd DataLabel="Summary">@forecast.Summary</MudTd>
-                </RowTemplate>
-            </MudTable>
-        }
-   
+        </div>
+    }
+    else
+    {
+        <MudDataGrid T="WeatherForecast" Items="@forecasts" Filterable="false" SortMode="SortMode.Single" Hover="true">
+            <Columns>
+                <TemplateColumn T="WeatherForecast" Title="日期">
+                    <CellTemplate Context="cellContext">
+                        <MudText>@cellContext.Item.Date.ToString("yyyy/MM/dd")</MudText>
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn T="WeatherForecast" Title="溫度 (°C)">
+                    <CellTemplate Context="cellContext">
+                        @{
+                            var temp = cellContext.Item.TemperatureC;
+                            var color = GetTemperatureColor(temp);
+                            var icon = GetTemperatureIcon(temp);
+                        }
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                            <MudIcon Icon="@icon" Color="@color" Size="Size.Small" />
+                            <MudText>@temp</MudText>
+                        </MudStack>
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn T="WeatherForecast" Title="溫度 (°F)">
+                    <CellTemplate Context="cellContext">
+                        <MudText>@cellContext.Item.TemperatureF</MudText>
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn T="WeatherForecast" Title="摘要">
+                    <CellTemplate Context="cellContext">
+                        <MudChip T="string" Size="Size.Small" Color="Color.Default" Variant="Variant.Outlined">
+                            @cellContext.Item.Summary
+                        </MudChip>
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+            <PagerContent>
+                <MudDataGridPager T="WeatherForecast" />
+            </PagerContent>
+            <NoRecordsContent>
+                <MudStack AlignItems="AlignItems.Center" Class="pa-8">
+                    <MudIcon Icon="@Icons.Material.Filled.CloudOff" Size="Size.Large" Color="Color.Default" />
+                    <MudText Typo="Typo.body1" Color="Color.Default">目前沒有天氣資料</MudText>
+                </MudStack>
+            </NoRecordsContent>
+        </MudDataGrid>
+    }
+</MudPaper>

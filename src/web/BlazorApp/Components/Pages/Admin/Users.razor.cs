@@ -8,6 +8,27 @@ namespace AspireAppTemplate.Web.Components.Pages.Admin
     {
         private IEnumerable<KeycloakUser> _users = new List<KeycloakUser>();
         private bool _loading = true;
+        private string _searchString = string.Empty;
+
+        private Func<KeycloakUser, bool> _quickFilter => user =>
+        {
+            if (string.IsNullOrWhiteSpace(_searchString))
+                return true;
+
+            if (user.Username?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true)
+                return true;
+
+            if (user.Email?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true)
+                return true;
+
+            if (user.FirstName?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true)
+                return true;
+
+            if (user.LastName?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true)
+                return true;
+
+            return false;
+        };
 
         protected override async Task OnInitializedAsync()
         {

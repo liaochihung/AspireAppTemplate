@@ -1,34 +1,60 @@
 using AspireAppTemplate.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor;
 
 namespace AspireAppTemplate.Web.Components.Pages
 {
     public partial class Products : IDisposable
     {
+        [Inject]
+        private IAuthorizationService AuthorizationService { get; set; } = default!;
+
         private Product[]? products;
         private bool isLoading = true;
         private string? errorMessage;
         private PersistingComponentStateSubscription _subscription;
+        private string _searchString = string.Empty;
+        private bool showForm = false;
+        private bool _canManage = false;
 
         private ProductEditModel formModel = new();
         private bool isEditing = false;
+
+        private Func<Product, bool> _quickFilter => product =>
+        {
+            if (string.IsNullOrWhiteSpace(_searchString))
+                return true;
+
+            if (product.Name?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true)
+                return true;
+
+            if (product.Description?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true)
+                return true;
+
+            return false;
+        };
 
         protected override async Task OnInitializedAsync()
         {
             _subscription = ApplicationState.RegisterOnPersisting(PersistProducts);
 
-            if (ApplicationState.TryTakeFromJson<Product[]>("products", out var restored))
-            {
-                products = restored;
-                isLoading = false;
-            }
-            else
-            {
-                var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-                var user = authState.User;
+            // Check authorization
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
 
-                if (user.Identity?.IsAuthenticated == true)
+            if (user.Identity?.IsAuthenticated == true)
+            {
+                var authResult = await AuthorizationService.AuthorizeAsync(user, AppPolicies.CanManageProducts);
+                _canManage = authResult.Succeeded;
+
+                if (ApplicationState.TryTakeFromJson<Product[]>("products", out var restored))
+                {
+                    products = restored;
+                    isLoading = false;
+                }
+                else
                 {
                     await LoadProducts();
                 }
@@ -64,6 +90,13 @@ namespace AspireAppTemplate.Web.Components.Pages
             }
         }
 
+        private void OpenAddForm()
+        {
+            formModel = new ProductEditModel();
+            isEditing = false;
+            showForm = true;
+        }
+
         private void StartEdit(Product p)
         {
             formModel = new ProductEditModel
@@ -74,12 +107,20 @@ namespace AspireAppTemplate.Web.Components.Pages
                 Description = p.Description
             };
             isEditing = true;
+            showForm = true;
         }
 
         private void CancelEdit()
         {
             ClearForm();
             isEditing = false;
+        }
+
+        private void CloseForm()
+        {
+            showForm = false;
+            isEditing = false;
+            ClearForm();
         }
 
         private void ClearForm()
@@ -111,8 +152,8 @@ namespace AspireAppTemplate.Web.Components.Pages
                         arr[idx] = toUpdate;
                         products = arr.ToArray();
                     }
-                    CancelEdit();
-                    Snackbar.Add("Product updated successfully", Severity.Success);
+                    CloseForm();
+                    Snackbar.Add("產品更新成功", Severity.Success);
                 }
                 else
                 {
@@ -129,8 +170,8 @@ namespace AspireAppTemplate.Web.Components.Pages
                         var list = (products ?? Array.Empty<Product>()).ToList();
                         list.Add(created);
                         products = list.ToArray();
-                        ClearForm();
-                        Snackbar.Add("Product added successfully", Severity.Success);
+                        CloseForm();
+                        Snackbar.Add("產品新增成功", Severity.Success);
                     }
                 }
             }
@@ -144,9 +185,9 @@ namespace AspireAppTemplate.Web.Components.Pages
         private async Task ConfirmDelete(int id)
         {
             var result = await DialogService.ShowMessageBox(
-                "Confirm Delete",
-                $"Delete product #{id}? This action cannot be undone.",
-                yesText: "Delete", cancelText: "Cancel");
+                "確認刪除",
+                $"確定要刪除產品 #{id} 嗎？此操作無法復原。",
+                yesText: "刪除", cancelText: "取消");
 
             if (result != true) return;
 
@@ -159,10 +200,10 @@ namespace AspireAppTemplate.Web.Components.Pages
 
                 if (isEditing && formModel.Id == id)
                 {
-                    CancelEdit();
+                    CloseForm();
                 }
 
-                Snackbar.Add("Product deleted successfully", Severity.Success);
+                Snackbar.Add("產品刪除成功", Severity.Success);
             }
             catch (Exception ex)
             {
