@@ -13,7 +13,8 @@ public class DeleteRoleTests(TestFixture fixture) : IClassFixture<TestFixture>
         var fakeKeycloak = new FakeKeycloakHandler();
         fakeKeycloak.SetupDeleteRole("test-role", HttpStatusCode.NoContent);
 
-        var client = fixture.WithMockKeycloak(fakeKeycloak).CreateClient();
+        fixture.SetMockKeycloakHandler(fakeKeycloak);
+        var client = fixture.CreateClient();
 
         var token = JWTBearer.CreateToken(
             signingKey: "VerifyTheIntegrityOfThisTokenSignature123!",
@@ -41,7 +42,8 @@ public class DeleteRoleTests(TestFixture fixture) : IClassFixture<TestFixture>
         var fakeKeycloak = new FakeKeycloakHandler();
         fakeKeycloak.SetupDeleteRole("missing-role", HttpStatusCode.NotFound);
 
-        var client = fixture.WithMockKeycloak(fakeKeycloak).CreateClient();
+        fixture.SetMockKeycloakHandler(fakeKeycloak);
+        var client = fixture.CreateClient();
 
         var token = JWTBearer.CreateToken(
             signingKey: "VerifyTheIntegrityOfThisTokenSignature123!", 

@@ -14,7 +14,8 @@ public class CreateRoleTests(TestFixture fixture) : IClassFixture<TestFixture>
         var fakeKeycloak = new FakeKeycloakHandler();
         fakeKeycloak.SetupCreateRole(HttpStatusCode.Created);
 
-        var client = fixture.WithMockKeycloak(fakeKeycloak).CreateClient();
+        fixture.SetMockKeycloakHandler(fakeKeycloak);
+        var client = fixture.CreateClient();
 
         var request = new CreateRoleRequest
         {
@@ -47,7 +48,8 @@ public class CreateRoleTests(TestFixture fixture) : IClassFixture<TestFixture>
         var fakeKeycloak = new FakeKeycloakHandler();
         fakeKeycloak.SetupCreateRole(HttpStatusCode.Conflict);
 
-        var client = fixture.WithMockKeycloak(fakeKeycloak).CreateClient();
+        fixture.SetMockKeycloakHandler(fakeKeycloak);
+        var client = fixture.CreateClient();
 
         var request = new CreateRoleRequest { Name = "existing-role" };
         

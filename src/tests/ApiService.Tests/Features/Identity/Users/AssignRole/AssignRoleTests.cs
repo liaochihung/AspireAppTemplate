@@ -13,7 +13,8 @@ public class AssignRoleTests(TestFixture fixture) : IClassFixture<TestFixture>
         var fakeKeycloak = new FakeKeycloakHandler();
         fakeKeycloak.SetupAssignRole("user-id", HttpStatusCode.NoContent);
 
-        var client = fixture.WithMockKeycloak(fakeKeycloak).CreateClient();
+        fixture.SetMockKeycloakHandler(fakeKeycloak);
+        var client = fixture.CreateClient();
 
         var token = JWTBearer.CreateToken(
             signingKey: "VerifyTheIntegrityOfThisTokenSignature123!",

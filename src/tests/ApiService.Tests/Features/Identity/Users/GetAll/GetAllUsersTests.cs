@@ -19,7 +19,8 @@ public class GetAllUsersTests(TestFixture fixture) : IClassFixture<TestFixture>
         };
         fakeKeycloak.SetupGetAllUsers(HttpStatusCode.OK, mockUsersResponse);
 
-        var client = fixture.WithMockKeycloak(fakeKeycloak).CreateClient();
+        fixture.SetMockKeycloakHandler(fakeKeycloak);
+        var client = fixture.CreateClient();
 
         var token = JWTBearer.CreateToken(
             signingKey: "VerifyTheIntegrityOfThisTokenSignature123!",

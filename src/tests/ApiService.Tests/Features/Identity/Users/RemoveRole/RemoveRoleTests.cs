@@ -14,7 +14,8 @@ public class RemoveRoleTests(TestFixture fixture) : IClassFixture<TestFixture>
         var userId = "user-id";
         fakeKeycloak.SetupRemoveRole(userId, HttpStatusCode.NoContent);
 
-        var client = fixture.WithMockKeycloak(fakeKeycloak).CreateClient();
+        fixture.SetMockKeycloakHandler(fakeKeycloak);
+        var client = fixture.CreateClient();
 
         var token = JWTBearer.CreateToken(
             signingKey: "VerifyTheIntegrityOfThisTokenSignature123!",
