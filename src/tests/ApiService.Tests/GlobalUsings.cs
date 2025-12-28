@@ -1,7 +1,6 @@
 global using FluentAssertions;
 global using FastEndpoints;
 global using FastEndpoints.Testing;
-global using Xunit;
 global using Microsoft.AspNetCore.Hosting;
 global using Microsoft.Extensions.Hosting;
 global using Microsoft.Extensions.Configuration;

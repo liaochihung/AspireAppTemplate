@@ -1,12 +1,7 @@
 using System.Net;
 using AspireAppTemplate.ApiService.Features.Identity.Users.GetRoles;
-using AspireAppTemplate.ApiService.Services;
 using AspireAppTemplate.Shared;
-using ErrorOr;
 using Keycloak.AuthServices.Sdk.Admin.Models;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 
 namespace AspireAppTemplate.ApiService.Tests.Features.Identity.Users.GetRoles;
 
@@ -16,21 +11,15 @@ public class GetUserRolesTests(TestFixture fixture) : IClassFixture<TestFixture>
     public async Task GetUserRoles_ReturnsRoles_WhenUserExists()
     {
         // Arrange
-        var mockService = Substitute.For<IIdentityService>();
-        var roles = new List<KeycloakRole>
+        var fakeKeycloak = new FakeKeycloakHandler();
+        var userId = "user-id";
+        var mockRolesResponse = new[]
         {
-            new() { Id = "1", Name = "Admin" }
+            new { Id = "1", Name = "Admin", Description = "Administrator" }
         };
-        mockService.GetUserRolesAsync(Arg.Any<string>())
-            .Returns(Task.FromResult<ErrorOr<IEnumerable<KeycloakRole>>>(roles));
+        fakeKeycloak.SetupGetUserRoles(userId, HttpStatusCode.OK, mockRolesResponse);
 
-        var client = fixture.WithWebHostBuilder(b =>
-        {
-            b.ConfigureTestServices(services =>
-            {
-                services.AddScoped(_ => mockService);
-            });
-        }).CreateClient();
+        var client = fixture.WithMockKeycloak(fakeKeycloak).CreateClient();
 
         var token = JWTBearer.CreateToken(
             signingKey: "VerifyTheIntegrityOfThisTokenSignature123!",
@@ -38,10 +27,7 @@ public class GetUserRolesTests(TestFixture fixture) : IClassFixture<TestFixture>
 
         client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-        var userId = "user-id";
-
         // Act
-        // GET /api/users/{id}/roles
         var response = await client.GetAsync($"/api/users/{userId}/roles");
 
         // Assert

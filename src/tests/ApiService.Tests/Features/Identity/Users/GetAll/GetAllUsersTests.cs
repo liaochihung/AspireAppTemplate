@@ -1,12 +1,7 @@
 using System.Net;
 using AspireAppTemplate.ApiService.Features.Identity.Users.GetAll;
-using AspireAppTemplate.ApiService.Services;
 using AspireAppTemplate.Shared;
-using ErrorOr;
 using Keycloak.AuthServices.Sdk.Admin.Models;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 
 namespace AspireAppTemplate.ApiService.Tests.Features.Identity.Users.GetAll;
 
@@ -16,22 +11,15 @@ public class GetAllUsersTests(TestFixture fixture) : IClassFixture<TestFixture>
     public async Task GetAllUsers_ReturnsUsers_WhenUsersExist()
     {
         // Arrange
-        var mockService = Substitute.For<IIdentityService>();
-        var users = new List<KeycloakUser>
+        var fakeKeycloak = new FakeKeycloakHandler();
+        var mockUsersResponse = new[]
         {
-            new() { Id = "1", Username = "user1" },
-            new() { Id = "2", Username = "user2" }
+            new { Id = "1", Username = "user1", Email = "user1@test.com" },
+            new { Id = "2", Username = "user2", Email = "user2@test.com" }
         };
-        mockService.GetUsersAsync(Arg.Any<string?>())
-            .Returns(Task.FromResult<ErrorOr<IEnumerable<KeycloakUser>>>(users));
+        fakeKeycloak.SetupGetAllUsers(HttpStatusCode.OK, mockUsersResponse);
 
-        var client = fixture.WithWebHostBuilder(b =>
-        {
-            b.ConfigureTestServices(services =>
-            {
-                services.AddScoped(_ => mockService);
-            });
-        }).CreateClient();
+        var client = fixture.WithMockKeycloak(fakeKeycloak).CreateClient();
 
         var token = JWTBearer.CreateToken(
             signingKey: "VerifyTheIntegrityOfThisTokenSignature123!",

@@ -1,12 +1,7 @@
 using System.Net;
 using AspireAppTemplate.ApiService.Features.Identity.Roles.Create;
-using AspireAppTemplate.ApiService.Services;
 using AspireAppTemplate.Shared;
-using ErrorOr;
 using Keycloak.AuthServices.Sdk.Admin.Models;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 
 namespace AspireAppTemplate.ApiService.Tests.Features.Identity.Roles.Create;
 
@@ -16,17 +11,10 @@ public class CreateRoleTests(TestFixture fixture) : IClassFixture<TestFixture>
     public async Task CreateRole_ReturnsCreated_WhenDataIsValid()
     {
         // Arrange
-        var mockService = Substitute.For<IIdentityService>();
-        mockService.CreateRoleAsync(Arg.Any<KeycloakRole>())
-            .Returns(Task.FromResult<ErrorOr<Created>>(Result.Created));
+        var fakeKeycloak = new FakeKeycloakHandler();
+        fakeKeycloak.SetupCreateRole(HttpStatusCode.Created);
 
-        var client = fixture.WithWebHostBuilder(b =>
-        {
-            b.ConfigureTestServices(services =>
-            {
-                services.AddScoped(_ => mockService);
-            });
-        }).CreateClient();
+        var client = fixture.WithMockKeycloak(fakeKeycloak).CreateClient();
 
         var request = new CreateRoleRequest
         {
@@ -34,7 +22,6 @@ public class CreateRoleTests(TestFixture fixture) : IClassFixture<TestFixture>
             Description = "Test Role Description"
         };
         
-        // Generate a fake token with Admin role
         var token = JWTBearer.CreateToken(
             signingKey: "VerifyTheIntegrityOfThisTokenSignature123!", 
             claims: new[] { ("role", AppRoles.Administrator) });
@@ -46,24 +33,21 @@ public class CreateRoleTests(TestFixture fixture) : IClassFixture<TestFixture>
 
         // Assert
         result.Response.StatusCode.Should().Be(HttpStatusCode.Created);
-        await mockService.Received(1).CreateRoleAsync(Arg.Is<KeycloakRole>(r => r.Name == request.Name));
+        
+        // Verify request was sent to Keycloak
+        fakeKeycloak.VerifyRequestSent(req => 
+            req.Method == HttpMethod.Post && 
+            req.RequestUri!.PathAndQuery.Contains("/admin/realms/test-realm/roles")).Should().BeTrue();
     }
 
     [Fact]
     public async Task CreateRole_ReturnsConflict_WhenRoleAlreadyExists()
     {
         // Arrange
-        var mockService = Substitute.For<IIdentityService>();
-        mockService.CreateRoleAsync(Arg.Any<KeycloakRole>())
-            .Returns(Task.FromResult<ErrorOr<Created>>(Error.Conflict("Role already exists.")));
+        var fakeKeycloak = new FakeKeycloakHandler();
+        fakeKeycloak.SetupCreateRole(HttpStatusCode.Conflict);
 
-        var client = fixture.WithWebHostBuilder(b =>
-        {
-            b.ConfigureTestServices(services =>
-            {
-                services.AddScoped(_ => mockService);
-            });
-        }).CreateClient();
+        var client = fixture.WithMockKeycloak(fakeKeycloak).CreateClient();
 
         var request = new CreateRoleRequest { Name = "existing-role" };
         
@@ -74,9 +58,9 @@ public class CreateRoleTests(TestFixture fixture) : IClassFixture<TestFixture>
         client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
         // Act
-        var response = await client.PostAsJsonAsync("/api/roles", request);
+        var result = await client.POSTAsync<Endpoint, CreateRoleRequest, EmptyResponse>(request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        result.Response.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
 }

@@ -1,11 +1,6 @@
 using System.Net;
 using AspireAppTemplate.ApiService.Features.Identity.Roles.Delete;
-using AspireAppTemplate.ApiService.Services;
 using AspireAppTemplate.Shared;
-using ErrorOr;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 
 namespace AspireAppTemplate.ApiService.Tests.Features.Identity.Roles.Delete;
 
@@ -15,17 +10,10 @@ public class DeleteRoleTests(TestFixture fixture) : IClassFixture<TestFixture>
     public async Task DeleteRole_ReturnsOk_WhenRoleExists()
     {
         // Arrange
-        var mockService = Substitute.For<IIdentityService>();
-        mockService.DeleteRoleAsync(Arg.Any<string>())
-            .Returns(Task.FromResult<ErrorOr<Deleted>>(Result.Deleted));
+        var fakeKeycloak = new FakeKeycloakHandler();
+        fakeKeycloak.SetupDeleteRole("test-role", HttpStatusCode.NoContent);
 
-        var client = fixture.WithWebHostBuilder(b =>
-        {
-            b.ConfigureTestServices(services =>
-            {
-                services.AddScoped(_ => mockService);
-            });
-        }).CreateClient();
+        var client = fixture.WithMockKeycloak(fakeKeycloak).CreateClient();
 
         var token = JWTBearer.CreateToken(
             signingKey: "VerifyTheIntegrityOfThisTokenSignature123!",
@@ -39,24 +27,21 @@ public class DeleteRoleTests(TestFixture fixture) : IClassFixture<TestFixture>
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        await mockService.Received(1).DeleteRoleAsync("test-role");
+        
+        // Verify request was sent to Keycloak
+        fakeKeycloak.VerifyRequestSent(req => 
+            req.Method == HttpMethod.Delete && 
+            req.RequestUri!.PathAndQuery.Contains("/admin/realms/test-realm/roles/test-role")).Should().BeTrue();
     }
 
     [Fact]
     public async Task DeleteRole_ReturnsNotFound_WhenRoleDoesNotExist()
     {
         // Arrange
-        var mockService = Substitute.For<IIdentityService>();
-        mockService.DeleteRoleAsync(Arg.Any<string>())
-            .Returns(Task.FromResult<ErrorOr<Deleted>>(Error.NotFound()));
+        var fakeKeycloak = new FakeKeycloakHandler();
+        fakeKeycloak.SetupDeleteRole("missing-role", HttpStatusCode.NotFound);
 
-        var client = fixture.WithWebHostBuilder(b =>
-        {
-            b.ConfigureTestServices(services =>
-            {
-                services.AddScoped(_ => mockService);
-            });
-        }).CreateClient();
+        var client = fixture.WithMockKeycloak(fakeKeycloak).CreateClient();
 
         var token = JWTBearer.CreateToken(
             signingKey: "VerifyTheIntegrityOfThisTokenSignature123!", 

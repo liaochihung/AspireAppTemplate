@@ -1,4 +1,5 @@
 using AspireAppTemplate.ApiService;
+using AspireAppTemplate.ApiService.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -24,7 +25,8 @@ public class TestFixture : WebApplicationFactory<Program>, IAsyncLifetime
         .WithImage("redis:alpine")
         .Build();
 
-    public async Task InitializeAsync()
+
+    public async ValueTask InitializeAsync()
     {
         await _dbContainer.StartAsync();
         await _redisContainer.StartAsync();
@@ -33,11 +35,27 @@ public class TestFixture : WebApplicationFactory<Program>, IAsyncLifetime
         Environment.SetEnvironmentVariable("ConnectionStrings__cache", _redisContainer.GetConnectionString());
     }
 
-    public new async Task DisposeAsync()
+    public new async ValueTask DisposeAsync()
     {
         await _dbContainer.DisposeAsync();
         await _redisContainer.DisposeAsync();
         await base.DisposeAsync();
+    }
+
+    /// <summary>
+    /// 建立使用 Mock Keycloak HttpClient 的測試環境
+    /// </summary>
+    public WebApplicationFactory<Program> WithMockKeycloak(FakeKeycloakHandler handler)
+    {
+        return WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureTestServices(services =>
+            {
+                // 替換 Keycloak HttpClient
+                services.AddHttpClient<IIdentityService, IdentityService>()
+                    .ConfigurePrimaryHttpMessageHandler(() => handler);
+            });
+        });
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)

@@ -1,12 +1,7 @@
 using System.Net;
 using AspireAppTemplate.ApiService.Features.Identity.Roles.GetAll;
-using AspireAppTemplate.ApiService.Services;
 using AspireAppTemplate.Shared;
-using ErrorOr;
 using Keycloak.AuthServices.Sdk.Admin.Models;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
 
 namespace AspireAppTemplate.ApiService.Tests.Features.Identity.Roles.GetAll;
 
@@ -16,22 +11,15 @@ public class GetAllRolesTests(TestFixture fixture) : IClassFixture<TestFixture>
     public async Task GetAllRoles_ReturnsRoles_WhenRolesExist()
     {
         // Arrange
-        var mockService = Substitute.For<IIdentityService>();
-        var roles = new List<KeycloakRole>
+        var fakeKeycloak = new FakeKeycloakHandler();
+        var mockRolesResponse = new[]
         {
-            new() { Id = "1", Name = "Admin", Description = "Administrator" },
-            new() { Id = "2", Name = "User", Description = "User" }
+            new { Id = "1", Name = "Admin", Description = "Administrator" },
+            new { Id = "2", Name = "User", Description = "User" }
         };
-        mockService.GetRolesAsync()
-            .Returns(Task.FromResult<ErrorOr<IEnumerable<KeycloakRole>>>(roles));
+        fakeKeycloak.SetupGetAllRoles(HttpStatusCode.OK, mockRolesResponse);
 
-        var client = fixture.WithWebHostBuilder(b =>
-        {
-            b.ConfigureTestServices(services =>
-            {
-                services.AddScoped(_ => mockService);
-            });
-        }).CreateClient();
+        var client = fixture.WithMockKeycloak(fakeKeycloak).CreateClient();
 
         var token = JWTBearer.CreateToken(
             signingKey: "VerifyTheIntegrityOfThisTokenSignature123!",
