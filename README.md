@@ -62,6 +62,30 @@ run.bat
 3.  資料庫 `aspiredb` 會在 `ApiService` 啟動時自動建立 (Development 環境)。
 4.  API 文件可透過 `/scalar/v1` 存取 (例如: `https://localhost:<port>/scalar/v1`)。
 
+### 常見問題 (Troubleshooting)
+
+**Q: 如果我的 7092/7085 埠口被佔用怎麼辦？**
+
+當您在不同電腦啟動專案時，若預設的 HTTPS 埠口 (`7092` 或 `7085`) 已被佔用，IDE 或 `dotnet run` 可能會自動分配一個新的隨機埠口。這會導致 Keycloak 登入失敗（錯誤：`invalid_request`, `Invalid parameter: redirect_uri`），因為新埠口不在 Keycloak 的允許清單中。
+
+解決步驟：
+1.  **確認新埠口**：查看瀏覽器網址列或 Aspire Dashboard，記下 `webfrontend` 目前運行的 HTTPS 埠口 (例如 `7123`)。
+2.  **更新 Keycloak 設定**：
+    *   開啟 `src/aspire/AppHost/Realms/import-realmdata.json`。
+    *   搜尋 `redirectUris` 和 `webOrigins` 區塊。
+    *   將新的網址 (例如 `https://localhost:7123` 和 `https://localhost:7123/signin-oidc/signout-callback-oidc`) 加入清單中。
+3.  **重啟環境**：因為 Keycloak 容器可能已經匯入了舊資料，建議執行 `docker volume prune` 或手動刪除 Keycloak 容器的 Volume 讓設定重新匯入。
+
+**Q: 如何在生產環境 Docker 中動態配置 Keycloak 參數？**
+
+若您希望在部署時透過環境變數動態替換 `import-realmdata.json` 中的網址 (例如將 `localhost` 替換為真實域名)，建議採用的方式為：
+
+1.  **自訂 Docker Image**: 建立一個繼承自官方 Keycloak 的 Dockerfile。
+2.  **使用 envsubst**: 安裝並使用 `envsubst` 工具。
+3.  **啟動腳本**: 撰寫 Entrypoint 腳本，在 Keycloak 啟動前讀取 `import-realmdata.template.json`，將其中的變數 (如 `${APP_BASE_URL}`) 替換為環境變數的值，生成最終的 `.json` 供 Keycloak 匯入。
+
+這能讓同一份 Docker Image 適用於不同的部署環境 (Staging/Production)。
+
 ## 開發指南 (Development Guidelines)
 
 *   **資料庫開發**:

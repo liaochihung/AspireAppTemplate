@@ -33,6 +33,7 @@
   ],
   "defaultLocale": "zh-TW",
   "sslRequired": "external",
+  "loginTheme": "my-company-theme",
   "registrationAllowed": true,
   "registrationEmailAsUsername": false,
   "rememberMe": false,
@@ -614,10 +615,14 @@
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "https://localhost:7085/signin-oidc"
+        "https://localhost:7085/signin-oidc",
+        "https://localhost:7092/signin-oidc",
+        "https://localhost:7085/signout-callback-oidc",
+        "https://localhost:7092/signout-callback-oidc"
       ],
       "webOrigins": [
-        "https://localhost:7085"
+        "https://localhost:7085",
+        "https://localhost:7092"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -631,7 +636,7 @@
       "protocol": "openid-connect",
       "attributes": {
         "oidc.ciba.grant.enabled": "false",
-        "post.logout.redirect.uris": "https://localhost:7085/signout-callback-oidc",
+        "post.logout.redirect.uris": "+",
         "oauth2.device.authorization.grant.enabled": "false",
         "backchannel.logout.session.required": "true",
         "backchannel.logout.revoke.offline.tokens": "false"
