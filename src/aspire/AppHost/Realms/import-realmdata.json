@@ -76,6 +76,32 @@
           "manage-account"
         ]
       }
+    },
+    {
+      "id": "user-jack-id-456",
+      "username": "jack",
+      "enabled": true,
+      "email": "jack@example.com",
+      "emailVerified": true,
+      "firstName": "Jack",
+      "lastName": "User",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "0000",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "Administrator",
+        "default-roles-weathershop"
+      ],
+      "clientRoles": {
+        "account": [
+          "view-profile",
+          "manage-account"
+        ]
+      }
     }
   ],
   "roles": {
@@ -613,6 +639,19 @@
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": true,
       "nodeReRegistrationTimeout": -1,
+      "protocolMappers": [
+        {
+          "name": "weather-api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-hardcoded-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.custom.audience": "weather.api",
+            "id.token.claim": "false",
+            "access.token.claim": "true"
+          }
+        }
+      ],
       "defaultClientScopes": [
         "web-origins",
         "acr",

@@ -3,22 +3,40 @@ using System.Net.Http.Headers;
 
 namespace AspireAppTemplate.Web;
 
-public class AuthorizationHandler(IHttpContextAccessor httpContextAccessor) : DelegatingHandler
+/// <summary>
+/// HTTP Message Handler that attaches access tokens to outgoing requests.
+/// </summary>
+public class AuthorizationHandler(IHttpContextAccessor httpContextAccessor, ILogger<AuthorizationHandler> logger) : DelegatingHandler
+{
+    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        var httpContext = httpContextAccessor.HttpContext;
+
+        if (httpContext is null)
         {
-            var httpContext = httpContextAccessor.HttpContext;
-
-            if (httpContext is not null)
-            {
-                var accessToken = await httpContext.GetTokenAsync("access_token");
-
-                if (!string.IsNullOrWhiteSpace(accessToken))
-                {
-                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-                }
-            }
-
+            logger.LogWarning("HttpContext is null - cannot attach token");
             return await base.SendAsync(request, cancellationToken);
         }
+
+        try
+        {
+            var accessToken = await httpContext.GetTokenAsync("access_token");
+            
+            if (string.IsNullOrWhiteSpace(accessToken))
+            {
+                logger.LogWarning("No access_token found in HttpContext for request to {Uri}", request.RequestUri);
+            }
+            else
+            {
+                logger.LogInformation("Attaching Bearer token to request: {Uri}", request.RequestUri);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error getting access token from HttpContext");
+        }
+
+        return await base.SendAsync(request, cancellationToken);
     }
+}

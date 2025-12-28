@@ -26,33 +26,65 @@ builder.Services.SwaggerDocument();
 
 builder.Services.Configure<KeycloakAdminConfiguration>(builder.Configuration.GetSection("KeycloakAdmin"));
 
-var keycloakEndpoint = builder.Configuration["services:keycloak:http"];
+var keycloakEndpoint = builder.Configuration["services:keycloak:http:0"];
+Log.Information("Keycloak Endpoint from Aspire: {Endpoint}", keycloakEndpoint);
 
 if (!string.IsNullOrEmpty(keycloakEndpoint))
 {
     builder.Configuration["Keycloak:AuthServerUrl"] = keycloakEndpoint;
     builder.Configuration["KeycloakAdmin:AuthServerUrl"] = keycloakEndpoint;
 }
+else
+{
+    // Fallback to appsettings value
+    keycloakEndpoint = builder.Configuration["Keycloak:AuthServerUrl"];
+    Log.Information("Keycloak Endpoint from appsettings: {Endpoint}", keycloakEndpoint);
+}
+
 builder.Configuration["Keycloak:RequireHttpsMetadata"] = (!builder.Environment.IsDevelopment()).ToString();
 
 // 1. Authentication (Protecting the API)
 builder.Services.AddKeycloakWebApiAuthentication(builder.Configuration);
 
 // Fix: Allow issuer mismatch (Internal Docker vs External Localhost)
-// and ensure Audience is validated correctly if needed
 builder.Services.PostConfigure<JwtBearerOptions>(
-    JwtBearerDefaults.AuthenticationScheme, 
+    JwtBearerDefaults.AuthenticationScheme,
     options =>
 {
     options.TokenValidationParameters.ValidateIssuer = false; // Internal service sees 'keycloak:8080' but token issued by 'localhost:port'
-    options.TokenValidationParameters.RoleClaimType = "role"; // Reinforce role mapping
+    options.TokenValidationParameters.RoleClaimType = "role"; // Align with Keycloak's default short name claim
+    options.MapInboundClaims = false; // Prevent mapping 'role' to 'http://.../role'
+    
+    // Debug: Log token validation events
+    options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            Log.Error(context.Exception, "JWT Authentication Failed: {Message}", context.Exception.Message);
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = context =>
+        {
+            var identity = context.Principal?.Identity as System.Security.Claims.ClaimsIdentity;
+            var claims = context.Principal?.Claims.Select(c => $"{c.Type}: {c.Value}");
+            Log.Information("JWT Token Validated. RoleClaimType: {RoleClaimType}. Claims: {Claims}", identity?.RoleClaimType, string.Join(", ", claims ?? Array.Empty<string>()));
+            return Task.CompletedTask;
+        },
+        OnMessageReceived = context =>
+        {
+            var hasToken = !string.IsNullOrEmpty(context.Token);
+            var authHeader = context.Request.Headers.Authorization.FirstOrDefault();
+            Log.Information("JWT MessageReceived. HasToken: {HasToken}, AuthHeader: {AuthHeader}", hasToken, authHeader?.Substring(0, Math.Min(authHeader?.Length ?? 0, 50)));
+            return Task.CompletedTask;
+        }
+    };
 });
 
 // 2. Admin SDK (Managing Keycloak)
 // Configure IdentityService with HttpClient and Password Grant Handler
 builder.Services.AddTransient<KeycloakPasswordTokenHandler>();
 
-builder.Services.AddHttpClient<IdentityService>(client => 
+builder.Services.AddHttpClient<IdentityService>(client =>
 {
     if (!string.IsNullOrEmpty(keycloakEndpoint))
     {
