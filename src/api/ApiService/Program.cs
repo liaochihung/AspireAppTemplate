@@ -85,7 +85,7 @@ builder.Services.PostConfigure<JwtBearerOptions>(
 // Configure IdentityService with HttpClient and Password Grant Handler
 builder.Services.AddTransient<KeycloakPasswordTokenHandler>();
 
-builder.Services.AddHttpClient<IdentityService>(client =>
+builder.Services.AddHttpClient<IIdentityService, IdentityService>(client =>
 {
     if (!string.IsNullOrEmpty(keycloakEndpoint))
     {
@@ -167,3 +167,5 @@ finally
     Log.Information("AspireAppTemplate.ApiService is shutting down"); 
     await Log.CloseAndFlushAsync(); 
 }
+
+public partial class Program { }

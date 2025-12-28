@@ -42,3 +42,5 @@ builder.AddProject<Projects.AspireAppTemplate_Web>("webfrontend")
     .WaitFor(keycloak);
 
 await builder.Build().RunAsync();
+
+public partial class Program { }

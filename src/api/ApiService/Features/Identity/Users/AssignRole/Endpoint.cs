@@ -12,7 +12,7 @@ public class UserRoleRequest
     public string RoleName { get; set; } = string.Empty; // From Body
 }
 
-public class Endpoint(IdentityService identityService, IOutputCacheStore cacheStore) : Endpoint<UserRoleRequest>
+public class Endpoint(IIdentityService identityService, IOutputCacheStore cacheStore) : Endpoint<UserRoleRequest>
 {
     public override void Configure()
     {

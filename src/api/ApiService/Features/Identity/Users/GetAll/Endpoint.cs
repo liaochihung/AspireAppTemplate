@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.OutputCaching;
 
 namespace AspireAppTemplate.ApiService.Features.Identity.Users.GetAll;
 
-public class Endpoint(IdentityService identityService) : Endpoint<PaginationRequest, PaginatedResult<KeycloakUser>>
+public class Endpoint(IIdentityService identityService) : Endpoint<PaginationRequest, PaginatedResult<KeycloakUser>>
 {
     public override void Configure()
     {

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.OutputCaching;
 
 namespace AspireAppTemplate.ApiService.Features.Identity.Roles.GetAll;
 
-public class Endpoint(IdentityService identityService) : Endpoint<PaginationRequest, PaginatedResult<KeycloakRole>>
+public class Endpoint(IIdentityService identityService) : Endpoint<PaginationRequest, PaginatedResult<KeycloakRole>>
 {
     public override void Configure()
     {

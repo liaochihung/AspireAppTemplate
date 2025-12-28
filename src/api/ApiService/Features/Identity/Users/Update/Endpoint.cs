@@ -28,7 +28,7 @@ public class UpdateUserRequest
     public bool Enabled { get; set; }
 }
 
-public class Endpoint(IdentityService identityService, IOutputCacheStore cacheStore) : Endpoint<UpdateUserRequest>
+public class Endpoint(IIdentityService identityService, IOutputCacheStore cacheStore) : Endpoint<UpdateUserRequest>
 {
     public override void Configure()
     {

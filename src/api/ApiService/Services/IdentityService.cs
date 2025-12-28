@@ -17,7 +17,7 @@ public class KeycloakAdminConfiguration
 
 public class IdentityService(
     HttpClient httpClient,
-    IOptions<KeycloakAdminConfiguration> options)
+    IOptions<KeycloakAdminConfiguration> options) : IIdentityService
 {
     private readonly string _realm = options.Value.TargetRealm;
     private readonly HttpClient _httpClient = httpClient;

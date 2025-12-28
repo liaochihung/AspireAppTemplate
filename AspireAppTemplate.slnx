@@ -1,8 +1,9 @@
 <Solution>
   <Project Path="src/api/ApiService/AspireAppTemplate.ApiService.csproj" />
+  <Project Path="src/tests/Web.Tests/AspireAppTemplate.Web.Tests.csproj" />
   <Project Path="src/aspire/AppHost/AspireAppTemplate.AppHost.csproj" />
   <Project Path="src/aspire/ServiceDefaults/AspireAppTemplate.ServiceDefaults.csproj" />
   <Project Path="src/shared/Shared/AspireAppTemplate.Shared.csproj" />
-  <Project Path="src/tests/ApiService.Tests/AspireAppTemplate.Tests.csproj" />
+  <Project Path="src/tests/ApiService.Tests/AspireAppTemplate.ApiService.Tests.csproj" />
   <Project Path="src/web/BlazorApp/AspireAppTemplate.Web.csproj" />
 </Solution>

@@ -12,7 +12,7 @@ public class RemoveUserRoleRequest
     public string RoleName { get; set; } = string.Empty;
 }
 
-public class Endpoint(IdentityService identityService, IOutputCacheStore cacheStore) : Endpoint<RemoveUserRoleRequest>
+public class Endpoint(IIdentityService identityService, IOutputCacheStore cacheStore) : Endpoint<RemoveUserRoleRequest>
 {
     public override void Configure()
     {

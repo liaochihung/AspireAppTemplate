@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.OutputCaching;
 
 namespace AspireAppTemplate.ApiService.Features.Identity.Users.Delete;
 
-public class Endpoint(IdentityService identityService, IOutputCacheStore cacheStore) : EndpointWithoutRequest
+public class Endpoint(IIdentityService identityService, IOutputCacheStore cacheStore) : EndpointWithoutRequest
 {
     public override void Configure()
     {

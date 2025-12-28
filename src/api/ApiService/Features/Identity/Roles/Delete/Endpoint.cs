@@ -11,7 +11,7 @@ public class DeleteRoleRequest
     public string Name { get; set; } = default!;
 }
 
-public class Endpoint(IdentityService identityService, IOutputCacheStore cacheStore) : Endpoint<DeleteRoleRequest>
+public class Endpoint(IIdentityService identityService, IOutputCacheStore cacheStore) : Endpoint<DeleteRoleRequest>
 {
     public override void Configure()
     {

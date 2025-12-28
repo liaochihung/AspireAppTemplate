@@ -35,7 +35,7 @@ public class CreateUserValidator : Validator<CreateUserRequest>
     }
 }
 
-public class Endpoint(IdentityService identityService, IOutputCacheStore cacheStore) : Endpoint<CreateUserRequest>
+public class Endpoint(IIdentityService identityService, IOutputCacheStore cacheStore) : Endpoint<CreateUserRequest>
 {
     public override void Configure()
     {

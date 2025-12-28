@@ -10,7 +10,7 @@ public class GetUserRolesRequest
     public string Id { get; set; } = string.Empty;
 }
 
-public class Endpoint(IdentityService identityService) : Endpoint<GetUserRolesRequest, IEnumerable<KeycloakRole>>
+public class Endpoint(IIdentityService identityService) : Endpoint<GetUserRolesRequest, IEnumerable<KeycloakRole>>
 {
     public override void Configure()
     {

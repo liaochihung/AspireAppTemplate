@@ -24,7 +24,7 @@ public class CreateRoleValidator : Validator<CreateRoleRequest>
     }
 }
 
-public class Endpoint(IdentityService identityService, IOutputCacheStore cacheStore) : Endpoint<CreateRoleRequest>
+public class Endpoint(IIdentityService identityService, IOutputCacheStore cacheStore) : Endpoint<CreateRoleRequest>
 {
     public override void Configure()
     {
