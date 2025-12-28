@@ -93,3 +93,40 @@ login user: jack/0000,
 ### 2. 運行 API 測試
 *   確保 Docker 容器已啟動 (至少 Postgres)。
 *   直接執行 `AspireAppTemplate.ApiService` 或透過 `run.bat` 啟動完整 Aspire 環境。
+
+
+# AI 開發指引：BDD 測試優先與規格驅動開發 (SDD)
+
+### 1. 核心開發原則
+*   **測試優先 (Test-First)：** 在撰寫功能程式碼前，必須先確保有對應的測試案例。
+*   **小步快跑 (Small Steps)：** 保持紅燈 (Red) -> 綠燈 (Green) -> 重構 (Refactor) 的節奏。
+*   **規格即模具：** 程式碼行為必須嚴格限制在規格描述的範圍內，避免過度設計。
+
+### 2. 測試策略：以行為為核心 (Behavior-Centric Testing)
+*   **測功能，而非函式 (Test Features, Not Functions)**：
+    *   測試的顆粒度應對齊「業務行為」（例如：「使用者註冊」），而非內部的實作細節（例如：「Repository 的 Save 方法」或「Service 的驗證函式」）。
+    *   **禁止**為了追求覆蓋率而單獨測試 `Service`、`Repository` 等內部類別，除非該邏輯極度複雜且與 I/O 無關。
+*   **垂直切片測試 (Vertical Slice Testing)**：
+    *   主要測試對象應為 **Endpoint**。
+    *   驗證從 Request 輸入 -> Validator -> 業務邏輯 -> Database 持久化 -> Response 輸出的完整路徑。
+    *   **Mock 的原則**：只 Mock **外部**不受控的依賴（如：第三方金流 API、寄信服務），對於 Database 與內部邏輯，應盡量使用 Testcontainers 或真實環境進行驗證，確保組件協作正常。
+
+### 3. BDD 開發工作流
+針對**複雜功能**，請依循以下思維模式：
+
+1.  **規格拆解 (Given/When/Then)**：
+    *   專注於 Feature 的外在行為，將實作細節與業務行為分開。
+2.  **失敗測試 (Red Light)**：
+    *   撰寫一個針對該 Feature (Endpoint) 的測試，並確認它失敗。
+3.  **最小實作 (Green Light)**：
+    *   實作 Endpoint 與必要的邏輯，以最精簡的方式通過測試。
+4.  **持續重構 (Refactor)**：
+    *   檢查壞味道 (Code Smells)。
+    *   因為測試是針對「外部行為」，所以你可以放心地重構內部結構（例如抽取 Service 或 Value Object），而不用擔心修改測試程式碼。
+
+### 4. 架構與品質規範 (AspireAppTemplate 專用)
+*   **遵循 REPR Pattern (FastEndpoints)**：
+    *   **Endpoint 優先**：每個 Endpoint 應為獨立、高內聚的單元，包含相關的 Request/Response/Validator。
+    *   **KISS 原則**：不強制拆分 Controller/Service 層，除非邏輯確實需要共用。
+*   **領域術語一致性**：使用與業務場景一致的命名，確保 Request/Response DTO 命名清晰。
+*   **互動與確認**：若規格包含無法測試的形容詞（如「方便」），請先要求定義驗收標準；若發現程式碼壞味道，請主動建議重構。
