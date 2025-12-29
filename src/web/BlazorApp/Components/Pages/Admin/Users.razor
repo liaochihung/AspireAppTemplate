@@ -20,7 +20,7 @@
 </PageHeader>
 
 <MudPaper Elevation="2" Class="pa-0">
-    <MudDataGrid T="KeycloakUser" Items="@_users" Loading="@_loading" Filterable="true" QuickFilter="@_quickFilter" Hover="true">
+    <AppDataGrid T="KeycloakUser" Items="@_users" Loading="@_loading" Filterable="true" QuickFilter="@_quickFilter">
         <ToolBarContent>
             <MudSpacer />
             <DebouncedSearchField @bind-Value="_searchString" 
@@ -106,5 +106,5 @@
                 <MudText Typo="Typo.body1" Color="Color.Default">目前沒有使用者資料</MudText>
             </MudStack>
         </NoRecordsContent>
-    </MudDataGrid>
+    </AppDataGrid>
 </MudPaper>

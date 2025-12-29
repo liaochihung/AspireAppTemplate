@@ -27,7 +27,7 @@
     }
     else
     {
-        <MudDataGrid T="WeatherForecast" Items="@forecasts" Filterable="false" SortMode="SortMode.Single" Hover="true">
+        <AppDataGrid T="WeatherForecast" Items="@forecasts" Filterable="false" SortMode="SortMode.Single">
             <Columns>
                 <TemplateColumn T="WeatherForecast" Title="日期">
                     <CellTemplate Context="cellContext">
@@ -69,6 +69,6 @@
                     <MudText Typo="Typo.body1" Color="Color.Default">目前沒有天氣資料</MudText>
                 </MudStack>
             </NoRecordsContent>
-        </MudDataGrid>
+        </AppDataGrid>
     }
 </MudPaper>

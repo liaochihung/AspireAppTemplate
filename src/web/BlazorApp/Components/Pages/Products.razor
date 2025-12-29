@@ -45,8 +45,7 @@
                     }
                     else
                     {
-                        <MudDataGrid T="Product" Items="@products" Filterable="true" QuickFilter="@_quickFilter"
-                                     Hover="true" Dense="false">
+                        <AppDataGrid T="Product" Items="@products" Filterable="true" QuickFilter="@_quickFilter">
                             <ToolBarContent>
                                 <MudText Typo="Typo.subtitle1" Class="mud-text-secondary">
                                     共 @(products?.Length ?? 0) 項產品
@@ -123,7 +122,7 @@
                                     }
                                 </MudStack>
                             </NoRecordsContent>
-                        </MudDataGrid>
+                        </AppDataGrid>
                     }
                 </MudPaper>
             </MudItem>
