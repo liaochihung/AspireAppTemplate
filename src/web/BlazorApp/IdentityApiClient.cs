@@ -101,6 +101,12 @@ public class IdentityApiClient(HttpClient httpClient)
         return result ?? new PaginatedResult<KeycloakRole>();
     }
 
+    public async Task SyncUserAsync(CancellationToken ct = default)
+    {
+        var response = await httpClient.PostAsync("/api/identity/sync", null, ct);
+        response.EnsureSuccessStatusCode();
+    }
+
     public async Task CreateRoleAsync(KeycloakRole role, CancellationToken ct = default)
     {
          var request = new 

@@ -65,6 +65,15 @@
                     }
                 </CellTemplate>
             </TemplateColumn>
+            <TemplateColumn T="KeycloakUser" Title="上次登入">
+                <CellTemplate Context="cellContext">
+                   <MudText Typo="Typo.body2">
+                       @(cellContext.Item.LastLoginAt.HasValue 
+                           ? cellContext.Item.LastLoginAt.Value.ToLocalTime().ToString("yyyy/MM/dd HH:mm") 
+                           : "-")
+                   </MudText>
+                </CellTemplate>
+            </TemplateColumn>
             <TemplateColumn T="KeycloakUser" Title="操作">
                 <CellTemplate Context="cellContext">
                     <MudTooltip Text="分配角色">

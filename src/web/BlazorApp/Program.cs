@@ -69,9 +69,10 @@ builder.Services.AddAuthentication(oidcScheme)
         options.ResponseType = OpenIdConnectResponseType.Code;
         options.Scope.Add("weather:all");
         options.TokenValidationParameters.NameClaimType = JwtRegisteredClaimNames.Name;
-        options.TokenValidationParameters.RoleClaimType = ClaimTypes.Role; // "role"
+        options.TokenValidationParameters.RoleClaimType = "role"; // Keycloak uses short "role" claim
         options.SaveTokens = true;
         options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.MapInboundClaims = false; // Prevent mapping 'role' to long URI format
 
         if (builder.Environment.IsDevelopment())
         {

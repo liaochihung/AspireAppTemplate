@@ -130,3 +130,12 @@ login user: jack/0000,
     *   **KISS 原則**：不強制拆分 Controller/Service 層，除非邏輯確實需要共用。
 *   **領域術語一致性**：使用與業務場景一致的命名，確保 Request/Response DTO 命名清晰。
 *   **互動與確認**：若規格包含無法測試的形容詞（如「方便」），請先要求定義驗收標準；若發現程式碼壞味道，請主動建議重構。
+
+### 5. 開發工具與記憶管理 (Serena MCP)
+*   **符號感知開發 (Symbol-Aware)**：
+    *   **精準分析**：優先使用 Serena MCP 的符號工具（如 `get_symbols_overview`, `find_symbol`, `find_referencing_symbols`）來理解代碼結構，避免一次讀取整份大型檔案以節省資源並提升精確度。
+    *   **手術式修改**：對於類別或方法層級的修改，優先使用 `replace_symbol_body`；對於新增功能，優先使用 `insert_after_symbol` 定位插入點。
+*   **持久化記憶 (Persistent Memory)**：
+    *   **決策紀錄**：對於重要的架構決定、業務邏輯細節或跨對話的關鍵資訊，應使用 `write_memory` 寫入專案記憶檔。
+    *   **主動讀取**：在開始新任務前，應先 `list_memories` 並讀取相關內容，確保開發邏輯的連續性。
+    *   **同步更新**：若 `GEMINI.md` 或記憶檔案中的資訊已過時，應立即更新以維持「單一事實來源」(Single Source of Truth)。

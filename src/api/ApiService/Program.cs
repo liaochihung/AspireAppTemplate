@@ -7,6 +7,7 @@ using AspireAppTemplate.ApiService.Services;
 using Keycloak.AuthServices.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Scalar.AspNetCore;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -89,7 +90,8 @@ builder.Services.AddHttpClient<IdentityService>(client =>
 {
     if (!string.IsNullOrEmpty(keycloakEndpoint))
     {
-        client.BaseAddress = new Uri(keycloakEndpoint.TrimEnd('/') + "/");
+        var baseUrl = keycloakEndpoint.EndsWith('/') ? keycloakEndpoint : $"{keycloakEndpoint}/";
+        client.BaseAddress = new Uri(baseUrl);
     }
 })
 .AddHttpMessageHandler<KeycloakPasswordTokenHandler>();
@@ -114,7 +116,7 @@ if (app.Environment.IsDevelopment())
     using (var scope = app.Services.CreateScope())
     {
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        await context.Database.EnsureCreatedAsync();
+        await context.Database.MigrateAsync();
     }
 }
 

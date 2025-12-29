@@ -25,7 +25,34 @@ public class Endpoint(IdentityService identityService) : Endpoint<PaginationRequ
             return;
         }
 
-        var paginated = result.Value.ToPaginatedResult(req);
+        var keycloakUsers = result.Value.ToList();
+        var userIds = keycloakUsers
+            .Where(u => !string.IsNullOrEmpty(u.Id) && Guid.TryParse(u.Id, out _))
+            .Select(u => Guid.Parse(u.Id!))
+            .ToList();
+
+        if (userIds.Any())
+        {
+            var dbContext = Resolve<AspireAppTemplate.ApiService.Data.AppDbContext>();
+            var localUsers = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync(
+                dbContext.Users.Where(u => userIds.Contains(u.Id)), 
+                cancellationToken: ct);
+
+            foreach (var kUser in keycloakUsers)
+            {
+                if (Guid.TryParse(kUser.Id, out var uid))
+                {
+                    var local = localUsers.FirstOrDefault(l => l.Id == uid);
+                    if (local != null)
+                    {
+                        kUser.LastLoginAt = local.LastLoginAt;
+                        kUser.CreatedAt = local.CreatedAt;
+                    }
+                }
+            }
+        }
+
+        var paginated = keycloakUsers.ToPaginatedResult(req);
         await SendAsync(paginated, cancellation: ct);
     }
 }

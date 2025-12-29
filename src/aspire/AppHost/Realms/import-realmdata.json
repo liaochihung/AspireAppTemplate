@@ -53,7 +53,7 @@
   "failureFactor": 30,
   "users": [
     {
-      "id": "user-admin-id-123",
+      "id": "88888888-8888-8888-8888-888888888888",
       "username": "admin",
       "enabled": true,
       "email": "admin@example.com",
@@ -79,7 +79,7 @@
       }
     },
     {
-      "id": "user-jack-id-456",
+      "id": "99999999-9999-9999-9999-999999999999",
       "username": "jack",
       "enabled": true,
       "email": "jack@example.com",

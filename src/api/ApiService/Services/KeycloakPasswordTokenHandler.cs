@@ -23,9 +23,7 @@ public class KeycloakPasswordTokenHandler(
         catch (Exception ex)
         {
              logger.LogError(ex, "Failed to attach access token to request.");
-             // Allow request to proceed (will likely fail 401) or throw?
-             // Throwing gives more clarity that it's an internal error.
-             throw; 
+             throw new InvalidOperationException("Unable to obtain Keycloak admin token for API request.", ex); 
         }
         return await base.SendAsync(request, cancellationToken);
     }
@@ -72,5 +70,5 @@ public class KeycloakPasswordTokenHandler(
         return _cachedToken;
     }
 
-    private record TokenResponse(string access_token, int expires_in);
+    private sealed record TokenResponse(string access_token, int expires_in);
 }

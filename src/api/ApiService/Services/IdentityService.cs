@@ -34,7 +34,7 @@ public class IdentityService(
         return users?.Select(u => new KeycloakUser
         {
             Id = u.Id,
-            Username = u.Username,
+            Username = u.Username ?? string.Empty,
             FirstName = u.FirstName,
             LastName = u.LastName,
             Email = u.Email,
@@ -43,8 +43,18 @@ public class IdentityService(
         }).ToList() ?? new List<KeycloakUser>();
     }
 
-    public async Task<ErrorOr<Created>> CreateUserAsync(KeycloakUser user)
+    public async Task<ErrorOr<string>> CreateUserAsync(KeycloakUser user)
     {
+        var credentials = user.Credentials?.Select(c => new CredentialRepresentation
+        {
+            Type = c.Type,
+            Value = c.Value,
+            Temporary = c.Temporary
+        }).ToList() ?? new List<CredentialRepresentation>
+        {
+            new() { Type = "password", Value = "0000", Temporary = false }
+        };
+
         var userRep = new UserRepresentation
         {
             Username = user.Username,
@@ -53,17 +63,30 @@ public class IdentityService(
             Email = user.Email,
             Enabled = true,
             EmailVerified = true,
-            Credentials = new List<CredentialRepresentation>
-            {
-                new() { Type = "password", Value = "0000", Temporary = true }
-            }
+            Credentials = credentials,
+            RequiredActions = new List<string>() // Clear any required actions like "UPDATE_PASSWORD"
         };
 
         var response = await _httpClient.PostAsJsonAsync($"admin/realms/{_realm}/users", userRep);
         
         if (response.IsSuccessStatusCode)
         {
-            return Result.Created;
+            // Extract ID from Location header
+            // Format: .../admin/realms/{realm}/users/{id}
+            var location = response.Headers.Location;
+            if (location != null)
+            {
+                var segments = location.AbsolutePath.Split('/');
+                var userId = segments[^1];
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    return userId;
+                }
+            }
+            
+            // Fallback: If location header is somehow missing (unlikely in Keycloak),
+            // we might need to query by username, but primarily we rely on Location.
+             return Error.Failure(description: "User created but failed to retrieve ID.");
         }
 
         if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
@@ -100,7 +123,7 @@ public class IdentityService(
         return roles?.Select(r => new KeycloakRole
         {
             Id = r.Id,
-            Name = r.Name,
+            Name = r.Name ?? string.Empty,
             Description = r.Description
         }).ToList() ?? new List<KeycloakRole>();
     }
@@ -206,7 +229,7 @@ public class IdentityService(
         return roles?.Select(r => new KeycloakRole
         {
             Id = r.Id,
-            Name = r.Name,
+            Name = r.Name ?? string.Empty,
             Description = r.Description
         }).ToList() ?? new List<KeycloakRole>();
     }

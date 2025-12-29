@@ -17,12 +17,18 @@ public partial class Weather
         forecasts = await WeatherApi.GetWeatherAsync();
     }
 
-    private static Color GetTemperatureColor(int temp) =>
-        temp > 30 ? Color.Error :
-        temp > 20 ? Color.Warning :
-        temp > 10 ? Color.Success : Color.Info;
+    private static Color GetTemperatureColor(int temp) => temp switch
+    {
+        > 30 => Color.Error,
+        > 20 => Color.Warning,
+        > 10 => Color.Success,
+        _ => Color.Info
+    };
 
-    private static string GetTemperatureIcon(int temp) =>
-        temp > 25 ? Icons.Material.Filled.WbSunny :
-        temp > 15 ? Icons.Material.Filled.WbCloudy : Icons.Material.Filled.AcUnit;
+    private static string GetTemperatureIcon(int temp) => temp switch
+    {
+        > 25 => Icons.Material.Filled.WbSunny,
+        > 15 => Icons.Material.Filled.WbCloudy,
+        _ => Icons.Material.Filled.AcUnit
+    };
 }
