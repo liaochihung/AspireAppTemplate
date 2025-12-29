@@ -65,6 +65,12 @@ builder.Services.AddHttpClient<IdentityApiClient>(client =>
     client.BaseAddress = new("https+http://apiservice");
 }).AddHttpMessageHandler<AuthorizationHandler>();
 
+builder.Services.AddHttpClient<CustomJobsApiClient>(client =>
+{
+    client.BaseAddress = new("https+http://apiservice");
+}).AddHttpMessageHandler<AuthorizationHandler>();
+
+
 
 var oidcScheme = OpenIdConnectDefaults.AuthenticationScheme;
 builder.Services.AddAuthentication(oidcScheme)
@@ -92,6 +98,15 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole(AppRoles.Administrator));
 
     options.AddPolicy(AppPolicies.CanViewWeather, policy => 
+        policy.RequireRole(AppRoles.Administrator));
+    
+    options.AddPolicy(AppPolicies.CanManageRoles, policy => 
+        policy.RequireRole(AppRoles.Administrator));
+    
+    options.AddPolicy(AppPolicies.CanManageUsers, policy => 
+        policy.RequireRole(AppRoles.Administrator));
+    
+    options.AddPolicy(AppPolicies.CanManageSystem, policy => 
         policy.RequireRole(AppRoles.Administrator));
 });
 

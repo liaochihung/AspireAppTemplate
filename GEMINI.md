@@ -79,9 +79,24 @@ login user: jack/0000,
 
 ### API Documentation (2025-12-27)
 *   **Scalar**: 取代 Swagger UI 作為主要的 API 文件介面。
-    *   *原因*: 提供更好的視覺體驗 (Rich Aesthetics) 與 DX (Developer Experience)，符合專案的 Premium 定位。
+    *   *原因*: 提供更好的視覺體驗 (Rich Aesthetics) 與 DX (Developer Experience),符合專案的 Premium 定位。
     *   *整合方式*: 使用 `Scalar.AspNetCore` 並對接 FastEndpoints 生成的 OpenAPI JSON (`/swagger/v1/swagger.json`)。
     *   *主題*: 預設使用 `Moon` (深色) 主題。
+
+### Background Jobs Management (2025-12-29)
+*   **Hangfire 1.8.20**: 採用 Hangfire 作為背景任務管理系統。
+    *   *選型理由*: 支援動態任務建立、持久化儲存、內建 Dashboard 與失敗重試機制，適合需要使用者可視化管理的場景。
+    *   *儲存體*: 使用 PostgreSQL (`Hangfire.PostgreSql 1.20.13`)，與業務資料庫共用連接字串，但使用獨立的 `hangfire` schema。
+*   **Dashboard 授權**:
+    *   路由: `/hangfire`
+    *   權限: 僅限 `Administrator` 角色存取 (透過 `HangfireAuthorizationFilter` 實作)
+*   **任務範例**:
+    *   `LogCleanupJob`: 示範週期性清理任務，支援自動重試 (3 次，間隔 60s/300s/900s)
+    *   API Endpoint: `POST /api/jobs/log-cleanup` 允許管理員動態建立清理任務
+*   **設計原則**:
+    *   Job 類別放置於 `Infrastructure/Jobs/`
+    *   API Endpoint 遵循 REPR Pattern: `Features/Jobs/<JobName>/<Action>/`
+    *   使用 `AppPolicies.CanManageSystem` 策略保護任務管理 API
 
 ## 常見任務 (Common Tasks)
 

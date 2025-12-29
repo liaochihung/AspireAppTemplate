@@ -11,6 +11,7 @@ public class AppDbContext : DbContext
 
     public DbSet<Product> Products => Set<Product>();
     public DbSet<Entities.AppUser> Users => Set<Entities.AppUser>();
+    public DbSet<Entities.CustomJob> CustomJobs => Set<Entities.CustomJob>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -1,0 +1,179 @@
+@using AspireAppTemplate.Web
+@using MudBlazor
+
+<MudDialog>
+    <TitleContent>
+        <div class="d-flex align-center">
+            <MudIcon Icon="@Icons.Material.Filled.AddTask" Class="mr-3" Color="Color.Primary" />
+            <MudText Typo="Typo.h6">新增自訂任務</MudText>
+        </div>
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="_form" @bind-IsValid="_isValid">
+            <MudGrid Spacing="2">
+                <MudItem xs="12">
+                    <MudTextField T="string" Label="任務名稱" 
+                                 @bind-Value="Model.Name" 
+                                 Required="true" 
+                                 RequiredError="請輸入任務名稱"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense"
+                                 Placeholder="例如: 同步資料、產生報表" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField T="string" Label="描述" 
+                                 @bind-Value="Model.Description" 
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense"
+                                 Lines="2"
+                                 Placeholder="簡單說明此任務的用途" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudSelect T="int" Label="任務類型" 
+                              @bind-Value="Model.Type" 
+                              Required="true"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense">
+                        <MudSelectItem Value="1">一次性</MudSelectItem>
+                        <MudSelectItem Value="2">週期性</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+
+                @if (Model.Type == 1)
+                {
+                    <MudItem xs="6">
+                        <MudDatePicker @bind-Date="_scheduledDate" Label="執行日期" 
+                                      Required="true" 
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense" />
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudTimePicker @bind-Time="_scheduledTime" Label="執行時間" 
+                                      Required="true" 
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense" />
+                    </MudItem>
+                }
+                else if (Model.Type == 2)
+                {
+                    <MudItem xs="12">
+                        <MudTextField T="string" Label="Cron 表達式" 
+                                     @bind-Value="Model.CronExpression" 
+                                     Required="true" 
+                                     RequiredError="請輸入 Cron 表達式"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     HelperText="例如: * * * * * (每分鐘) 或 0 0 * * * (每天午夜)" />
+                    </MudItem>
+                }
+
+                <MudItem xs="12">
+                    <MudDivider />
+                </MudItem>
+
+                <MudItem xs="6">
+                    <MudSelect T="int" Label="HTTP 方法" 
+                              @bind-Value="Model.HttpMethod" 
+                              Required="true"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense">
+                        <MudSelectItem Value="1">GET</MudSelectItem>
+                        <MudSelectItem Value="2">POST</MudSelectItem>
+                        <MudSelectItem Value="3">PUT</MudSelectItem>
+                        <MudSelectItem Value="4">DELETE</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField T="string" Label="URL" 
+                                 @bind-Value="Model.Url" 
+                                 Required="true" 
+                                 RequiredError="請輸入 URL"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense"
+                                 HelperText="例如: https://jsonplaceholder.typicode.com/posts/1" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudButton OnClick="TestUrl" 
+                               Color="Color.Info" 
+                               Variant="Variant.Text" 
+                               Disabled="@(_testing || string.IsNullOrWhiteSpace(Model.Url))" 
+                               StartIcon="@Icons.Material.Filled.PlayArrow"
+                               Size="Size.Small">
+                        @if (_testing)
+                        {
+                            <MudProgressCircular Size="Size.Small" Indeterminate="true" />
+                            <MudText Class="ml-2">測試中...</MudText>
+                        }
+                        else
+                        {
+                            <text>測試連線</text>
+                        }
+                    </MudButton>
+                </MudItem>
+
+                @if (_testResult != null)
+                {
+                    <MudItem xs="12">
+                        <MudAlert Severity="@(_testResult.IsSuccess ? Severity.Success : Severity.Error)" Dense="true">
+                            <MudStack Spacing="1">
+                                <MudText Typo="Typo.body2">
+                                    <b>狀態:</b> @(_testResult.IsSuccess ? "成功" : "失敗")
+                                    @if (_testResult.StatusCode > 0)
+                                    {
+                                        <text> | <b>HTTP @_testResult.StatusCode</b></text>
+                                    }
+                                    | <b>耗時:</b> @_testResult.LatencyMs ms
+                                </MudText>
+                                @if (!string.IsNullOrWhiteSpace(_testResult.ErrorMessage))
+                                {
+                                    <MudText Typo="Typo.body2" Color="Color.Error">
+                                        <b>錯誤:</b> @_testResult.ErrorMessage
+                                    </MudText>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(_testResult.ResponseBody))
+                                {
+                                    <MudExpansionPanels Dense="true">
+                                        <MudExpansionPanel Text="查看回應內容">
+                                            <MudText Typo="Typo.body2" Style="font-family: monospace; white-space: pre-wrap; font-size: 0.75rem;">@_testResult.ResponseBody</MudText>
+                                        </MudExpansionPanel>
+                                    </MudExpansionPanels>
+                                }
+                            </MudStack>
+                        </MudAlert>
+                    </MudItem>
+                }
+
+                <MudItem xs="12">
+                    <MudTextField T="string" Label="Headers (JSON)" 
+                                 @bind-Value="Model.Headers" 
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense"
+                                 Lines="3"
+                                 HelperText='例如: {"Authorization": "Bearer token"}' />
+                </MudItem>
+
+                @if (Model.HttpMethod == 2 || Model.HttpMethod == 3)
+                {
+                    <MudItem xs="12">
+                        <MudTextField T="string" Label="Body (JSON)" 
+                                     @bind-Value="Model.Body" 
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     Lines="5"
+                                     HelperText='例如: {"title": "test", "body": "content"}' />
+                    </MudItem>
+                }
+            </MudGrid>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Variant="Variant.Text" Class="px-6">取消</MudButton>
+        <MudButton Color="Color.Primary" 
+                   OnClick="Submit" 
+                   Variant="Variant.Filled" 
+                   Disabled="@(!_isValid)" 
+                   Class="px-8 ml-2"
+                   DisableElevation="true">建立</MudButton>
+    </DialogActions>
+</MudDialog>
