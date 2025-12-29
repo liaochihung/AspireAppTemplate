@@ -1,0 +1,109 @@
+@using AspireAppTemplate.Web.Infrastructure.Services
+@using AspireAppTemplate.Web.Infrastructure.Models
+@implements IDisposable
+@inject NotificationService NotificationService
+
+<MudBadge Content="@_unreadCount" Overlap="true" Color="Color.Error" Visible="@(_unreadCount > 0)">
+    <MudIconButton Icon="@Icons.Material.Filled.Notifications" 
+                   Color="Color.Inherit" 
+                   @onclick="TogglePopover" 
+                   id="notification-bell" />
+</MudBadge>
+
+<MudPopover Open="@_isOpen" 
+            AnchorOrigin="Origin.BottomRight" 
+            TransformOrigin="Origin.TopRight"
+            Style="width: 400px; max-height: 500px;">
+    <MudPaper Elevation="0" Class="pa-4">
+        <div class="d-flex justify-space-between align-center mb-3">
+            <MudText Typo="Typo.h6">通知中心</MudText>
+            @if (_notifications.Any())
+            {
+                <div>
+                    <MudButton Size="Size.Small" 
+                               Variant="Variant.Text" 
+                               OnClick="MarkAllAsRead"
+                               Disabled="@(_unreadCount == 0)">
+                        全部已讀
+                    </MudButton>
+                    <MudButton Size="Size.Small" 
+                               Variant="Variant.Text" 
+                               Color="Color.Error"
+                               OnClick="ClearAll">
+                        清空
+                    </MudButton>
+                </div>
+            }
+        </div>
+
+        <MudDivider />
+
+        @if (!_notifications.Any())
+        {
+            <div class="d-flex flex-column align-center justify-center pa-8">
+                <MudIcon Icon="@Icons.Material.Filled.NotificationsNone" Size="Size.Large" Color="Color.Default" Class="mb-2" />
+                <MudText Typo="Typo.body2" Color="Color.Default">目前沒有通知</MudText>
+            </div>
+        }
+        else
+        {
+            <div style="max-height: 400px; overflow-y: auto;">
+                @foreach (var notification in _notifications)
+                {
+                    <NotificationItem Notification="@notification" OnClick="() => MarkAsRead(notification.Id)" />
+                }
+            </div>
+        }
+    </MudPaper>
+</MudPopover>
+
+@code {
+    private bool _isOpen = false;
+    private List<NotificationModel> _notifications = new();
+    private int _unreadCount = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await NotificationService.InitializeAsync();
+        UpdateState();
+        NotificationService.OnChange += OnNotificationChanged;
+    }
+
+    private void TogglePopover()
+    {
+        _isOpen = !_isOpen;
+    }
+
+    private async Task MarkAsRead(Guid id)
+    {
+        await NotificationService.MarkAsReadAsync(id);
+    }
+
+    private async Task MarkAllAsRead()
+    {
+        await NotificationService.MarkAllAsReadAsync();
+    }
+
+    private async Task ClearAll()
+    {
+        await NotificationService.ClearAllAsync();
+        _isOpen = false;
+    }
+
+    private void OnNotificationChanged()
+    {
+        UpdateState();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void UpdateState()
+    {
+        _notifications = NotificationService.GetNotifications();
+        _unreadCount = NotificationService.GetUnreadCount();
+    }
+
+    public void Dispose()
+    {
+        NotificationService.OnChange -= OnNotificationChanged;
+    }
+}

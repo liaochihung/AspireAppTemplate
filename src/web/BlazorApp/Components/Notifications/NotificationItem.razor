@@ -1,0 +1,77 @@
+@using AspireAppTemplate.Web.Infrastructure.Models
+
+<MudPaper Elevation="0" 
+          Class="@GetItemClass()" 
+          Style="cursor: pointer; transition: all 0.2s;"
+          @onclick="OnClick">
+    <div class="d-flex align-start pa-3">
+        <MudIcon Icon="@GetIcon()" Color="@GetColor()" Class="mr-3 mt-1" />
+        <div class="flex-grow-1">
+            <MudText Typo="Typo.body2" Class="@GetTextClass()">
+                @Notification.Message
+            </MudText>
+            <MudText Typo="Typo.caption" Color="Color.Default" Class="mt-1">
+                @GetRelativeTime()
+            </MudText>
+        </div>
+    </div>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public NotificationModel Notification { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    private string GetItemClass()
+    {
+        var baseClass = "mb-2 rounded";
+        return Notification.IsRead 
+            ? $"{baseClass} opacity-60" 
+            : $"{baseClass} mud-theme-primary-lighten";
+    }
+
+    private string GetTextClass()
+    {
+        return Notification.IsRead ? "" : "font-weight-medium";
+    }
+
+    private string GetIcon()
+    {
+        return Notification.Severity switch
+        {
+            "Error" => Icons.Material.Filled.Error,
+            "Warning" => Icons.Material.Filled.Warning,
+            "Success" => Icons.Material.Filled.CheckCircle,
+            _ => Icons.Material.Filled.Info
+        };
+    }
+
+    private Color GetColor()
+    {
+        return Notification.Severity switch
+        {
+            "Error" => Color.Error,
+            "Warning" => Color.Warning,
+            "Success" => Color.Success,
+            _ => Color.Info
+        };
+    }
+
+    private string GetRelativeTime()
+    {
+        var diff = DateTime.UtcNow - Notification.Timestamp;
+
+        if (diff.TotalMinutes < 1)
+            return "剛剛";
+        if (diff.TotalMinutes < 60)
+            return $"{(int)diff.TotalMinutes} 分鐘前";
+        if (diff.TotalHours < 24)
+            return $"{(int)diff.TotalHours} 小時前";
+        if (diff.TotalDays < 7)
+            return $"{(int)diff.TotalDays} 天前";
+        
+        return Notification.Timestamp.ToLocalTime().ToString("MM/dd HH:mm");
+    }
+}

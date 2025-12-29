@@ -39,6 +39,7 @@ builder.Services.AddSingleton<AspireAppTemplate.Web.Infrastructure.Authenticatio
 builder.Services.AddMudServices();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<LayoutService>();
+builder.Services.AddScoped<NotificationService>();
 
 
 builder.Services.AddHttpContextAccessor()
