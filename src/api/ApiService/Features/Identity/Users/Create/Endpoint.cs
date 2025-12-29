@@ -5,6 +5,8 @@ using FluentValidation;
 using AspireAppTemplate.ApiService.Infrastructure.Extensions;
 using Microsoft.AspNetCore.OutputCaching;
 
+using AspireAppTemplate.ApiService.Infrastructure.Services;
+
 namespace AspireAppTemplate.ApiService.Features.Identity.Users.Create;
 
 public class CreateUserRequest
@@ -35,7 +37,7 @@ public class CreateUserValidator : Validator<CreateUserRequest>
     }
 }
 
-public class Endpoint(IdentityService identityService, IOutputCacheStore cacheStore) : Endpoint<CreateUserRequest>
+public class Endpoint(IdentityService identityService, IOutputCacheStore cacheStore, IAuditService auditService) : Endpoint<CreateUserRequest>
 {
     public override void Configure()
     {
@@ -82,6 +84,8 @@ public class Endpoint(IdentityService identityService, IOutputCacheStore cacheSt
         var dbContext = Resolve<AspireAppTemplate.ApiService.Data.AppDbContext>();
         dbContext.Users.Add(appUser);
         await dbContext.SaveChangesAsync(ct);
+        
+        await auditService.LogAsync("Create", "User", userId.ToString(), null, appUser, ct);
 
         await cacheStore.EvictByTagAsync("users", ct);
         // Return Created with ID
