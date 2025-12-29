@@ -90,7 +90,8 @@ builder.Services.AddHttpClient<IdentityService>(client =>
 {
     if (!string.IsNullOrEmpty(keycloakEndpoint))
     {
-        client.BaseAddress = new Uri(keycloakEndpoint.TrimEnd('/') + "/");
+        var baseUrl = keycloakEndpoint.EndsWith('/') ? keycloakEndpoint : $"{keycloakEndpoint}/";
+        client.BaseAddress = new Uri(baseUrl);
     }
 })
 .AddHttpMessageHandler<KeycloakPasswordTokenHandler>();

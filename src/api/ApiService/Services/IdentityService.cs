@@ -34,7 +34,7 @@ public class IdentityService(
         return users?.Select(u => new KeycloakUser
         {
             Id = u.Id,
-            Username = u.Username,
+            Username = u.Username ?? string.Empty,
             FirstName = u.FirstName,
             LastName = u.LastName,
             Email = u.Email,
@@ -77,7 +77,7 @@ public class IdentityService(
             if (location != null)
             {
                 var segments = location.AbsolutePath.Split('/');
-                var userId = segments.Last();
+                var userId = segments[^1];
                 if (!string.IsNullOrEmpty(userId))
                 {
                     return userId;
@@ -123,7 +123,7 @@ public class IdentityService(
         return roles?.Select(r => new KeycloakRole
         {
             Id = r.Id,
-            Name = r.Name,
+            Name = r.Name ?? string.Empty,
             Description = r.Description
         }).ToList() ?? new List<KeycloakRole>();
     }
@@ -229,7 +229,7 @@ public class IdentityService(
         return roles?.Select(r => new KeycloakRole
         {
             Id = r.Id,
-            Name = r.Name,
+            Name = r.Name ?? string.Empty,
             Description = r.Description
         }).ToList() ?? new List<KeycloakRole>();
     }

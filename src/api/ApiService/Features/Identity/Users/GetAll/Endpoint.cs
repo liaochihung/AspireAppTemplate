@@ -26,14 +26,10 @@ public class Endpoint(IdentityService identityService) : Endpoint<PaginationRequ
         }
 
         var keycloakUsers = result.Value.ToList();
-        var userIds = new List<Guid>();
-        foreach (var u in keycloakUsers)
-        {
-            if (!string.IsNullOrEmpty(u.Id) && Guid.TryParse(u.Id, out var parsedId))
-            {
-                userIds.Add(parsedId);
-            }
-        }
+        var userIds = keycloakUsers
+            .Where(u => !string.IsNullOrEmpty(u.Id) && Guid.TryParse(u.Id, out _))
+            .Select(u => Guid.Parse(u.Id!))
+            .ToList();
 
         if (userIds.Any())
         {
