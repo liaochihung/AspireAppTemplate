@@ -1,12 +1,13 @@
 using FastEndpoints;
 using AspireAppTemplate.ApiService.Data;
 using AspireAppTemplate.ApiService.Data.Entities;
-using System.Security.Claims;
+
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace AspireAppTemplate.ApiService.Features.Identity.Sync;
 
-public class Endpoint(AppDbContext dbContext) : EndpointWithoutRequest<UserProfileResponse>
+public class Endpoint(AppDbContext dbContext, IOutputCacheStore cacheStore) : EndpointWithoutRequest<UserProfileResponse>
 {
     public override void Configure()
     {
@@ -15,15 +16,16 @@ public class Endpoint(AppDbContext dbContext) : EndpointWithoutRequest<UserProfi
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        // Use "sub" directly since MapInboundClaims = false in JwtBearerOptions
+        var userIdClaim = User.FindFirst("sub")?.Value;
         if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
         {
             ThrowError("User ID claim is missing or invalid");
             return; // Explicit return to satisfy compiler flow analysis
         }
 
-        var username = User.FindFirst("preferred_username")?.Value ?? User.FindFirst(ClaimTypes.Name)?.Value ?? "Unknown";
-        var email = User.FindFirst(ClaimTypes.Email)?.Value ?? "";
+        var username = User.FindFirst("preferred_username")?.Value ?? User.FindFirst("name")?.Value ?? "Unknown";
+        var email = User.FindFirst("email")?.Value ?? "";
         // Keycloak often puts first/last name in 'given_name' and 'family_name' claims, 
         // but depending on mapping they might be elsewhere. Standard OIDC claims:
         var firstName = User.FindFirst("given_name")?.Value;
@@ -56,6 +58,7 @@ public class Endpoint(AppDbContext dbContext) : EndpointWithoutRequest<UserProfi
         }
 
         await dbContext.SaveChangesAsync(ct);
+        await cacheStore.EvictByTagAsync("users", ct);
 
         await SendAsync(new UserProfileResponse
         {
