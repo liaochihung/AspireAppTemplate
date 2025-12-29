@@ -34,13 +34,13 @@ public class Validator : Validator<Request>
             .WithMessage("Body 必須是有效的 JSON 格式");
     }
 
-    private bool BeValidUrl(string url)
+    private static bool BeValidUrl(string url)
     {
         return Uri.TryCreate(url, UriKind.Absolute, out var uriResult)
                && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
     }
 
-    private bool BeValidJson(string? json)
+    private static bool BeValidJson(string? json)
     {
         if (string.IsNullOrWhiteSpace(json)) return true;
         

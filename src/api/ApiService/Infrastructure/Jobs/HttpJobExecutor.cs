@@ -44,49 +44,43 @@ public class HttpJobExecutor
             "Executing CustomJob {JobId} ({JobName}): {Method} {Url}",
             job.Id, job.Name, job.HttpMethod, job.Url);
 
-        try
-        {
-            var client = _httpClientFactory.CreateClient();
-            var request = new HttpRequestMessage(
-                new System.Net.Http.HttpMethod(job.HttpMethod.ToString()),
-                job.Url
-            );
 
-            // 設定 Headers
-            if (!string.IsNullOrEmpty(job.Headers))
+
+        var client = _httpClientFactory.CreateClient();
+        var request = new HttpRequestMessage(
+            new System.Net.Http.HttpMethod(job.HttpMethod.ToString()),
+            job.Url
+        );
+
+        // 設定 Headers
+        if (!string.IsNullOrEmpty(job.Headers))
+        {
+            var headers = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(job.Headers);
+            if (headers != null)
             {
-                var headers = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(job.Headers);
-                if (headers != null)
+                foreach (var (key, value) in headers)
                 {
-                    foreach (var (key, value) in headers)
-                    {
-                        request.Headers.TryAddWithoutValidation(key, value);
-                    }
+                    request.Headers.TryAddWithoutValidation(key, value);
                 }
             }
-
-            // 設定 Body
-            if (!string.IsNullOrEmpty(job.Body))
-            {
-                request.Content = new StringContent(
-                    job.Body,
-                    System.Text.Encoding.UTF8,
-                    "application/json"
-                );
-            }
-
-            var response = await client.SendAsync(request);
-            response.EnsureSuccessStatusCode();
-
-            var responseBody = await response.Content.ReadAsStringAsync();
-            _logger.LogInformation(
-                "CustomJob {JobId} executed successfully. Status: {StatusCode}, Response: {Response}",
-                job.Id, response.StatusCode, responseBody.Length > 200 ? responseBody[..200] + "..." : responseBody);
         }
-        catch (Exception ex)
+
+        // 設定 Body
+        if (!string.IsNullOrEmpty(job.Body))
         {
-            _logger.LogError(ex, "CustomJob {JobId} failed: {Error}", job.Id, ex.Message);
-            throw; // 讓 Hangfire 處理重試
+            request.Content = new StringContent(
+                job.Body,
+                System.Text.Encoding.UTF8,
+                "application/json"
+            );
         }
+
+        var response = await client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+
+        var responseBody = await response.Content.ReadAsStringAsync();
+        _logger.LogInformation(
+            "CustomJob {JobId} executed successfully. Status: {StatusCode}, Response: {Response}",
+            job.Id, response.StatusCode, responseBody.Length > 200 ? responseBody[..200] + "..." : responseBody);
     }
 }
