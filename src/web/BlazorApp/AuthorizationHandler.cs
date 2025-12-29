@@ -87,18 +87,16 @@ public class AuthorizationHandler : DelegatingHandler
 
         // 3. Check if token needs refresh
         if (!string.IsNullOrEmpty(expiresAtStr) &&
-            DateTimeOffset.TryParse(expiresAtStr, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var expiresAt))
+            DateTimeOffset.TryParse(expiresAtStr, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var expiresAt) &&
+            expiresAt - DateTimeOffset.UtcNow < TokenRefreshBuffer)
         {
-            if (expiresAt - DateTimeOffset.UtcNow < TokenRefreshBuffer)
+            _logger.LogInformation("Access token expires at {ExpiresAt}, refreshing proactively", expiresAt);
+            var refreshedToken = await RefreshTokenAsync(httpContext, sessionId, cancellationToken);
+            if (refreshedToken != null)
             {
-                _logger.LogInformation("Access token expires at {ExpiresAt}, refreshing proactively", expiresAt);
-                var refreshedToken = await RefreshTokenAsync(httpContext, sessionId, cancellationToken);
-                if (refreshedToken != null)
-                {
-                    return refreshedToken;
-                }
-                // Fall through to return current token if refresh fails
+                return refreshedToken;
             }
+            // Fall through to return current token if refresh fails
         }
 
         return accessToken;

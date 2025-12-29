@@ -1,0 +1,145 @@
+@page "/audit-logs"
+@attribute [Authorize(Policy = AppPolicies.CanManageSystem)]
+@using AspireAppTemplate.Shared.Models
+@using AspireAppTemplate.Shared
+@using AspireAppTemplate.Web.Services
+@using Microsoft.AspNetCore.Authorization
+@inject AuditLogApiClient AuditClient
+@inject IDialogService DialogService
+
+<PageHeader Icon="@Icons.Material.Filled.History" 
+            Title="稽核日誌" 
+            Description="查看系統操作與變更記錄">
+</PageHeader>
+
+<MudPaper Elevation="2" Class="pa-0">
+    <AppDataGrid T="AuditLogDto" Items="@_logs" Loading="@_loading" Filterable="true" QuickFilter="@_quickFilter">
+        <ToolBarContent>
+            <MudSpacer />
+            <DebouncedSearchField @bind-Value="_searchString" 
+                                  Placeholder="搜尋操作、使用者或實體..."
+                                  DebounceMs="300" />
+        </ToolBarContent>
+        <Columns>
+            <TemplateColumn T="AuditLogDto" Title="時間" SortBy="@(x => x.Timestamp)">
+                <CellTemplate Context="cellContext">
+                   <MudText Typo="Typo.body2">
+                       @cellContext.Item.Timestamp.ToLocalTime().ToString("yyyy/MM/dd HH:mm:ss")
+                   </MudText>
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="AuditLogDto" Title="使用者" SortBy="@(x => x.UserName)">
+                <CellTemplate Context="cellContext">
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                        <MudAvatar Size="Size.Small" Color="Color.Tertiary">
+                            @(cellContext.Item.UserName?.FirstOrDefault().ToString().ToUpper() ?? "?")
+                        </MudAvatar>
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.body2">@cellContext.Item.UserName</MudText>
+                            <MudText Typo="Typo.caption" Class="mud-text-secondary">@cellContext.Item.UserId</MudText>
+                        </MudStack>
+                    </MudStack>
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="AuditLogDto" Title="動作" SortBy="x => x.Action">
+                <CellTemplate Context="cellContext">
+                     <MudText Typo="Typo.body2">@cellContext.Item.Action</MudText>
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="AuditLogDto" Title="實體類型" SortBy="x => x.EntityName">
+                <CellTemplate Context="cellContext">
+                     <MudText Typo="Typo.body2">@cellContext.Item.EntityName</MudText>
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="AuditLogDto" Title="實體 ID">
+                <CellTemplate Context="cellContext">
+                    <MudText Typo="Typo.caption" Style="font-family: monospace;">@cellContext.Item.EntityId</MudText>
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="AuditLogDto" Title="詳情">
+                <CellTemplate Context="cellContext">
+                     @{
+                         var hasDetails = !string.IsNullOrEmpty(cellContext.Item.OldValues) || !string.IsNullOrEmpty(cellContext.Item.NewValues);
+                     }
+                     @if (hasDetails)
+                     {
+                        <MudButton Variant="Variant.Outlined" 
+                                   Color="Color.Info" 
+                                   Size="Size.Small"
+                                   OnClick="@(async () => await ShowDetails(cellContext.Item))">
+                            查看變更
+                        </MudButton>
+                     }
+                     else
+                     {
+                         <MudText Typo="Typo.caption" Color="Color.Default">-</MudText>
+                     }
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="AuditLogDto" />
+        </PagerContent>
+        <NoRecordsContent>
+            <MudStack AlignItems="AlignItems.Center" Class="pa-8">
+                <MudIcon Icon="@Icons.Material.Filled.HistoryToggleOff" Size="Size.Large" Color="Color.Default" />
+                <MudText Typo="Typo.body1" Color="Color.Default">目前沒有稽核記錄</MudText>
+            </MudStack>
+        </NoRecordsContent>
+    </AppDataGrid>
+</MudPaper>
+
+@code {
+    private List<AuditLogDto> _logs = new();
+    private bool _loading = true;
+    private string _searchString = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        _loading = true;
+        try
+        {
+            _logs = await AuditClient.GetAuditLogsAsync();
+        }
+        catch (Exception)
+        {
+            // Handle error silently or show snackbar
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private Func<AuditLogDto, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (x.Action.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.UserName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.EntityName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        
+        if (x.EntityId.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+             return true;
+
+        return false;
+    };
+
+    private async Task ShowDetails(AuditLogDto item)
+    {
+        var parameters = new DialogParameters<AuditLogDetailDialog> { { x => x.AuditLog, item } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+        await DialogService.ShowAsync<AuditLogDetailDialog>("變更詳情", parameters, options);
+    }
+}

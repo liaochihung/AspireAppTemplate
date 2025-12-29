@@ -6,6 +6,9 @@ using AspireAppTemplate.ApiService.Infrastructure.Extensions;
 using ErrorOr;
 using Microsoft.AspNetCore.OutputCaching;
 
+using AspireAppTemplate.ApiService.Infrastructure.Services;
+using System.Text.Json;
+
 namespace AspireAppTemplate.ApiService.Features.Products.Update;
 
 public class UpdateProductRequest
@@ -24,7 +27,7 @@ public class UpdateProductValidator : Validator<UpdateProductRequest>
     }
 }
 
-public class Endpoint(AppDbContext dbContext, IOutputCacheStore cacheStore) : Endpoint<UpdateProductRequest, Product>
+public class Endpoint(AppDbContext dbContext, IOutputCacheStore cacheStore, IAuditService auditService) : Endpoint<UpdateProductRequest, Product>
 {
     public override void Configure()
     {
@@ -43,12 +46,21 @@ public class Endpoint(AppDbContext dbContext, IOutputCacheStore cacheStore) : En
             return;
         }
 
+        // Deep copy or manually capture old properties for logging
+        var oldValues = new { product.Name, product.Price, product.Description };
+
         product.Name = req.Name;
         product.Price = req.Price;
         product.Description = req.Description;
 
         await dbContext.SaveChangesAsync(ct);
         await cacheStore.EvictByTagAsync("products", ct);
+
+        // Capture new values
+        var newValues = new { product.Name, product.Price, product.Description };
+        
+        // Only log if something changed? AuditService doesn't check diffs, so let's log any update attempt that succeeds.
+        await auditService.LogAsync("Update", "Product", product.Id.ToString(), oldValues, newValues, ct);
 
         ErrorOr<Product> result = product!;
         await this.SendResultAsync(result, ct: ct);

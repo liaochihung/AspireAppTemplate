@@ -5,6 +5,8 @@ using FluentValidation;
 using AspireAppTemplate.ApiService.Infrastructure.Extensions;
 using Microsoft.AspNetCore.OutputCaching;
 
+using AspireAppTemplate.ApiService.Infrastructure.Services;
+
 namespace AspireAppTemplate.ApiService.Features.Identity.Users.Update;
 
 public class UpdateUserRequest
@@ -28,7 +30,7 @@ public class UpdateUserRequest
     public bool Enabled { get; set; }
 }
 
-public class Endpoint(IdentityService identityService, IOutputCacheStore cacheStore) : Endpoint<UpdateUserRequest>
+public class Endpoint(IdentityService identityService, IOutputCacheStore cacheStore, IAuditService auditService) : Endpoint<UpdateUserRequest>
 {
     public override void Configure()
     {
@@ -59,11 +61,17 @@ public class Endpoint(IdentityService identityService, IOutputCacheStore cacheSt
              
              if (appUser != null)
              {
+                 var oldValues = new { appUser.Username, appUser.Email, appUser.FirstName, appUser.LastName, Enabled = "?" };
+
                  appUser.Username = req.Username;
                  appUser.Email = req.Email;
                  appUser.FirstName = req.FirstName;
                  appUser.LastName = req.LastName;
                  await dbContext.SaveChangesAsync(ct);
+                 
+                 var newValues = new { appUser.Username, appUser.Email, appUser.FirstName, appUser.LastName, req.Enabled };
+                 
+                 await auditService.LogAsync("Update", "User", req.Id, oldValues, newValues, ct);
              }
         }
 
