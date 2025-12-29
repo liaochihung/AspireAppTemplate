@@ -1,0 +1,14 @@
+@page "/custom-jobs"
+@using AspireAppTemplate.Web.Components.CustomJobs
+@using AspireAppTemplate.Shared
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Policy = AppPolicies.CanManageSystem)]
+
+<PageTitle>自訂任務</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+    <MudText Typo="Typo.h4" GutterBottom="true">自訂任務管理</MudText>
+    <MudText Typo="Typo.body1" Class="mb-4">建立可呼叫 HTTP API 的背景任務</MudText>
+    
+    <CustomJobList />
+</MudContainer>

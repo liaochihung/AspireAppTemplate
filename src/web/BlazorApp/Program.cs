@@ -93,6 +93,15 @@ builder.Services.AddAuthorization(options =>
 
     options.AddPolicy(AppPolicies.CanViewWeather, policy => 
         policy.RequireRole(AppRoles.Administrator));
+    
+    options.AddPolicy(AppPolicies.CanManageRoles, policy => 
+        policy.RequireRole(AppRoles.Administrator));
+    
+    options.AddPolicy(AppPolicies.CanManageUsers, policy => 
+        policy.RequireRole(AppRoles.Administrator));
+    
+    options.AddPolicy(AppPolicies.CanManageSystem, policy => 
+        policy.RequireRole(AppRoles.Administrator));
 });
 
 var app = builder.Build();

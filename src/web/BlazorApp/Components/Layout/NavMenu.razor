@@ -46,6 +46,17 @@
             }
             <MudNavLink Href="admin/users" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.People">使用者</MudNavLink>
             <MudNavLink Href="admin/roles" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Security">角色</MudNavLink>
+            <MudNavLink Href="custom-jobs" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Schedule">自訂任務</MudNavLink>
+        </Authorized>
+    </AuthorizeView>
+
+    <AuthorizeView Policy="@AppPolicies.CanManageSystem">
+        <Authorized>
+            @if (IsOpen)
+            {
+                <MudText Typo="Typo.subtitle2" Color="Color.Surface" Class="ml-4 my-3">系統</MudText>
+            }
+            <MudNavLink Href="http://localhost:5000/hangfire" Target="_blank" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Dashboard">Hangfire 儀表板</MudNavLink>
         </Authorized>
     </AuthorizeView>
 
@@ -56,5 +67,3 @@
     <MudNavLink Href="token" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Token">存取權杖</MudNavLink>
     <MudNavLink Href="notifications-demo" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Notifications">通知中心</MudNavLink>
 </MudNavMenu>
-
-
