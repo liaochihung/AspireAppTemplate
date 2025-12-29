@@ -8,6 +8,9 @@ using Keycloak.AuthServices.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Scalar.AspNetCore;
 using Microsoft.EntityFrameworkCore;
+using Hangfire;
+using Hangfire.PostgreSql;
+using AspireAppTemplate.ApiService.Infrastructure.Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +28,22 @@ builder.Host.UseSerilog((context, services, configuration) => configuration
 builder.Services.AddProblemDetails();
 builder.Services.AddFastEndpoints();
 builder.Services.SwaggerDocument();
+
+// Hangfire Configuration
+builder.Services.AddHangfire(config =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("aspiredb");
+    config.UsePostgreSqlStorage(options =>
+        options.UseNpgsqlConnection(connectionString));
+    config.UseSimpleAssemblyNameTypeSerializer();
+    config.UseRecommendedSerializerSettings();
+});
+
+builder.Services.AddHangfireServer(options =>
+{
+    options.WorkerCount = Environment.ProcessorCount;
+    options.ServerName = $"ApiService-{Environment.MachineName}";
+});
 
 builder.Services.Configure<KeycloakAdminConfiguration>(builder.Configuration.GetSection("KeycloakAdmin"));
 
@@ -106,6 +125,9 @@ builder.Services.AddAuthorization(options =>
 
     options.AddPolicy(AppPolicies.CanManageUsers, policy => 
         policy.RequireRole(AppRoles.Administrator));
+
+    options.AddPolicy(AppPolicies.CanManageSystem, policy => 
+        policy.RequireRole(AppRoles.Administrator));
 });
 
 var app = builder.Build();
@@ -139,6 +161,13 @@ app.Use(async (context, next) =>
 });
 
 app.UseFastEndpoints(c => { c.Endpoints.RoutePrefix = "api"; });
+
+// Hangfire Dashboard (僅限 Administrator)
+app.MapHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new[] { new HangfireAuthorizationFilter() },
+    DashboardTitle = "Aspire App - Background Jobs"
+});
 
 if (app.Environment.IsDevelopment()) 
 { 

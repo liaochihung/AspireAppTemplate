@@ -10,4 +10,5 @@ public static class AppPolicies
 
     public const string CanManageUsers = "CanManageUsers";
     public const string CanManageRoles = "CanManageRoles";
+    public const string CanManageSystem = "CanManageSystem";
 }
