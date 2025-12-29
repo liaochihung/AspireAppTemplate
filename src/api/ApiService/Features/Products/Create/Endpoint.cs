@@ -6,6 +6,8 @@ using AspireAppTemplate.ApiService.Infrastructure.Extensions;
 using ErrorOr;
 using Microsoft.AspNetCore.OutputCaching;
 
+using AspireAppTemplate.ApiService.Infrastructure.Services;
+
 namespace AspireAppTemplate.ApiService.Features.Products.Create;
 
 public class CreateProductRequest
@@ -24,7 +26,7 @@ public class CreateProductValidator : Validator<CreateProductRequest>
     }
 }
 
-public class Endpoint(AppDbContext dbContext, IOutputCacheStore cacheStore) : Endpoint<CreateProductRequest, Product>
+public class Endpoint(AppDbContext dbContext, IOutputCacheStore cacheStore, IAuditService auditService) : Endpoint<CreateProductRequest, Product>
 {
     public override void Configure()
     {
@@ -44,6 +46,8 @@ public class Endpoint(AppDbContext dbContext, IOutputCacheStore cacheStore) : En
         dbContext.Products.Add(product);
         await dbContext.SaveChangesAsync(ct);
         await cacheStore.EvictByTagAsync("products", ct);
+
+        await auditService.LogAsync("Create", "Product", product.Id.ToString(), null, product, ct);
 
         ErrorOr<Product> result = product;
 

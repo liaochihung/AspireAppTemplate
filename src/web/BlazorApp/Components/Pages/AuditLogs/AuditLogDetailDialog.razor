@@ -1,0 +1,67 @@
+@using AspireAppTemplate.Shared.Models
+@using System.Text.Json
+@using MudBlazor
+
+<MudDialog>
+    <DialogContent>
+        <MudGrid>
+            <MudItem xs="12">
+                 <MudText Typo="Typo.subtitle1">
+                     <span style="font-weight:bold">@AuditLog.Action</span> @AuditLog.EntityName 
+                     (@AuditLog.EntityId)
+                 </MudText>
+                 <MudText Typo="Typo.body2" Class="mud-text-secondary">
+                     由 @AuditLog.UserName 於 @AuditLog.Timestamp.ToLocalTime().ToString("yyyy/MM/dd HH:mm:ss") 執行
+                 </MudText>
+            </MudItem>
+            <MudItem xs="12">
+                <MudDivider Class="my-2"/>
+            </MudItem>
+            
+            @if (!string.IsNullOrEmpty(AuditLog.OldValues))
+            {
+                <MudItem xs="12" md="6">
+                    <MudText Typo="Typo.h6" Class="mb-2" Color="Color.Warning">變更前</MudText>
+                    <MudPaper Class="pa-4" Outlined="true" Style="background-color: var(--mud-palette-background-grey); min-height: 200px;">
+                        <pre style="white-space: pre-wrap; word-wrap: break-word;">@FormatJson(AuditLog.OldValues)</pre>
+                    </MudPaper>
+                </MudItem>
+            }
+            
+            @if (!string.IsNullOrEmpty(AuditLog.NewValues))
+            {
+                 <MudItem xs="12" md="@(string.IsNullOrEmpty(AuditLog.OldValues) ? 12 : 6)">
+                    <MudText Typo="Typo.h6" Class="mb-2" Color="Color.Success">變更後</MudText>
+                    <MudPaper Class="pa-4" Outlined="true" Style="background-color: var(--mud-palette-background-grey); min-height: 200px;">
+                        <pre style="white-space: pre-wrap; word-wrap: break-word;">@FormatJson(AuditLog.NewValues)</pre>
+                    </MudPaper>
+                </MudItem>
+            }
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">關閉</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter] public AuditLogDto AuditLog { get; set; } = default!;
+
+    private string FormatJson(string json)
+    {
+        if (string.IsNullOrEmpty(json)) return string.Empty;
+        try
+        {
+            var parsedJson = JsonDocument.Parse(json);
+            return JsonSerializer.Serialize(parsedJson, new JsonSerializerOptions { WriteIndented = true });
+        }
+        catch
+        {
+            return json;
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

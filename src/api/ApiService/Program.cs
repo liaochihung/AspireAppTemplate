@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Hangfire;
 using Hangfire.PostgreSql;
 using AspireAppTemplate.ApiService.Infrastructure.Hangfire;
+using AspireAppTemplate.ApiService.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,9 +26,12 @@ builder.Host.UseSerilog((context, services, configuration) => configuration
     .Enrich.FromLogContext(),
     writeToProviders: true);
 
+
 builder.Services.AddProblemDetails();
 builder.Services.AddFastEndpoints();
 builder.Services.SwaggerDocument();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IAuditService, AuditService>();
 
 // Hangfire Configuration
 builder.Services.AddHangfire(config =>

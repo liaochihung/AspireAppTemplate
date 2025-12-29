@@ -10,6 +10,7 @@ using AspireAppTemplate.Shared;
 using MudBlazor.Services;
 using Blazored.LocalStorage;
 using AspireAppTemplate.Web.Infrastructure.Services;
+using AspireAppTemplate.Web.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -66,6 +67,11 @@ builder.Services.AddHttpClient<IdentityApiClient>(client =>
 }).AddHttpMessageHandler<AuthorizationHandler>();
 
 builder.Services.AddHttpClient<CustomJobsApiClient>(client =>
+{
+    client.BaseAddress = new("https+http://apiservice");
+}).AddHttpMessageHandler<AuthorizationHandler>();
+
+builder.Services.AddHttpClient<AuditLogApiClient>(client =>
 {
     client.BaseAddress = new("https+http://apiservice");
 }).AddHttpMessageHandler<AuthorizationHandler>();
