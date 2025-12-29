@@ -32,6 +32,10 @@ builder.Host.UseSerilog((context, services, configuration) => configuration
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+// Add memory cache for token caching
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<AspireAppTemplate.Web.Infrastructure.Authentication.TokenCacheService>();
+
 builder.Services.AddMudServices();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<LayoutService>();
@@ -104,6 +108,9 @@ app.UseHttpsRedirection();
 app.UseAntiforgery();
 
 app.UseOutputCache();
+
+// Persist cached tokens to cookies (must run before response starts)
+app.UseMiddleware<AspireAppTemplate.Web.Infrastructure.Middleware.TokenPersistenceMiddleware>();
 
 app.MapStaticAssets();
 

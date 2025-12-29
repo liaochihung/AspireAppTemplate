@@ -3,214 +3,206 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System.Globalization;
-using System.Net;
 using System.Net.Http.Headers;
+using AspireAppTemplate.Web.Infrastructure.Authentication;
 
 namespace AspireAppTemplate.Web;
 
 /// <summary>
-/// HTTP Message Handler that attaches access tokens to outgoing requests
-/// and automatically refreshes expired tokens using the refresh_token grant.
+/// HTTP Message Handler that attaches access tokens to outgoing requests.
+/// Automatically refreshes tokens when they are about to expire.
 /// </summary>
-public class AuthorizationHandler(
-    IHttpContextAccessor httpContextAccessor,
-    ILogger<AuthorizationHandler> logger) : DelegatingHandler
+public class AuthorizationHandler : DelegatingHandler
 {
-    // Refresh token when it expires within this buffer time
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly ILogger<AuthorizationHandler> _logger;
+    private readonly TokenCacheService _tokenCache;
+
     private static readonly TimeSpan TokenRefreshBuffer = TimeSpan.FromMinutes(1);
 
-    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    public AuthorizationHandler(
+        IHttpContextAccessor httpContextAccessor,
+        ILogger<AuthorizationHandler> logger,
+        TokenCacheService tokenCache)
     {
-        var httpContext = httpContextAccessor.HttpContext;
+        _httpContextAccessor = httpContextAccessor;
+        _logger = logger;
+        _tokenCache = tokenCache;
+    }
+
+    protected override async Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request,
+        CancellationToken cancellationToken)
+    {
+        var httpContext = _httpContextAccessor.HttpContext;
 
         if (httpContext is null)
         {
-            logger.LogWarning("HttpContext is null - cannot attach token");
+            _logger.LogWarning("HttpContext is null - cannot attach token");
             return await base.SendAsync(request, cancellationToken);
         }
 
         try
         {
-            var accessToken = await GetOrRefreshAccessTokenAsync(httpContext, cancellationToken);
+            var accessToken = await GetValidAccessTokenAsync(httpContext, cancellationToken);
 
             if (string.IsNullOrWhiteSpace(accessToken))
             {
-                logger.LogWarning("No access_token available for request to {Uri}", request.RequestUri);
+                _logger.LogWarning("No valid access_token available for request to {Uri}", request.RequestUri);
             }
             else
             {
-                logger.LogInformation("Attaching Bearer token to request: {Uri}", request.RequestUri);
+                _logger.LogDebug("Attaching Bearer token to request: {Uri}", request.RequestUri);
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
             }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error getting access token from HttpContext");
+            _logger.LogError(ex, "Error getting access token for request to {Uri}", request.RequestUri);
         }
 
-        var response = await base.SendAsync(request, cancellationToken);
-
-        // If we get a 401, try to refresh token and retry once
-        if (response.StatusCode == HttpStatusCode.Unauthorized)
-        {
-            logger.LogWarning("Received 401 from {Uri}, attempting token refresh and retry", request.RequestUri);
-
-            try
-            {
-                var newAccessToken = await ForceRefreshTokenAsync(httpContext, cancellationToken);
-
-                if (!string.IsNullOrWhiteSpace(newAccessToken))
-                {
-                    // Clone the request (can't reuse the original) and retry
-                    var retryRequest = await CloneHttpRequestMessageAsync(request);
-                    retryRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", newAccessToken);
-
-                    logger.LogInformation("Retrying request to {Uri} with refreshed token", request.RequestUri);
-                    response = await base.SendAsync(retryRequest, cancellationToken);
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Failed to refresh token after 401 response");
-            }
-        }
-
-        return response;
+        return await base.SendAsync(request, cancellationToken);
     }
 
-    private async Task<string?> GetOrRefreshAccessTokenAsync(HttpContext httpContext, CancellationToken cancellationToken)
+    private async Task<string?> GetValidAccessTokenAsync(HttpContext httpContext, CancellationToken cancellationToken)
     {
+        var sessionId = GetSessionId(httpContext);
+
+        // 1. Check if we have a cached refreshed token
+        var cachedTokens = _tokenCache.GetTokens(sessionId);
+        if (cachedTokens != null && cachedTokens.ExpiresAt > DateTimeOffset.UtcNow.Add(TokenRefreshBuffer))
+        {
+            _logger.LogDebug("Using cached access token, expires at {ExpiresAt}", cachedTokens.ExpiresAt);
+            return cachedTokens.AccessToken;
+        }
+
+        // 2. Get token from authentication properties (cookie)
+        var accessToken = await httpContext.GetTokenAsync("access_token");
         var expiresAtStr = await httpContext.GetTokenAsync("expires_at");
 
-        if (!string.IsNullOrEmpty(expiresAtStr) &&
-            DateTimeOffset.TryParse(expiresAtStr, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var expiresAt) &&
-            expiresAt - DateTimeOffset.UtcNow < TokenRefreshBuffer)
+        if (string.IsNullOrEmpty(accessToken))
         {
-            // Token is about to expire, refresh proactively
-            logger.LogInformation("Access token expires at {ExpiresAt}, refreshing proactively", expiresAt);
-            return await ForceRefreshTokenAsync(httpContext, cancellationToken);
+            return null;
         }
 
-        return await httpContext.GetTokenAsync("access_token");
+        // 3. Check if token needs refresh
+        if (!string.IsNullOrEmpty(expiresAtStr) &&
+            DateTimeOffset.TryParse(expiresAtStr, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var expiresAt))
+        {
+            if (expiresAt - DateTimeOffset.UtcNow < TokenRefreshBuffer)
+            {
+                _logger.LogInformation("Access token expires at {ExpiresAt}, refreshing proactively", expiresAt);
+                var refreshedToken = await RefreshTokenAsync(httpContext, sessionId, cancellationToken);
+                if (refreshedToken != null)
+                {
+                    return refreshedToken;
+                }
+                // Fall through to return current token if refresh fails
+            }
+        }
+
+        return accessToken;
     }
 
-    private async Task<string?> ForceRefreshTokenAsync(HttpContext httpContext, CancellationToken cancellationToken)
+    private async Task<string?> RefreshTokenAsync(HttpContext httpContext, string sessionId, CancellationToken cancellationToken)
     {
         var refreshToken = await httpContext.GetTokenAsync("refresh_token");
-
         if (string.IsNullOrWhiteSpace(refreshToken))
         {
-            logger.LogWarning("No refresh_token available for token refresh");
+            _logger.LogWarning("No refresh_token available for token refresh");
             return null;
         }
 
-        // Get OIDC configuration to find token endpoint
-        var oidcOptions = httpContext.RequestServices
-            .GetRequiredService<Microsoft.Extensions.Options.IOptionsMonitor<OpenIdConnectOptions>>()
-            .Get(OpenIdConnectDefaults.AuthenticationScheme);
-
-        var configuration = await oidcOptions.ConfigurationManager!.GetConfigurationAsync(cancellationToken);
-        var tokenEndpoint = configuration.TokenEndpoint;
-
-        if (string.IsNullOrEmpty(tokenEndpoint))
+        try
         {
-            logger.LogError("Token endpoint not found in OIDC configuration");
-            return null;
-        }
+            // Get OIDC configuration
+            var oidcOptions = httpContext.RequestServices
+                .GetRequiredService<Microsoft.Extensions.Options.IOptionsMonitor<OpenIdConnectOptions>>()
+                .Get(OpenIdConnectDefaults.AuthenticationScheme);
 
-        logger.LogDebug("Refreshing token using endpoint: {TokenEndpoint}", tokenEndpoint);
+            var configuration = await oidcOptions.ConfigurationManager!.GetConfigurationAsync(cancellationToken);
+            var tokenEndpoint = configuration.TokenEndpoint;
 
-        // Build the refresh token request
-        using var httpClient = new HttpClient();
-        var tokenRequest = new Dictionary<string, string>
-        {
-            ["grant_type"] = "refresh_token",
-            ["client_id"] = oidcOptions.ClientId!,
-            ["refresh_token"] = refreshToken
-        };
-
-        // Add client secret if configured
-        if (!string.IsNullOrEmpty(oidcOptions.ClientSecret))
-        {
-            tokenRequest["client_secret"] = oidcOptions.ClientSecret;
-        }
-
-        var response = await httpClient.PostAsync(
-            tokenEndpoint,
-            new FormUrlEncodedContent(tokenRequest),
-            cancellationToken);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
-            logger.LogWarning("Token refresh failed with status {StatusCode}: {Error}",
-                response.StatusCode, errorContent);
-            return null;
-        }
-
-        var tokenResponse = await response.Content.ReadFromJsonAsync<TokenResponse>(cancellationToken: cancellationToken);
-
-        if (tokenResponse is null || string.IsNullOrEmpty(tokenResponse.AccessToken))
-        {
-            logger.LogWarning("Token refresh response missing access_token");
-            return null;
-        }
-
-        // Update the stored tokens in the authentication properties
-        var authenticateResult = await httpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-        if (authenticateResult.Succeeded && authenticateResult.Properties != null)
-        {
-            var properties = authenticateResult.Properties;
-
-            properties.UpdateTokenValue("access_token", tokenResponse.AccessToken);
-
-            if (!string.IsNullOrEmpty(tokenResponse.RefreshToken))
+            if (string.IsNullOrEmpty(tokenEndpoint))
             {
-                properties.UpdateTokenValue("refresh_token", tokenResponse.RefreshToken);
+                _logger.LogError("Token endpoint not found in OIDC configuration");
+                return null;
             }
 
-            if (tokenResponse.ExpiresIn > 0)
+            // Build refresh token request
+            using var httpClient = new HttpClient();
+            var tokenRequest = new Dictionary<string, string>
             {
-                var newExpiresAt = DateTimeOffset.UtcNow.AddSeconds(tokenResponse.ExpiresIn);
-                properties.UpdateTokenValue("expires_at", newExpiresAt.ToString("o", CultureInfo.InvariantCulture));
+                ["grant_type"] = "refresh_token",
+                ["client_id"] = oidcOptions.ClientId!,
+                ["refresh_token"] = refreshToken
+            };
+
+            if (!string.IsNullOrEmpty(oidcOptions.ClientSecret))
+            {
+                tokenRequest["client_secret"] = oidcOptions.ClientSecret;
             }
 
-            // Re-sign in to persist the updated tokens
-            await httpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                authenticateResult.Principal!,
-                properties);
+            var response = await httpClient.PostAsync(
+                tokenEndpoint,
+                new FormUrlEncodedContent(tokenRequest),
+                cancellationToken);
 
-            logger.LogInformation("Successfully refreshed access token, new expiry in {ExpiresIn}s", tokenResponse.ExpiresIn);
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+                _logger.LogWarning("Token refresh failed: {StatusCode} - {Error}",
+                    response.StatusCode, errorContent);
+                return null;
+            }
+
+            var tokenResponse = await response.Content.ReadFromJsonAsync<TokenResponse>(cancellationToken: cancellationToken);
+            if (tokenResponse?.AccessToken == null)
+            {
+                _logger.LogWarning("Token refresh response missing access_token");
+                return null;
+            }
+
+            // Calculate expiration
+            var newExpiresAt = DateTimeOffset.UtcNow.AddSeconds(tokenResponse.ExpiresIn);
+
+            // Store in cache
+            var cachedTokens = new CachedTokens
+            {
+                AccessToken = tokenResponse.AccessToken,
+                RefreshToken = tokenResponse.RefreshToken,
+                ExpiresAt = newExpiresAt
+            };
+            _tokenCache.StoreTokens(sessionId, cachedTokens);
+
+            _logger.LogInformation("Successfully refreshed access token, new expiry in {ExpiresIn}s (cached for persistence)",
+                tokenResponse.ExpiresIn);
+
+            return tokenResponse.AccessToken;
         }
-
-        return tokenResponse.AccessToken;
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error refreshing access token");
+            return null;
+        }
     }
 
-    private static async Task<HttpRequestMessage> CloneHttpRequestMessageAsync(HttpRequestMessage request)
+    private static string GetSessionId(HttpContext httpContext)
     {
-        var clone = new HttpRequestMessage(request.Method, request.RequestUri);
-
-        // Copy headers
-        foreach (var header in request.Headers)
+        // Use the session cookie or user identity as a key
+        // This ensures multiple users don't share cached tokens
+        var user = httpContext.User;
+        if (user.Identity?.IsAuthenticated == true)
         {
-            clone.Headers.TryAddWithoutValidation(header.Key, header.Value);
-        }
-
-        // Copy content if any
-        if (request.Content != null)
-        {
-            var contentBytes = await request.Content.ReadAsByteArrayAsync();
-            clone.Content = new ByteArrayContent(contentBytes);
-
-            foreach (var header in request.Content.Headers)
+            var sub = user.FindFirst("sub")?.Value;
+            if (!string.IsNullOrEmpty(sub))
             {
-                clone.Content.Headers.TryAddWithoutValidation(header.Key, header.Value);
+                return sub;
             }
         }
 
-        return clone;
+        // Fallback to session id from cookie
+        return httpContext.Session?.Id ?? "anonymous";
     }
 
     private sealed class TokenResponse
@@ -223,8 +215,5 @@ public class AuthorizationHandler(
 
         [System.Text.Json.Serialization.JsonPropertyName("expires_in")]
         public int ExpiresIn { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("token_type")]
-        public string? TokenType { get; set; }
     }
 }
