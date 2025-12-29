@@ -40,9 +40,13 @@
     </MudMainContent>
 </MudLayout>
 
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IdentityApiClient IdentityApiClient
 @inject IJSRuntime JSRuntime
 
 @code {
+
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)

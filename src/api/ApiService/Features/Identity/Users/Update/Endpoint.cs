@@ -49,6 +49,24 @@ public class Endpoint(IdentityService identityService, IOutputCacheStore cacheSt
         };
 
         var result = await identityService.UpdateUserAsync(req.Id, user);
+        
+        if (!result.IsError)
+        {
+             // Sync local DB
+             var userId = Guid.Parse(req.Id);
+             var dbContext = Resolve<AspireAppTemplate.ApiService.Data.AppDbContext>();
+             var appUser = await dbContext.Users.FindAsync([userId], cancellationToken: ct);
+             
+             if (appUser != null)
+             {
+                 appUser.Username = req.Username;
+                 appUser.Email = req.Email;
+                 appUser.FirstName = req.FirstName;
+                 appUser.LastName = req.LastName;
+                 await dbContext.SaveChangesAsync(ct);
+             }
+        }
+
         await cacheStore.EvictByTagAsync("users", ct);
         await this.SendResultAsync(result, ct: ct);
     }

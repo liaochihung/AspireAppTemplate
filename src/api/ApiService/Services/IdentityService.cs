@@ -43,7 +43,7 @@ public class IdentityService(
         }).ToList() ?? new List<KeycloakUser>();
     }
 
-    public async Task<ErrorOr<Created>> CreateUserAsync(KeycloakUser user)
+    public async Task<ErrorOr<string>> CreateUserAsync(KeycloakUser user)
     {
         var userRep = new UserRepresentation
         {
@@ -63,7 +63,22 @@ public class IdentityService(
         
         if (response.IsSuccessStatusCode)
         {
-            return Result.Created;
+            // Extract ID from Location header
+            // Format: .../admin/realms/{realm}/users/{id}
+            var location = response.Headers.Location;
+            if (location != null)
+            {
+                var segments = location.AbsolutePath.Split('/');
+                var userId = segments.Last();
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    return userId;
+                }
+            }
+            
+            // Fallback: If location header is somehow missing (unlikely in Keycloak),
+            // we might need to query by username, but primarily we rely on Location.
+             return Error.Failure(description: "User created but failed to retrieve ID.");
         }
 
         if (response.StatusCode == System.Net.HttpStatusCode.Conflict)

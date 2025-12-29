@@ -28,6 +28,12 @@ public class KeycloakUser
     
     [JsonPropertyName("credentials")]
     public List<KeycloakCredential>? Credentials { get; set; }
+
+    [JsonPropertyName("lastLoginAt")]
+    public DateTime? LastLoginAt { get; set; }
+
+    [JsonPropertyName("createdAt")]
+    public DateTime? CreatedAt { get; set; }
 }
 
 public class KeycloakCredential

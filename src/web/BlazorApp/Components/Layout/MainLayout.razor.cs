@@ -19,6 +19,20 @@ namespace AspireAppTemplate.Web.Components.Layout
             _isDarkMode = prefs.IsDarkMode;
 
             LayoutService.MajorUpdateOccurred += OnMajorUpdateOccurred;
+
+            // Sync user to local DB
+            try 
+            {
+                var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+                if (authState.User.Identity?.IsAuthenticated == true)
+                {
+                    await IdentityApiClient.SyncUserAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to sync user: {ex.Message}");
+            }
         }
 
         private async Task DrawerToggle()

@@ -10,6 +10,7 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<Product> Products => Set<Product>();
+    public DbSet<Entities.AppUser> Users => Set<Entities.AppUser>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
