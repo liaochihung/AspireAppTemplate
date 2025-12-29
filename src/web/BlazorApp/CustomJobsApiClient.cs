@@ -30,6 +30,14 @@ public class CustomJobsApiClient(HttpClient httpClient)
         response.EnsureSuccessStatusCode();
     }
 
+    public async Task<TestUrlResponse> TestUrlAsync(TestUrlRequest request, CancellationToken ct = default)
+    {
+        var response = await httpClient.PostAsJsonAsync("/api/custom-jobs/test-url", request, ct);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<TestUrlResponse>(cancellationToken: ct)
+            ?? throw new InvalidOperationException("Failed to deserialize response");
+    }
+
     // DTOs
     public class GetAllJobsResponse
     {
@@ -76,4 +84,22 @@ public class CustomJobsApiClient(HttpClient httpClient)
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
     }
+
+    public class TestUrlRequest
+    {
+        public string Url { get; set; } = string.Empty;
+        public int HttpMethod { get; set; }
+        public string? Headers { get; set; }
+        public string? Body { get; set; }
+    }
+
+    public class TestUrlResponse
+    {
+        public bool IsSuccess { get; set; }
+        public int StatusCode { get; set; }
+        public string? ResponseBody { get; set; }
+        public long LatencyMs { get; set; }
+        public string? ErrorMessage { get; set; }
+    }
 }
+

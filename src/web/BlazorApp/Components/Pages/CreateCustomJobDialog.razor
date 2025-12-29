@@ -1,6 +1,5 @@
 @using AspireAppTemplate.Web
 @using MudBlazor
-@inject ISnackbar Snackbar
 
 <MudDialog>
     <TitleContent>
@@ -93,6 +92,58 @@
                                  Margin="Margin.Dense"
                                  HelperText="例如: https://jsonplaceholder.typicode.com/posts/1" />
                 </MudItem>
+
+                <MudItem xs="12">
+                    <MudButton OnClick="TestUrl" 
+                               Color="Color.Info" 
+                               Variant="Variant.Text" 
+                               Disabled="@(_testing || string.IsNullOrWhiteSpace(Model.Url))" 
+                               StartIcon="@Icons.Material.Filled.PlayArrow"
+                               Size="Size.Small">
+                        @if (_testing)
+                        {
+                            <MudProgressCircular Size="Size.Small" Indeterminate="true" />
+                            <MudText Class="ml-2">測試中...</MudText>
+                        }
+                        else
+                        {
+                            <text>測試連線</text>
+                        }
+                    </MudButton>
+                </MudItem>
+
+                @if (_testResult != null)
+                {
+                    <MudItem xs="12">
+                        <MudAlert Severity="@(_testResult.IsSuccess ? Severity.Success : Severity.Error)" Dense="true">
+                            <MudStack Spacing="1">
+                                <MudText Typo="Typo.body2">
+                                    <b>狀態:</b> @(_testResult.IsSuccess ? "成功" : "失敗")
+                                    @if (_testResult.StatusCode > 0)
+                                    {
+                                        <text> | <b>HTTP @_testResult.StatusCode</b></text>
+                                    }
+                                    | <b>耗時:</b> @_testResult.LatencyMs ms
+                                </MudText>
+                                @if (!string.IsNullOrWhiteSpace(_testResult.ErrorMessage))
+                                {
+                                    <MudText Typo="Typo.body2" Color="Color.Error">
+                                        <b>錯誤:</b> @_testResult.ErrorMessage
+                                    </MudText>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(_testResult.ResponseBody))
+                                {
+                                    <MudExpansionPanels Dense="true">
+                                        <MudExpansionPanel Text="查看回應內容">
+                                            <MudText Typo="Typo.body2" Style="font-family: monospace; white-space: pre-wrap; font-size: 0.75rem;">@_testResult.ResponseBody</MudText>
+                                        </MudExpansionPanel>
+                                    </MudExpansionPanels>
+                                }
+                            </MudStack>
+                        </MudAlert>
+                    </MudItem>
+                }
+
                 <MudItem xs="12">
                     <MudTextField T="string" Label="Headers (JSON)" 
                                  @bind-Value="Model.Headers" 
