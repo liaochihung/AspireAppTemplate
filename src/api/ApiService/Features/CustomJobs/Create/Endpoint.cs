@@ -20,7 +20,7 @@ public class Endpoint : Endpoint<Request, Response>
 
     public override void Configure()
     {
-        Post("/api/custom-jobs");
+        Post("/custom-jobs");
         Policies(AppPolicies.CanManageSystem);
     }
 

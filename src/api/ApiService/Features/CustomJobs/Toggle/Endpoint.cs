@@ -18,7 +18,7 @@ public class Endpoint : Endpoint<Request, Response>
 
     public override void Configure()
     {
-        Post("/api/custom-jobs/{id}/toggle");
+        Post("/custom-jobs/{id}/toggle");
         Policies(AppPolicies.CanManageSystem);
     }
 

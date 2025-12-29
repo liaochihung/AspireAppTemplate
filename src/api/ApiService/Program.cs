@@ -45,6 +45,10 @@ builder.Services.AddHangfireServer(options =>
     options.ServerName = $"ApiService-{Environment.MachineName}";
 });
 
+// 註冊 Hangfire Dashboard 認證過濾器
+builder.Services.AddSingleton<HangfireAuthorizationFilter>();
+
+
 builder.Services.Configure<KeycloakAdminConfiguration>(builder.Configuration.GetSection("KeycloakAdmin"));
 
 var keycloakEndpoint = builder.Configuration["services:keycloak:http:0"];
@@ -165,7 +169,7 @@ app.UseFastEndpoints(c => { c.Endpoints.RoutePrefix = "api"; });
 // Hangfire Dashboard (僅限 Administrator)
 app.MapHangfireDashboard("/hangfire", new DashboardOptions
 {
-    Authorization = new[] { new HangfireAuthorizationFilter() },
+    Authorization = new[] { app.Services.GetRequiredService<HangfireAuthorizationFilter>() },
     DashboardTitle = "Aspire App - Background Jobs"
 });
 

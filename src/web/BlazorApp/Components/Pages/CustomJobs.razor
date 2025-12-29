@@ -1,14 +1,107 @@
 @page "/custom-jobs"
-@using AspireAppTemplate.Web.Components.CustomJobs
+@attribute [Authorize(Policy = AppPolicies.CanManageSystem)]
+@using AspireAppTemplate.Web
 @using AspireAppTemplate.Shared
 @using Microsoft.AspNetCore.Authorization
-@attribute [Authorize(Policy = AppPolicies.CanManageSystem)]
+@inject CustomJobsApiClient ApiClient
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
 
-<PageTitle>自訂任務</PageTitle>
+<PageHeader Icon="@Icons.Material.Filled.Schedule" 
+            Title="自訂任務管理" 
+            Description="建立可呼叫 HTTP API 的背景任務">
+    <MudButton Variant="Variant.Filled" 
+               Color="Color.Primary" 
+               StartIcon="@Icons.Material.Filled.Add" 
+               OnClick="CreateJob"
+               DropShadow="false">
+        新增任務
+    </MudButton>
+</PageHeader>
 
-<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
-    <MudText Typo="Typo.h4" GutterBottom="true">自訂任務管理</MudText>
-    <MudText Typo="Typo.body1" Class="mb-4">建立可呼叫 HTTP API 的背景任務</MudText>
-    
-    <CustomJobList />
-</MudContainer>
+<MudPaper Elevation="2" Class="pa-0">
+    <AppDataGrid T="CustomJobsApiClient.JobDto" Items="@_jobs" Loading="@_loading" Filterable="true" QuickFilter="@_quickFilter">
+        <ToolBarContent>
+            <MudSpacer />
+            <DebouncedSearchField @bind-Value="_searchString" 
+                                  Placeholder="搜尋任務..."
+                                  DebounceMs="300" />
+        </ToolBarContent>
+        <Columns>
+            <TemplateColumn T="CustomJobsApiClient.JobDto" Title="名稱">
+                <CellTemplate Context="cellContext">
+                    <MudStack Spacing="1">
+                        <MudText Typo="Typo.body2" Style="font-weight: 500;">@cellContext.Item.Name</MudText>
+                        @if (!string.IsNullOrEmpty(cellContext.Item.Description))
+                        {
+                            <MudText Typo="Typo.caption" Class="mud-text-secondary">@cellContext.Item.Description</MudText>
+                        }
+                    </MudStack>
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="CustomJobsApiClient.JobDto" Title="類型">
+                <CellTemplate Context="cellContext">
+                    <MudChip T="string" Size="Size.Small" Color="@(cellContext.Item.Type == 1 ? Color.Info : Color.Success)">
+                        @(cellContext.Item.Type == 1 ? "一次性" : "週期性")
+                    </MudChip>
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="CustomJobsApiClient.JobDto" Title="HTTP 方法">
+                <CellTemplate Context="cellContext">
+                    <MudChip T="string" Size="Size.Small" Color="@GetHttpMethodColor(cellContext.Item.HttpMethod)">
+                        @GetHttpMethodName(cellContext.Item.HttpMethod)
+                    </MudChip>
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="CustomJobsApiClient.JobDto" Title="URL">
+                <CellTemplate Context="cellContext">
+                    <MudText Typo="Typo.body2" Style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">
+                        @cellContext.Item.Url
+                    </MudText>
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="CustomJobsApiClient.JobDto" Title="狀態">
+                <CellTemplate Context="cellContext">
+                    @if (cellContext.Item.IsActive)
+                    {
+                        <MudChip T="string" Size="Size.Small" Color="Color.Success" Icon="@Icons.Material.Filled.CheckCircle">啟用中</MudChip>
+                    }
+                    else
+                    {
+                        <MudChip T="string" Size="Size.Small" Color="Color.Default" Icon="@Icons.Material.Filled.Cancel">已停用</MudChip>
+                    }
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="CustomJobsApiClient.JobDto" Title="建立時間">
+                <CellTemplate Context="cellContext">
+                    <MudText Typo="Typo.body2">@cellContext.Item.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</MudText>
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="CustomJobsApiClient.JobDto" Title="操作">
+                <CellTemplate Context="cellContext">
+                    <MudTooltip Text="@(cellContext.Item.IsActive ? "停用" : "啟用")">
+                        <MudIconButton Icon="@Icons.Material.Filled.PowerSettingsNew" 
+                                       Color="@(cellContext.Item.IsActive ? Color.Warning : Color.Success)"
+                                       Size="Size.Small"
+                                       OnClick="@(() => ToggleJob(cellContext.Item))" />
+                    </MudTooltip>
+                    <MudTooltip Text="刪除任務">
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                                       Color="Color.Error" 
+                                       Size="Size.Small"
+                                       OnClick="@(() => DeleteJob(cellContext.Item))" />
+                    </MudTooltip>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="CustomJobsApiClient.JobDto" />
+        </PagerContent>
+        <NoRecordsContent>
+            <MudStack AlignItems="AlignItems.Center" Class="pa-8">
+                <MudIcon Icon="@Icons.Material.Filled.EventBusy" Size="Size.Large" Color="Color.Default" />
+                <MudText Typo="Typo.body1" Color="Color.Default">目前沒有自訂任務</MudText>
+            </MudStack>
+        </NoRecordsContent>
+    </AppDataGrid>
+</MudPaper>

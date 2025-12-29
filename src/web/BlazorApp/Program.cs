@@ -65,6 +65,12 @@ builder.Services.AddHttpClient<IdentityApiClient>(client =>
     client.BaseAddress = new("https+http://apiservice");
 }).AddHttpMessageHandler<AuthorizationHandler>();
 
+builder.Services.AddHttpClient<CustomJobsApiClient>(client =>
+{
+    client.BaseAddress = new("https+http://apiservice");
+}).AddHttpMessageHandler<AuthorizationHandler>();
+
+
 
 var oidcScheme = OpenIdConnectDefaults.AuthenticationScheme;
 builder.Services.AddAuthentication(oidcScheme)

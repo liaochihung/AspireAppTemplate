@@ -16,7 +16,7 @@ public class Endpoint : EndpointWithoutRequest<Response>
 
     public override void Configure()
     {
-        Get("/api/custom-jobs");
+        Get("/custom-jobs");
         Policies(AppPolicies.CanManageSystem);
     }
 

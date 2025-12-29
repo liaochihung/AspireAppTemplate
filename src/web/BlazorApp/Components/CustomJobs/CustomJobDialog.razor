@@ -1,5 +1,5 @@
-@using System.Net.Http.Json
-@inject HttpClient Http
+@using AspireAppTemplate.Web
+@inject CustomJobsApiClient ApiClient
 @inject ISnackbar Snackbar
 
 <MudDialog @bind-Visible="_visible" Options="_dialogOptions">
@@ -71,7 +71,7 @@
     private bool _visible;
     private MudForm? _form;
     private bool _submitting;
-    private CreateJobRequest _model = new();
+    private CustomJobsApiClient.CreateJobRequest _model = new();
     private DateTime? _scheduledDate;
     private TimeSpan? _scheduledTime;
 
@@ -84,7 +84,7 @@
 
     public void Open()
     {
-        _model = new CreateJobRequest { Type = 1, HttpMethod = 1 };
+        _model = new CustomJobsApiClient.CreateJobRequest { Type = 1, HttpMethod = 1 };
         _scheduledDate = DateTime.Today.AddDays(1);
         _scheduledTime = new TimeSpan(9, 0, 0);
         _visible = true;
@@ -111,18 +111,10 @@
         _submitting = true;
         try
         {
-            var response = await Http.PostAsJsonAsync("/api/custom-jobs", _model);
-            if (response.IsSuccessStatusCode)
-            {
-                Snackbar.Add("任務建立成功", Severity.Success);
-                _visible = false;
-                await OnJobCreated.InvokeAsync();
-            }
-            else
-            {
-                var error = await response.Content.ReadAsStringAsync();
-                Snackbar.Add($"建立失敗: {error}", Severity.Error);
-            }
+            await ApiClient.CreateAsync(_model);
+            Snackbar.Add("任務建立成功", Severity.Success);
+            _visible = false;
+            await OnJobCreated.InvokeAsync();
         }
         catch (Exception ex)
         {
@@ -132,18 +124,5 @@
         {
             _submitting = false;
         }
-    }
-
-    private class CreateJobRequest
-    {
-        public string Name { get; set; } = string.Empty;
-        public string? Description { get; set; }
-        public int Type { get; set; }
-        public string? CronExpression { get; set; }
-        public DateTime? ScheduledAt { get; set; }
-        public int HttpMethod { get; set; }
-        public string Url { get; set; } = string.Empty;
-        public string? Headers { get; set; }
-        public string? Body { get; set; }
     }
 }

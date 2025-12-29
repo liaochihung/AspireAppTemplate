@@ -1,5 +1,5 @@
-@using System.Net.Http.Json
-@inject HttpClient Http
+@using AspireAppTemplate.Web
+@inject CustomJobsApiClient ApiClient
 @inject ISnackbar Snackbar
 
 <MudCard>
@@ -65,7 +65,7 @@
 <CustomJobDialog @ref="_dialog" OnJobCreated="LoadJobs" />
 
 @code {
-    private List<JobDto> _jobs = new();
+    private List<CustomJobsApiClient.JobDto> _jobs = new();
     private bool _loading = true;
     private CustomJobDialog? _dialog;
 
@@ -79,8 +79,8 @@
         _loading = true;
         try
         {
-            var response = await Http.GetFromJsonAsync<GetAllResponse>("/api/custom-jobs");
-            _jobs = response?.Jobs ?? new();
+            var response = await ApiClient.GetAllAsync();
+            _jobs = response.Jobs;
         }
         catch (Exception ex)
         {
@@ -101,12 +101,9 @@
     {
         try
         {
-            var response = await Http.PostAsync($"/api/custom-jobs/{id}/toggle", null);
-            if (response.IsSuccessStatusCode)
-            {
-                await LoadJobs();
-                Snackbar.Add("任務狀態已更新", Severity.Success);
-            }
+            await ApiClient.ToggleAsync(id);
+            await LoadJobs();
+            Snackbar.Add("任務狀態已更新", Severity.Success);
         }
         catch (Exception ex)
         {
@@ -118,12 +115,9 @@
     {
         try
         {
-            var response = await Http.DeleteAsync($"/api/custom-jobs/{id}");
-            if (response.IsSuccessStatusCode)
-            {
-                await LoadJobs();
-                Snackbar.Add("任務已刪除", Severity.Success);
-            }
+            await ApiClient.DeleteAsync(id);
+            await LoadJobs();
+            Snackbar.Add("任務已刪除", Severity.Success);
         }
         catch (Exception ex)
         {
@@ -131,7 +125,7 @@
         }
     }
 
-    private Color GetHttpMethodColor(int method) => method switch
+    private static Color GetHttpMethodColor(int method) => method switch
     {
         1 => Color.Info,    // GET
         2 => Color.Success, // POST
@@ -140,7 +134,7 @@
         _ => Color.Default
     };
 
-    private string GetHttpMethodName(int method) => method switch
+    private static string GetHttpMethodName(int method) => method switch
     {
         1 => "GET",
         2 => "POST",
@@ -148,23 +142,4 @@
         4 => "DELETE",
         _ => "UNKNOWN"
     };
-
-    private class GetAllResponse
-    {
-        public List<JobDto> Jobs { get; set; } = new();
-    }
-
-    private class JobDto
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string? Description { get; set; }
-        public int Type { get; set; }
-        public string? CronExpression { get; set; }
-        public DateTime? ScheduledAt { get; set; }
-        public int HttpMethod { get; set; }
-        public string Url { get; set; } = string.Empty;
-        public bool IsActive { get; set; }
-        public DateTime CreatedAt { get; set; }
-    }
 }

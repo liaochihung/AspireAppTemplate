@@ -20,7 +20,7 @@ public class Endpoint : Endpoint<Request>
 
     public override void Configure()
     {
-        Delete("/api/custom-jobs/{id}");
+        Delete("/custom-jobs/{id}");
         Policies(AppPolicies.CanManageSystem);
     }
 
