@@ -45,6 +45,16 @@ public class IdentityService(
 
     public async Task<ErrorOr<string>> CreateUserAsync(KeycloakUser user)
     {
+        var credentials = user.Credentials?.Select(c => new CredentialRepresentation
+        {
+            Type = c.Type,
+            Value = c.Value,
+            Temporary = c.Temporary
+        }).ToList() ?? new List<CredentialRepresentation>
+        {
+            new() { Type = "password", Value = "0000", Temporary = false }
+        };
+
         var userRep = new UserRepresentation
         {
             Username = user.Username,
@@ -53,10 +63,8 @@ public class IdentityService(
             Email = user.Email,
             Enabled = true,
             EmailVerified = true,
-            Credentials = new List<CredentialRepresentation>
-            {
-                new() { Type = "password", Value = "0000", Temporary = true }
-            }
+            Credentials = credentials,
+            RequiredActions = new List<string>() // Clear any required actions like "UPDATE_PASSWORD"
         };
 
         var response = await _httpClient.PostAsJsonAsync($"admin/realms/{_realm}/users", userRep);
