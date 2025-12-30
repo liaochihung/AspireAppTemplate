@@ -22,6 +22,7 @@ public class Endpoint : Endpoint<Request, Response>
     {
         Post("/custom-jobs");
         Policies(AppPolicies.CanManageSystem);
+        Version(1);
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)

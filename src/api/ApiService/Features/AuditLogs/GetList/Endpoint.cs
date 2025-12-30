@@ -21,6 +21,7 @@ public class Endpoint : EndpointWithoutRequest<List<AuditLogDto>>
         Get("/audit-logs");
         // We might want to restrict this to Admins only
         Policies(AppPolicies.CanManageSystem); 
+        Version(1); 
     }
 
     public override async Task HandleAsync(CancellationToken ct)

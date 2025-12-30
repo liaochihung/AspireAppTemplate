@@ -20,6 +20,7 @@ public class Endpoint : Endpoint<Request, Response>
     {
         Post("/custom-jobs/{id}/toggle");
         Policies(AppPolicies.CanManageSystem);
+        Version(1);
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)

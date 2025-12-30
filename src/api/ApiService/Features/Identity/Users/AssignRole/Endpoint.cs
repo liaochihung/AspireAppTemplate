@@ -20,6 +20,7 @@ public class Endpoint(IdentityService identityService, IOutputCacheStore cacheSt
     {
         Post("/users/{id}/roles");
         Policies(AppPolicies.CanManageUsers);
+        Version(1);
     }
 
     public override async Task HandleAsync(UserRoleRequest req, CancellationToken ct)

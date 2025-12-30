@@ -12,6 +12,7 @@ public class Endpoint(IdentityService identityService) : Endpoint<PaginationRequ
     {
         Get("/users");
         Policies(AppPolicies.CanManageUsers);
+        Version(1);
         Options(x => x.CacheOutput(c => c.Expire(TimeSpan.FromMinutes(5)).Tag("users")));
     }
 

@@ -36,6 +36,7 @@ public class Endpoint(IdentityService identityService, IOutputCacheStore cacheSt
     {
         Put("/users/{id}");
         Policies(AppPolicies.CanManageUsers);
+        Version(1);
     }
 
     public override async Task HandleAsync(UpdateUserRequest req, CancellationToken ct)

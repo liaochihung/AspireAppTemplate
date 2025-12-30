@@ -15,6 +15,7 @@ public class Endpoint(IStorageService storageService, ILogger<Endpoint> logger) 
     {
         Get("/storage/files/{*Path}"); // Capital P to match property
         AllowAnonymous();
+        Version(1);
         Summary(s => 
         {
             s.Summary = "Download a file";

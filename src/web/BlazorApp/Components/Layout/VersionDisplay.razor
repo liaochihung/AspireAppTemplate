@@ -1,0 +1,20 @@
+@using System.Reflection
+
+<MudText Typo="Typo.caption" Color="Color.Default" Class="d-flex justify-center my-4">
+    Version: @AppVersion
+</MudText>
+
+@code {
+    private string AppVersion { get; set; } = "1.0.0";
+
+    protected override void OnInitialized()
+    {
+        var version = Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+        if (!string.IsNullOrWhiteSpace(version))
+        {
+            // Usually format is 1.0.0+hash, we might want just 1.0.0 or include hash
+            var plusIndex = version.IndexOf('+');
+            AppVersion = plusIndex > 0 ? version.Substring(0, plusIndex) : version;
+        }
+    }
+}

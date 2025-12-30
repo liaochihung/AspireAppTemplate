@@ -31,7 +31,16 @@ builder.Host.UseSerilog((context, services, configuration) => configuration
 
 builder.Services.AddProblemDetails();
 builder.Services.AddFastEndpoints();
-builder.Services.SwaggerDocument();
+builder.Services.SwaggerDocument(o =>
+{
+    o.MaxEndpointVersion = 1;
+    o.MinEndpointVersion = 1; // Force v1
+    o.DocumentSettings = s => 
+    {
+        s.Title = "Aspire App API v1";
+        s.Version = "v1";
+    };
+});
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<IStorageService, MinioStorageService>();
@@ -40,6 +49,16 @@ builder.Services.AddScoped<IStorageService, MinioStorageService>();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddTransient<IEmailService, SmtpEmailService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder => builder
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+});
 
 // Hangfire Configuration
 builder.Services.AddHangfire(config =>
@@ -159,6 +178,7 @@ if (app.Environment.IsDevelopment())
     }
 }
 
+app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseOutputCache();
@@ -180,6 +200,9 @@ app.Use(async (context, next) =>
 app.UseFastEndpoints(c => 
 { 
     c.Endpoints.RoutePrefix = "api"; 
+    c.Versioning.Prefix = "v";
+    c.Versioning.PrependToRoute = true;
+    c.Versioning.DefaultVersion = 1;
     c.Errors.UseProblemDetails();
 });
 

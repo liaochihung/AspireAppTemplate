@@ -85,10 +85,10 @@ Tier 2: 開發體驗提升
 結構化錯誤回應（ProblemDetails）
 整合 Serilog Sinks（File、Seq、Application Insights）
 前端統一錯誤處理（顯示友善訊息）
-6. API Versioning（API 版本控制）
+6. API Versioning（API 版本控制） ✅
 實作範圍：
 
-使用 Asp.Versioning.Http 套件
+使用 FastEndpoints 內建 Versioning
 示範 URL-based 版本控制（/api/v1/products）
 在 Scalar 中顯示多版本文件
 7. Rate Limiting（流量限制）

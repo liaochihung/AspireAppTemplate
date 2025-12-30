@@ -11,6 +11,7 @@ public class Endpoint : Endpoint<Request, Response>
     {
         Post("/jobs/log-cleanup");
         Policies(AppPolicies.CanManageSystem);
+        Version(1);
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)

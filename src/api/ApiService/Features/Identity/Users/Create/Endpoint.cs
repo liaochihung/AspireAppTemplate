@@ -43,6 +43,7 @@ public class Endpoint(IdentityService identityService, IOutputCacheStore cacheSt
     {
         Post("/users");
         Policies(AppPolicies.CanManageUsers);
+        Version(1);
     }
 
     public override async Task HandleAsync(CreateUserRequest req, CancellationToken ct)

@@ -20,6 +20,7 @@ public class Endpoint(IdentityService identityService, IOutputCacheStore cacheSt
     {
         Delete("/users/{id}/roles/{RoleName}");
         Policies(AppPolicies.CanManageUsers);
+        Version(1);
     }
 
     public override async Task HandleAsync(RemoveUserRoleRequest req, CancellationToken ct)

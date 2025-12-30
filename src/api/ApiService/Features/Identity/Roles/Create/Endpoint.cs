@@ -32,6 +32,7 @@ public class Endpoint(IdentityService identityService, IOutputCacheStore cacheSt
     {
         Post("/roles");
         Policies(AppPolicies.CanManageRoles);
+        Version(1);
     }
 
     public override async Task HandleAsync(CreateRoleRequest req, CancellationToken ct)

@@ -22,7 +22,7 @@ public class IdentityApiClient(HttpClient httpClient)
         if (!string.IsNullOrEmpty(request.SearchTerm))
             query["searchTerm"] = request.SearchTerm;
 
-        var result = await httpClient.GetFromJsonAsync<PaginatedResult<KeycloakUser>>($"/api/users?{query}", ct);
+        var result = await httpClient.GetFromJsonAsync<PaginatedResult<KeycloakUser>>($"/api/v1/users?{query}", ct);
         return result ?? new PaginatedResult<KeycloakUser>();
     }
 
@@ -37,13 +37,13 @@ public class IdentityApiClient(HttpClient httpClient)
             Password = user.Credentials?.FirstOrDefault()?.Value ?? "123456"
         };
         
-        var response = await httpClient.PostAsJsonAsync("/api/users", request, ct);
+        var response = await httpClient.PostAsJsonAsync("/api/v1/users", request, ct);
         response.EnsureSuccessStatusCode();
     }
 
     public async Task DeleteUserAsync(string id, CancellationToken ct = default)
     {
-        var response = await httpClient.DeleteAsync($"/api/users/{id}", ct);
+        var response = await httpClient.DeleteAsync($"/api/v1/users/{id}", ct);
         response.EnsureSuccessStatusCode();
     }
 
@@ -58,26 +58,26 @@ public class IdentityApiClient(HttpClient httpClient)
             LastName = user.LastName,
             Enabled = user.Enabled
         };
-        var response = await httpClient.PutAsJsonAsync($"/api/users/{user.Id}", request, ct);
+        var response = await httpClient.PutAsJsonAsync($"/api/v1/users/{user.Id}", request, ct);
         response.EnsureSuccessStatusCode();
     }
 
     public async Task AssignRoleAsync(string userId, string roleName, CancellationToken ct = default)
     {
         var request = new { RoleName = roleName };
-        var response = await httpClient.PostAsJsonAsync($"/api/users/{userId}/roles", request, ct);
+        var response = await httpClient.PostAsJsonAsync($"/api/v1/users/{userId}/roles", request, ct);
         response.EnsureSuccessStatusCode();
     }
 
     public async Task RemoveRoleAsync(string userId, string roleName, CancellationToken ct = default)
     {
-        var response = await httpClient.DeleteAsync($"/api/users/{userId}/roles/{roleName}", ct);
+        var response = await httpClient.DeleteAsync($"/api/v1/users/{userId}/roles/{roleName}", ct);
         response.EnsureSuccessStatusCode();
     }
 
     public async Task<KeycloakRole[]> GetUserRolesAsync(string userId, CancellationToken ct = default)
     {
-        var roles = await httpClient.GetFromJsonAsync<KeycloakRole[]>($"/api/users/{userId}/roles", ct);
+        var roles = await httpClient.GetFromJsonAsync<KeycloakRole[]>($"/api/v1/users/{userId}/roles", ct);
         return roles ?? [];
     }
 
@@ -97,13 +97,13 @@ public class IdentityApiClient(HttpClient httpClient)
         if (!string.IsNullOrEmpty(request.SearchTerm))
             query["searchTerm"] = request.SearchTerm;
 
-        var result = await httpClient.GetFromJsonAsync<PaginatedResult<KeycloakRole>>($"/api/roles?{query}", ct);
+        var result = await httpClient.GetFromJsonAsync<PaginatedResult<KeycloakRole>>($"/api/v1/roles?{query}", ct);
         return result ?? new PaginatedResult<KeycloakRole>();
     }
 
     public async Task SyncUserAsync(CancellationToken ct = default)
     {
-        var response = await httpClient.PostAsync("/api/identity/sync", null, ct);
+        var response = await httpClient.PostAsync("/api/v1/identity/sync", null, ct);
         response.EnsureSuccessStatusCode();
     }
 
@@ -114,13 +114,13 @@ public class IdentityApiClient(HttpClient httpClient)
             Name = role.Name,
             Description = role.Description
         };
-        var response = await httpClient.PostAsJsonAsync("/api/roles", request, ct);
+        var response = await httpClient.PostAsJsonAsync("/api/v1/roles", request, ct);
         response.EnsureSuccessStatusCode();
     }
 
     public async Task DeleteRoleAsync(string name, CancellationToken ct = default)
     {
-        var response = await httpClient.DeleteAsync($"/api/roles/{name}", ct);
+        var response = await httpClient.DeleteAsync($"/api/v1/roles/{name}", ct);
         response.EnsureSuccessStatusCode();
     }
 }

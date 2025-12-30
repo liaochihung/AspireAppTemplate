@@ -12,6 +12,7 @@ public class Endpoint(AppDbContext dbContext) : EndpointWithoutRequest<Product>
     {
         Get("/products/{id}");
         AllowAnonymous();
+        Version(1);
     }
 
     public override async Task HandleAsync(CancellationToken ct)

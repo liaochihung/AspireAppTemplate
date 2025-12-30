@@ -19,6 +19,7 @@ public class Endpoint(IStorageService storageService) : Endpoint<UploadRequest, 
     {
         Post("/storage/upload");
         AllowAnonymous(); // Enable for easy testing, enable Auth in production
+        Version(1);
         AllowFileUploads();
         Summary(s => 
         {
@@ -34,7 +35,7 @@ public class Endpoint(IStorageService storageService) : Endpoint<UploadRequest, 
         
         // Return URL pointing to our own API Proxy (Get Endpoint)
         // This solves Mixed Content (HTTPS vs HTTP) and CORS issues.
-        var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}/api/storage/files";
+        var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}/api/v1/storage/files";
         
         // uri is relative path "folder/filename.ext"
         var fullUrl = $"{baseUrl}/{uri}";

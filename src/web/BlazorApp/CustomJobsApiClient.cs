@@ -6,13 +6,13 @@ public class CustomJobsApiClient(HttpClient httpClient)
 {
     public async Task<GetAllJobsResponse> GetAllAsync(CancellationToken ct = default)
     {
-        var result = await httpClient.GetFromJsonAsync<GetAllJobsResponse>("/api/custom-jobs", ct);
+        var result = await httpClient.GetFromJsonAsync<GetAllJobsResponse>("/api/v1/custom-jobs", ct);
         return result ?? new GetAllJobsResponse();
     }
 
     public async Task<CreateJobResponse> CreateAsync(CreateJobRequest request, CancellationToken ct = default)
     {
-        var response = await httpClient.PostAsJsonAsync("/api/custom-jobs", request, ct);
+        var response = await httpClient.PostAsJsonAsync("/api/v1/custom-jobs", request, ct);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<CreateJobResponse>(cancellationToken: ct) 
             ?? throw new InvalidOperationException("Failed to deserialize response");
@@ -20,19 +20,19 @@ public class CustomJobsApiClient(HttpClient httpClient)
 
     public async Task ToggleAsync(Guid id, CancellationToken ct = default)
     {
-        var response = await httpClient.PostAsync($"/api/custom-jobs/{id}/toggle", null, ct);
+        var response = await httpClient.PostAsync($"/api/v1/custom-jobs/{id}/toggle", null, ct);
         response.EnsureSuccessStatusCode();
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken ct = default)
     {
-        var response = await httpClient.DeleteAsync($"/api/custom-jobs/{id}", ct);
+        var response = await httpClient.DeleteAsync($"/api/v1/custom-jobs/{id}", ct);
         response.EnsureSuccessStatusCode();
     }
 
     public async Task<TestUrlResponse> TestUrlAsync(TestUrlRequest request, CancellationToken ct = default)
     {
-        var response = await httpClient.PostAsJsonAsync("/api/custom-jobs/test-url", request, ct);
+        var response = await httpClient.PostAsJsonAsync("/api/v1/custom-jobs/test-url", request, ct);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<TestUrlResponse>(cancellationToken: ct)
             ?? throw new InvalidOperationException("Failed to deserialize response");

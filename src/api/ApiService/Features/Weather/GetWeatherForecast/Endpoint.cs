@@ -13,6 +13,7 @@ public class Endpoint : EndpointWithoutRequest<IEnumerable<WeatherForecast>>
     {
         Get("/weatherforecast");
         AllowAnonymous();
+        Version(1);
         Options(x => x.CacheOutput(c => c.Expire(TimeSpan.FromSeconds(30))));
     }
 

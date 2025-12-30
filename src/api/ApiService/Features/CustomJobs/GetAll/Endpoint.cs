@@ -18,6 +18,7 @@ public class Endpoint : EndpointWithoutRequest<Response>
     {
         Get("/custom-jobs");
         Policies(AppPolicies.CanManageSystem);
+        Version(1);
     }
 
     public override async Task HandleAsync(CancellationToken ct)

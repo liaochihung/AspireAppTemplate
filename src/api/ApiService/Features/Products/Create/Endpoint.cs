@@ -32,6 +32,12 @@ public class Endpoint(AppDbContext dbContext, IOutputCacheStore cacheStore, IAud
     {
         Post("/products");
         Policies(AppPolicies.CanManageProducts);
+        Version(1);
+        Summary(s => 
+        {
+            s.Summary = "Create a new product";
+            s.Description = "Creates a new product in the catalog.";
+        });
     }
 
     public override async Task HandleAsync(CreateProductRequest req, CancellationToken ct)

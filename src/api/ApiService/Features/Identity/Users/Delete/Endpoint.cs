@@ -14,6 +14,7 @@ public class Endpoint(IdentityService identityService, IOutputCacheStore cacheSt
     {
         Delete("/users/{id}");
         Policies(AppPolicies.CanManageUsers);
+        Version(1);
     }
 
     public override async Task HandleAsync(CancellationToken ct)

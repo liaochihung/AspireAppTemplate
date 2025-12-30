@@ -14,7 +14,7 @@ public class AuditLogApiClient
 
     public async Task<List<AuditLogDto>> GetAuditLogsAsync(CancellationToken cancellationToken = default)
     {
-        var logs = await _httpClient.GetFromJsonAsync<List<AuditLogDto>>("api/audit-logs", cancellationToken);
+        var logs = await _httpClient.GetFromJsonAsync<List<AuditLogDto>>("/api/v1/audit-logs", cancellationToken);
         return logs ?? new List<AuditLogDto>();
     }
 }

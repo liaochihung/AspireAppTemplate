@@ -9,6 +9,7 @@ public class Endpoint(INotificationService notificationService) : EndpointWithou
     {
         Post("/test/email");
         AllowAnonymous();
+        Version(1);
     }
 
     public override async Task HandleAsync(CancellationToken ct)

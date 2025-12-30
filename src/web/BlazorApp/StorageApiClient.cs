@@ -18,7 +18,7 @@ public class StorageApiClient(HttpClient httpClient)
         
         content.Add(streamContent, "File", file.Name);
 
-        var response = await httpClient.PostAsync("/api/storage/upload", content, ct);
+        var response = await httpClient.PostAsync("/api/v1/storage/upload", content, ct);
         response.EnsureSuccessStatusCode();
 
         var result = await response.Content.ReadFromJsonAsync<UploadResponse>(cancellationToken: ct);

@@ -12,6 +12,7 @@ public class Endpoint(AppDbContext dbContext, IOutputCacheStore cacheStore) : En
     public override void Configure()
     {
         Post("/identity/sync");
+        Version(1);
     }
 
     public override async Task HandleAsync(CancellationToken ct)

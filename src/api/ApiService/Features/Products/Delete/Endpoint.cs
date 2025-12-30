@@ -14,6 +14,7 @@ public class Endpoint(AppDbContext dbContext, IOutputCacheStore cacheStore) : En
     {
         Delete("/products/{id}");
         Policies(AppPolicies.CanManageProducts);
+        Version(1);
     }
 
     public override async Task HandleAsync(CancellationToken ct)

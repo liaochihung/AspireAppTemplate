@@ -16,6 +16,7 @@ public class Endpoint(IdentityService identityService) : Endpoint<GetUserRolesRe
     {
         Get("/users/{id}/roles");
         Policies(AppPolicies.CanManageUsers);
+        Version(1);
     }
 
     public override async Task HandleAsync(GetUserRolesRequest req, CancellationToken ct)

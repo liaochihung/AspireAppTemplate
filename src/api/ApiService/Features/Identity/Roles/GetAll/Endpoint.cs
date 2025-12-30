@@ -12,6 +12,7 @@ public class Endpoint(IdentityService identityService) : Endpoint<PaginationRequ
     {
         Get("/roles");
         Policies(AppPolicies.CanManageRoles);
+        Version(1);
         Options(x => x.CacheOutput(c => c.Expire(TimeSpan.FromMinutes(10)).Tag("roles")));
     }
 
