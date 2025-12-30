@@ -49,6 +49,22 @@ public class MinioStorageService(IConfiguration configuration) : IStorageService
         return new Uri(objectName, UriKind.Relative);
     }
 
+    public async Task<Uri> UploadAsync(string objectName, Stream stream, string contentType, CancellationToken cancellationToken = default)
+    {
+        await EnsureBucketExists(cancellationToken);
+
+        var putObjectArgs = new PutObjectArgs()
+            .WithBucket(BucketName)
+            .WithObject(objectName)
+            .WithStreamData(stream)
+            .WithObjectSize(stream.Length)
+            .WithContentType(contentType);
+
+        await _minioClient.PutObjectAsync(putObjectArgs, cancellationToken);
+        
+        return new Uri(objectName, UriKind.Relative);
+    }
+
     public async Task<Stream> GetFileAsync(string objectName, CancellationToken cancellationToken = default)
     {
         var memoryStream = new MemoryStream();

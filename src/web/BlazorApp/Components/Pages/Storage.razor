@@ -55,6 +55,9 @@
                         }
                     </div>
                     <MudSpacer />
+                    <MudTooltip Text="New Folder">
+                        <MudIconButton Icon="@Icons.Material.Filled.CreateNewFolder" OnClick="CreateFolder" Color="Color.Default" />
+                    </MudTooltip>
                     <MudIconButton Icon="@Icons.Material.Filled.Refresh" OnClick="LoadFiles" Color="Color.Default" />
                 </MudToolBar>
             </MudPaper>
@@ -138,10 +141,16 @@
                                         {
                                             <MudCardMedia Image="@file.Url" Height="140" />
                                         }
+                                        else if (file.IsFolder)
+                                        {
+                                            <div class="d-flex align-center justify-center bg-light" style="height: 140px; background-color: #f5f5f5;">
+                                                <MudIcon Icon="@Icons.Material.Filled.Folder" Size="Size.Large" Color="Color.Warning" Style="font-size: 4rem;" />
+                                            </div>
+                                        }
                                         else
                                         {
                                             <div class="d-flex align-center justify-center bg-light" style="height: 140px; background-color: #f5f5f5;">
-                                                <MudIcon Icon="@Icons.Material.Filled.InsertDriveFile" Size="Size.Large" />
+                                                <MudIcon Icon="@Icons.Material.Filled.InsertDriveFile" Size="Size.Large" Color="Color.Default" />
                                             </div>
                                         }
                                         <MudCardContent Class="py-2">
@@ -183,15 +192,40 @@
 
     private async Task LoadFiles()
     {
+        // Capture state
+        var previouslySelectedPath = _selectedFolder?.FullPath;
+        var expandedPaths = GetExpandedPaths(_treeItems);
+
         _loading = true;
         try
         {
             var dtos = await StorageClient.GetFilesAsync();
             BuildTree(dtos);
             
-            // Default view: Root
-            _selectedFolder = null;
-            UpdateCurrentFiles(null);
+            // Restore state
+            RestoreExpandedState(_treeItems, expandedPaths);
+
+            // Restore selection or default to Root
+            if (previouslySelectedPath != null)
+            {
+                 var node = FindNodeRecursive(_treeItems, previouslySelectedPath);
+                 if (node != null && node.Value?.IsFolder == true)
+                 {
+                     _selectedFolder = node.Value;
+                     // We need to pass the TreeItemData to UpdateCurrentFiles
+                     UpdateCurrentFiles(node);
+                 }
+                 else
+                 {
+                     _selectedFolder = null;
+                     UpdateCurrentFiles(null);
+                 }
+            }
+            else
+            {
+                _selectedFolder = null;
+                UpdateCurrentFiles(null);
+            }
             UpdateBreadcrumbs();
         }
         catch (Exception ex)
@@ -201,6 +235,42 @@
         finally
         {
             _loading = false;
+        }
+    }
+
+    private HashSet<string> GetExpandedPaths(IEnumerable<TreeItemData<FileTreeItem>> items)
+    {
+        var paths = new HashSet<string>();
+        if (items == null) return paths;
+
+        foreach (var item in items)
+        {
+            if (item.Expanded && item.Value != null)
+            {
+                paths.Add(item.Value.FullPath);
+            }
+            if (item.Children != null)
+            {
+                paths.UnionWith(GetExpandedPaths(item.Children));
+            }
+        }
+        return paths;
+    }
+
+    private void RestoreExpandedState(IEnumerable<TreeItemData<FileTreeItem>> items, HashSet<string> expandedPaths)
+    {
+        if (items == null) return;
+
+        foreach (var item in items)
+        {
+            if (item.Value != null && expandedPaths.Contains(item.Value.FullPath))
+            {
+                item.Expanded = true;
+            }
+            if (item.Children != null)
+            {
+                RestoreExpandedState(item.Children, expandedPaths);
+            }
         }
     }
 
@@ -222,14 +292,24 @@
 
         foreach (var file in files)
         {
-            var parts = file.Name.Split('/');
+            var parts = file.Name.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length == 0) continue;
+
             ICollection<TreeItemData<FileTreeItem>> currentLevel = rootItems;
             TreeItemData<FileTreeItem>? parent = null;
 
             for (int i = 0; i < parts.Length; i++)
             {
                 var part = parts[i];
-                var isFile = i == parts.Length - 1;
+                // It is a file only if it's the last part AND the original path didn't end with /
+                var isFile = (i == parts.Length - 1) && !file.Name.EndsWith("/");
+                
+                // Skip .keep files from tree
+                if (isFile && part == ".keep") 
+                {
+                    // But we still traversed parents so they are created.
+                    continue; 
+                }
                 
                 var existing = FindNode(currentLevel, part);
 
@@ -238,30 +318,23 @@
                     var fileItem = new FileTreeItem
                     {
                         Name = part,
-                        FullPath = file.Name,
+                        FullPath = isFile ? file.Name : (string.Join("/", parts.Take(i + 1)) + "/"), // Reconstruct path for folders
                         IsFolder = !isFile,
                         Size = isFile ? file.Size : 0,
                         Url = isFile ? file.Url : string.Empty,
                     };
 
+                    // Correction: For intermediate folders inferred from file paths (e.g. A/B/file.txt -> A and B are folders)
+                    // their FullPath might not be explicitly in 'files' list. 
+                    // But we construct consistent path: "A/" then "A/B/"
+                    
                     existing = new TreeItemData<FileTreeItem>
                     {
                         Text = part,
                         Value = fileItem,
-                        Icon = !isFile ? Icons.Material.Filled.InsertDriveFile : Icons.Material.Filled.Folder,
-                        Expanded = isFile ? false : true // Expand folders by default? Maybe just root.
+                        Icon = !isFile ? Icons.Material.Filled.Folder : Icons.Material.Filled.InsertDriveFile,
+                        Expanded = isFile ? false : false // Default collapsed
                     };
-
-                    // Correction: Icon logic
-                    if (fileItem.IsFolder)
-                    {
-                        existing.Icon = Icons.Material.Filled.Folder;
-                        existing.Expanded = false; // Collapse default
-                    }
-                    else
-                    {
-                        existing.Icon = Icons.Material.Filled.InsertDriveFile;
-                    }
 
                     if (currentLevel is HashSet<TreeItemData<FileTreeItem>> hashSet)
                     {
@@ -273,7 +346,7 @@
                     }
                 }
 
-                if (!isFile)
+                if (!isFile || existing.Value?.IsFolder == true) // If it's a folder (explicit or implicit)
                 {
                     if (existing.Children == null) existing.Children = new List<TreeItemData<FileTreeItem>>();
                     currentLevel = existing.Children;
@@ -306,18 +379,34 @@
 
     private async Task OnFileCardClick(FileTreeItem item)
     {
-        _selectedItem = item;
-        await LoadFilePreview(item);
+        if (item.IsFolder)
+        {
+            // Find the node in the tree to select it
+            var node = FindNodeRecursive(_treeItems, item.FullPath);
+            if (node != null)
+            {
+                // Expand parent if needed? It should be already expanded if we see the child.
+                // Select the folder
+                await OnTreeItemClick(node);
+            }
+        }
+        else
+        {
+            _selectedItem = item;
+            await LoadFilePreview(item);
+        }
     }
 
     private void UpdateCurrentFiles(TreeItemData<FileTreeItem>? folderData)
     {
         if (folderData == null)
         {
-             // Root: Filter root items that are NOT folders (files at /)
+             // Root: All items at root
              _currentFiles = _treeItems
-                .Where(x => x.Value != null && !x.Value.IsFolder)
+                .Where(x => x.Value != null)
                 .Select(x => x.Value!)
+                .OrderByDescending(x => x.IsFolder)
+                .ThenBy(x => x.Name)
                 .ToList();
         }
         else
@@ -325,8 +414,10 @@
              if (folderData.Children != null)
              {
                  _currentFiles = folderData.Children
-                    .Where(x => x.Value != null && !x.Value.IsFolder)
+                    .Where(x => x.Value != null)
                     .Select(x => x.Value!)
+                    .OrderByDescending(x => x.IsFolder)
+                    .ThenBy(x => x.Name)
                     .ToList();
              }
              else
@@ -361,6 +452,29 @@
     private void ClearSelection()
     {
         _selectedItem = null;
+    }
+
+    private async Task CreateFolder()
+    {
+        var parameters = new DialogParameters { ["Label"] = "Folder Name", ["Value"] = "New Folder" };
+        var dialog = await DialogService.ShowAsync<PromptDialog>("Create Folder", parameters);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && !string.IsNullOrWhiteSpace(result.Data as string))
+        {
+            var folderName = (string)result.Data;
+            try
+            {
+                 string? parent = _selectedFolder?.FullPath;
+                 await StorageClient.CreateFolderAsync(folderName, parent);
+                 Snackbar.Add("Folder created", Severity.Success);
+                 await LoadFiles();
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+            }
+        }
     }
 
     private async Task UploadFiles(IBrowserFile file)

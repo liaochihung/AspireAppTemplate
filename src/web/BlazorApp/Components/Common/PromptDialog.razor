@@ -1,0 +1,26 @@
+@using MudBlazor
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="Value" Label="@Label" Immediate="true" OnKeyDown="OnKeyDown" AutoFocus="true" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudBlazor.IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter] public string Label { get; set; } = "Value";
+    [Parameter] public string Value { get; set; } = string.Empty;
+
+    private void Submit() => MudDialog.Close(DialogResult.Ok(Value));
+    private void Cancel() => MudDialog.Cancel();
+
+    private void OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") Submit();
+        if (e.Key == "Escape") Cancel();
+    }
+}

@@ -45,6 +45,10 @@ public class StorageApiClient(HttpClient httpClient)
         // Reuse the proxy endpoint to get content
         return await httpClient.GetStringAsync($"/api/storage/files/{path}", ct);
     }
+    public async Task CreateFolderAsync(string folderName, string? parentPath = null, CancellationToken ct = default)
+    {
+        await httpClient.PostAsJsonAsync("/storage/folders", new CreateFolderRequest { FolderName = folderName, ParentPath = parentPath }, ct);
+    }
 }
 
 public class UploadResponse
@@ -63,3 +67,10 @@ public class StorageFileDto
     public string Url { get; set; } = default!;
     public long Size { get; set; }
 }
+
+public class CreateFolderRequest
+{
+    public string FolderName { get; set; } = string.Empty;
+    public string? ParentPath { get; set; }
+}
+
