@@ -36,7 +36,7 @@ Tier 1: 基礎設施增強
 
 記錄誰建立/修改/刪除了 Product
 記錄管理員建立了哪些背景任務
-2. File Upload & Storage（檔案上傳） 🔥
+2. File Upload & Storage（檔案上傳） ✅ 🔥
 為什麼需要：幾乎所有應用都需要處理檔案。
 
 實作範圍：

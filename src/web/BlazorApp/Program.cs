@@ -77,6 +77,12 @@ builder.Services.AddHttpClient<AuditLogApiClient>(client =>
 }).AddHttpMessageHandler<AuthorizationHandler>();
 
 
+builder.Services.AddHttpClient<StorageApiClient>(client =>
+{
+    client.BaseAddress = new("https+http://apiservice");
+}).AddHttpMessageHandler<AuthorizationHandler>();
+
+
 
 var oidcScheme = OpenIdConnectDefaults.AuthenticationScheme;
 builder.Services.AddAuthentication(oidcScheme)
