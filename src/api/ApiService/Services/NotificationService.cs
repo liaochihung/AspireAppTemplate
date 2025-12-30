@@ -29,11 +29,11 @@ public class NotificationService : INotificationService
 
     public Task SendWelcomeAsync(string email, string displayName)
     {
-        var subject = "Welcome to Aspire App!";
+        var subject = "Welcome to Aspire App Template!";
         var body = $@"
             <h1>Welcome, {displayName}!</h1>
             <p>We are excited to have you on board.</p>
-            <p>Best Regards,<br/>Aspire Team</p>";
+            <p>Best Regards,<br/>Aspire App Template Project</p>";
 
         return SendEmailAsync(email, subject, body);
     }
