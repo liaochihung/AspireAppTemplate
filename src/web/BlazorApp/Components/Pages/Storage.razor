@@ -5,81 +5,421 @@
 @using Microsoft.AspNetCore.Authorization
 @inject StorageApiClient StorageClient
 @inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@inject IJSRuntime JSRuntime
 @attribute [Authorize]
 
-<PageTitle>Storage | Aspire App</PageTitle>
+<PageTitle>File Manager | Aspire App</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.Large" Class="mt-8">
-    <MudText Typo="Typo.h3" GutterBottom="true">Storage</MudText>
-    <MudText Class="mb-4">Upload and manage files using MinIO storage.</MudText>
-
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-8">
+    <MudText Typo="Typo.h3" GutterBottom="true">File Manager</MudText>
+    
     <MudGrid>
-        <MudItem xs="12" md="6">
-            <MudPaper Class="pa-4">
-                <MudText Typo="Typo.h5" Class="mb-4">File Upload</MudText>
-                
-                <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
-                    <ActivatorContent>
-                        <MudButton Variant="Variant.Filled"
-                                   Color="Color.Primary"
-                                   StartIcon="@Icons.Material.Filled.CloudUpload">
-                            Upload Image
-                        </MudButton>
-                    </ActivatorContent>
-                </MudFileUpload>
-
-                @if (_uploading)
+        <!-- Left Sidebar: Tree View -->
+        <MudItem xs="12" md="3">
+            <MudPaper Elevation="2" Class="pa-4" Style="height: 100%; min-height: 500px;">
+                <MudText Typo="Typo.h6" Class="mb-4">Explorer</MudText>
+                @if (_loading)
                 {
-                    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="mt-4" />
-                    <MudText Class="mt-2">Uploading...</MudText>
-                }
-            </MudPaper>
-        </MudItem>
-        
-        <MudItem xs="12" md="6">
-            <MudPaper Class="pa-4">
-                <MudText Typo="Typo.h5" Class="mb-4">Preview</MudText>
-                
-                @if (!string.IsNullOrEmpty(_uploadedUrl))
-                {
-                    <MudImage Src="@_uploadedUrl" Alt="Uploaded Image" Elevation="25" Class="rounded-lg" Style="max-width: 100%;" />
-                    <MudText Class="mt-2" Typo="Typo.caption">URL: @_uploadedUrl</MudText>
-                    
-                     <MudButton Variant="Variant.Outlined" 
-                                Color="Color.Secondary" 
-                                Class="mt-2"
-                                OnClick="@(() => _uploadedUrl = string.Empty)">
-                        Clear Preview
-                    </MudButton>
+                    <MudSkeleton SkeletonType="SkeletonType.Text" Count="5" />
                 }
                 else
                 {
-                    <MudAlert Severity="Severity.Info">No file uploaded yet.</MudAlert>
+                    <MudTreeView T="FileTreeItem" Items="@_treeItems" Hover="true" Width="100%">
+                        <ItemTemplate>
+                            <MudTreeViewItem @bind-Expanded="@context.Expanded" Items="@context.Children" Value="@context.Value"
+                                             Icon="@context.Icon"
+                                             IconColor="@(context.Value?.IsFolder == true ? Color.Warning : Color.Default)"
+                                             Text="@context.Text"
+                                             OnClick="@(() => OnTreeItemClick(context))" />
+                        </ItemTemplate>
+                    </MudTreeView>
+                }
+            </MudPaper>
+        </MudItem>
+
+        <!-- Right Content: Preview / Gallery -->
+        <MudItem xs="12" md="9">
+            <MudPaper Elevation="2" Class="pa-4 mb-4">
+                <!-- Toolbar -->
+                <MudToolBar Dense="true" Class="px-0">
+                    <MudText Typo="Typo.h6">@GetBreadcrumbs()</MudText>
+                    <MudSpacer />
+                    <MudIconButton Icon="@Icons.Material.Filled.Refresh" OnClick="LoadFiles" Color="Color.Default" />
+                    <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
+                        <ActivatorContent>
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       StartIcon="@Icons.Material.Filled.CloudUpload"
+                                       Class="ml-2">
+                                Upload
+                            </MudButton>
+                        </ActivatorContent>
+                    </MudFileUpload>
+                </MudToolBar>
+            </MudPaper>
+
+            <!-- File Content / Gallery -->
+            <MudPaper Elevation="2" Class="pa-4 d-flex flex-column" Style="min-height: 600px;">
+                @if (_selectedItem != null && !_selectedItem.IsFolder)
+                {
+                    <!-- Single File Preview -->
+                    <div class="d-flex align-center mb-4">
+                        <MudIcon Icon="@Icons.Material.Filled.Description" Class="mr-2" />
+                        <MudText Typo="Typo.h5">@_selectedItem.Name</MudText>
+                        <MudSpacer />
+                        <MudText Typo="Typo.caption" Class="mr-4">@FormatSize(_selectedItem.Size)</MudText>
+                        <MudTooltip Text="Copy URL">
+                            <MudIconButton Icon="@Icons.Material.Filled.ContentCopy" OnClick="@(() => CopyToClipboard(_selectedItem.Url))" />
+                        </MudTooltip>
+                        <MudTooltip Text="Delete">
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => DeleteFile(_selectedItem))" />
+                        </MudTooltip>
+                        <MudIconButton Icon="@Icons.Material.Filled.Close" OnClick="ClearSelection" />
+                    </div>
+
+                    <MudDivider Class="mb-4" />
+
+                    <div class="flex-grow-1 overflow-auto">
+                        @if (IsImage(_selectedItem.Name))
+                        {
+                            <MudImage Src="@_selectedItem.Url" Fluid="true" Class="rounded-lg" Style="max-height: 500px;" />
+                        }
+                        else if (IsText(_selectedItem.Name))
+                        {
+                            @if (_loadingContent)
+                            {
+                                <MudProgressCircular Indeterminate="true" />
+                            }
+                            else
+                            {
+                                <MudTextField Value="@_fileContent" Lines="20" ReadOnly="true" Variant="Variant.Outlined" Style="font-family: monospace;" />
+                            }
+                        }
+                        else
+                        {
+                            <MudAlert Severity="Severity.Info">Preview not available for this file type.</MudAlert>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <!-- Folder Gallery (Root or Subfolder) -->
+                    @if (_currentFiles.Count == 0)
+                    {
+                        <div class="d-flex flex-column align-center justify-center flex-grow-1">
+                            <MudIcon Icon="@Icons.Material.Filled.FolderOpen" Size="Size.Large" Color="Color.Default" Style="font-size: 5rem; opacity: 0.5;" />
+                            <MudText Color="Color.Secondary" Class="mt-4">Empty Folder</MudText>
+                        </div>
+                    }
+                    else
+                    {
+                        <MudGrid>
+                            @foreach (var file in _currentFiles)
+                            {
+                                <MudItem xs="6" sm="4" md="3">
+                                    <MudCard Class="cursor-pointer hover-card" @onclick="@(() => OnFileCardClick(file))" Elevation="1">
+                                        @if (IsImage(file.Name))
+                                        {
+                                            <MudCardMedia Image="@file.Url" Height="140" />
+                                        }
+                                        else
+                                        {
+                                            <div class="d-flex align-center justify-center bg-light" style="height: 140px; background-color: #f5f5f5;">
+                                                <MudIcon Icon="@Icons.Material.Filled.InsertDriveFile" Size="Size.Large" />
+                                            </div>
+                                        }
+                                        <MudCardContent Class="py-2">
+                                            <MudText Typo="Typo.body2" Class="text-truncate">@file.Name</MudText>
+                                        </MudCardContent>
+                                    </MudCard>
+                                </MudItem>
+                            }
+                        </MudGrid>
+                    }
                 }
             </MudPaper>
         </MudItem>
     </MudGrid>
+
 </MudContainer>
 
-@code {
-    private bool _uploading;
-    private string _uploadedUrl = string.Empty;
+<script>
+    window.clipboardCopy = {
+        copyText: function(text) {
+            navigator.clipboard.writeText(text);
+        }
+    };
+</script>
 
-    private async Task UploadFiles(IBrowserFile file)
+@code {
+    private bool _loading = true;
+    private bool _loadingContent = false;
+    private HashSet<TreeItemData<FileTreeItem>> _treeItems = new();
+    private List<FileTreeItem> _currentFiles = new(); 
+    private FileTreeItem? _selectedItem;
+    private FileTreeItem? _selectedFolder;
+    private string _fileContent = string.Empty;
+
+    protected override async Task OnInitializedAsync()
     {
-        _uploading = true;
+        await LoadFiles();
+    }
+
+    private async Task LoadFiles()
+    {
+        _loading = true;
         try
         {
-            _uploadedUrl = await StorageClient.UploadFileAsync(file);
-            Snackbar.Add("File uploaded successfully!", Severity.Success);
+            var dtos = await StorageClient.GetFilesAsync();
+            BuildTree(dtos);
+            
+            // Default view: Root
+            _selectedFolder = null;
+            UpdateCurrentFiles(null);
         }
         catch (Exception ex)
         {
-            Snackbar.Add($"Upload failed: {ex.Message}", Severity.Error);
+            Snackbar.Add($"Failed to load files: {ex.Message}", Severity.Error);
         }
         finally
         {
-            _uploading = false;
+            _loading = false;
         }
+    }
+
+    // Tree Construction
+    private void BuildTree(List<StorageFileDto> files)
+    {
+        var rootItems = new HashSet<TreeItemData<FileTreeItem>>();
+
+        // Helper to find existing node in a collection
+        TreeItemData<FileTreeItem>? FindNode(ICollection<TreeItemData<FileTreeItem>>? collection, string text)
+        {
+            if (collection == null) return null;
+            foreach (var item in collection)
+            {
+                if (item.Text == text) return item;
+            }
+            return null;
+        }
+
+        foreach (var file in files)
+        {
+            var parts = file.Name.Split('/');
+            ICollection<TreeItemData<FileTreeItem>> currentLevel = rootItems;
+            TreeItemData<FileTreeItem>? parent = null;
+
+            for (int i = 0; i < parts.Length; i++)
+            {
+                var part = parts[i];
+                var isFile = i == parts.Length - 1;
+                
+                var existing = FindNode(currentLevel, part);
+
+                if (existing == null)
+                {
+                    var fileItem = new FileTreeItem
+                    {
+                        Name = part,
+                        FullPath = file.Name,
+                        IsFolder = !isFile,
+                        Size = isFile ? file.Size : 0,
+                        Url = isFile ? file.Url : string.Empty,
+                    };
+
+                    existing = new TreeItemData<FileTreeItem>
+                    {
+                        Text = part,
+                        Value = fileItem,
+                        Icon = !isFile ? Icons.Material.Filled.InsertDriveFile : Icons.Material.Filled.Folder,
+                        Expanded = isFile ? false : true // Expand folders by default? Maybe just root.
+                    };
+
+                    // Correction: Icon logic
+                    if (fileItem.IsFolder)
+                    {
+                        existing.Icon = Icons.Material.Filled.Folder;
+                        existing.Expanded = false; // Collapse default
+                    }
+                    else
+                    {
+                        existing.Icon = Icons.Material.Filled.InsertDriveFile;
+                    }
+
+                    if (currentLevel is HashSet<TreeItemData<FileTreeItem>> hashSet)
+                    {
+                        hashSet.Add(existing);
+                    }
+                    else if (currentLevel is List<TreeItemData<FileTreeItem>> list)
+                    {
+                        list.Add(existing);
+                    }
+                }
+
+                if (!isFile)
+                {
+                    if (existing.Children == null) existing.Children = new List<TreeItemData<FileTreeItem>>();
+                    currentLevel = existing.Children;
+                    parent = existing;
+                }
+            }
+        }
+        _treeItems = rootItems;
+    }
+
+    private async Task OnTreeItemClick(TreeItemData<FileTreeItem> itemData)
+    {
+        var item = itemData.Value;
+        if (item == null) return;
+
+        if (item.IsFolder)
+        {
+            _selectedFolder = item;
+            _selectedItem = null;
+            UpdateCurrentFiles(itemData);
+            // Toggle expansion handled by binding
+        }
+        else
+        {
+            _selectedItem = item;
+            await LoadFilePreview(item);
+        }
+    }
+
+    private async Task OnFileCardClick(FileTreeItem item)
+    {
+        _selectedItem = item;
+        await LoadFilePreview(item);
+    }
+
+    private void UpdateCurrentFiles(TreeItemData<FileTreeItem>? folderData)
+    {
+        if (folderData == null)
+        {
+             // Root: Filter root items that are NOT folders (files at /)
+             _currentFiles = _treeItems
+                .Where(x => x.Value != null && !x.Value.IsFolder)
+                .Select(x => x.Value!)
+                .ToList();
+        }
+        else
+        {
+             if (folderData.Children != null)
+             {
+                 _currentFiles = folderData.Children
+                    .Where(x => x.Value != null && !x.Value.IsFolder)
+                    .Select(x => x.Value!)
+                    .ToList();
+             }
+             else
+             {
+                 _currentFiles = new List<FileTreeItem>();
+             }
+        }
+        
+        StateHasChanged();
+    }
+
+    private async Task LoadFilePreview(FileTreeItem item)
+    {
+        if (IsText(item.Name))
+        {
+            _loadingContent = true;
+            try
+            {
+                _fileContent = await StorageClient.GetFileContentAsync(item.FullPath);
+            }
+            catch
+            {
+                _fileContent = "Error loading content.";
+            }
+            finally
+            {
+                _loadingContent = false;
+            }
+        }
+    }
+
+    private void ClearSelection()
+    {
+        _selectedItem = null;
+    }
+
+    private async Task UploadFiles(IBrowserFile file)
+    {
+        _loading = true; 
+        try
+        {
+            await StorageClient.UploadFileAsync(file);
+            Snackbar.Add("Uploaded!", Severity.Success);
+            await LoadFiles();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+        finally { _loading = false; }
+    }
+
+    private async Task DeleteFile(FileTreeItem item)
+    {
+         var confirm = await DialogService.ShowMessageBox("Delete", $"Delete {item.Name}?", yesText: "Yes", cancelText: "No");
+         if (confirm == true)
+         {
+             await StorageClient.DeleteFileAsync(item.FullPath);
+             Snackbar.Add("Deleted", Severity.Success);
+             _selectedItem = null;
+             await LoadFiles();
+         }
+    }
+    
+    private async Task CopyToClipboard(string text)
+    {
+        await JSRuntime.InvokeVoidAsync("clipboardCopy.copyText", text);
+        Snackbar.Add("Copied!", Severity.Success);
+    }
+
+    private string GetBreadcrumbs()
+    {
+        if (_selectedFolder == null) return "Root";
+        return $"Root / {_selectedFolder.Name}";
+    }
+
+    private static bool IsImage(string name)
+    {
+        var ext = System.IO.Path.GetExtension(name).ToLower();
+        return new[] { ".png", ".jpg", ".jpeg", ".gif", ".webp" }.Contains(ext);
+    }
+
+    private static bool IsText(string name)
+    {
+        var ext = System.IO.Path.GetExtension(name).ToLower();
+        return new[] { ".txt", ".md", ".json", ".xml", ".css", ".js", ".cs", ".html" }.Contains(ext);
+    }
+
+    private static string FormatSize(long bytes)
+    {
+        string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+        double len = bytes;
+        int order = 0;
+        while (len >= 1024 && order < sizes.Length - 1)
+        {
+            order++;
+            len = len / 1024;
+        }
+        return $"{len:0.##} {sizes[order]}";
+    }
+
+    public class FileTreeItem
+    {
+        public string Name { get; set; } = string.Empty;
+        public string FullPath { get; set; } = string.Empty;
+        public bool IsFolder { get; set; }
+        public long Size { get; set; }
+        public string Url { get; set; } = string.Empty;
+        
+        public override bool Equals(object? obj) => obj is FileTreeItem other && FullPath == other.FullPath;
+        public override int GetHashCode() => FullPath.GetHashCode();
     }
 }

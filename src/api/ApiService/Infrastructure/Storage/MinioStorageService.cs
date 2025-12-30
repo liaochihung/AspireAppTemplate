@@ -66,28 +66,32 @@ public class MinioStorageService(IConfiguration configuration) : IStorageService
         return memoryStream;
     }
 
-    public void Remove(Uri? path)
+    public async Task<List<StorageFile>> ListFilesAsync(CancellationToken cancellationToken = default)
     {
-        // Fire and forget or async void? Interface says void.
-        // In MinIO, remove is async. We might need to change interface or run sync over async (bad).
-        // StarterKit interface is sync void Remove(Uri? path).
-        // We will just log or do fire-forget for now, or change interface to Task RemoveAsync.
-        // But to stick to the plan of "IStorageService" from StarterKit, it is void.
-        // Realistically, we should make it Task.
-        _ = RemoveAsync(path);
+        var files = new List<StorageFile>();
+        
+        var args = new ListObjectsArgs()
+            .WithBucket(BucketName)
+            .WithRecursive(true);
+
+        var list = _minioClient.ListObjectsEnumAsync(args, cancellationToken);
+        
+        await foreach (var item in list)
+        {
+            files.Add(new StorageFile(item.Key, (long)item.Size));
+        }
+
+        return files;
     }
 
-    private async Task RemoveAsync(Uri? path)
+    public async Task RemoveAsync(string objectName, CancellationToken cancellationToken = default)
     {
-        if (path is null) return;
-        
         try 
         {
-            var objectName = path.ToString();
             var args = new RemoveObjectArgs()
                 .WithBucket(BucketName)
                 .WithObject(objectName);
-            await _minioClient.RemoveObjectAsync(args);
+            await _minioClient.RemoveObjectAsync(args, cancellationToken);
         }
         catch 
         {
