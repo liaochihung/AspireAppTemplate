@@ -91,11 +91,11 @@ Tier 2: 開發體驗提升
 使用 FastEndpoints 內建 Versioning
 示範 URL-based 版本控制（/api/v1/products）
 在 Scalar 中顯示多版本文件
-7. Rate Limiting（流量限制）
+8. Rate Limiting（流量限制） ✅
 實作範圍：
 
 使用 .NET 8+ 內建的 Rate Limiting Middleware
-設定不同 Endpoint 的限流策略
+設定全域 IP-based 限流策略 (60 requests/min)
 示範 IP-based 與 User-based 限流
 Tier 3: 進階功能
 8. Real-time Communication（即時通訊）

@@ -14,6 +14,7 @@ using AspireAppTemplate.ApiService.Infrastructure.Hangfire;
 using AspireAppTemplate.ApiService.Infrastructure.Services;
 using AspireAppTemplate.ApiService.Infrastructure.Storage;
 using AspireAppTemplate.ApiService.Infrastructure.Services.Email;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +50,23 @@ builder.Services.AddScoped<IStorageService, MinioStorageService>();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddTransient<IEmailService, SmtpEmailService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+
+// Rate Limiting
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: partition => new FixedWindowRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                PermitLimit = 60,
+                QueueLimit = 2,
+                Window = TimeSpan.FromMinutes(1)
+            }));
+});
 
 // CORS
 builder.Services.AddCors(options =>
@@ -179,6 +197,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowAll");
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseOutputCache();
