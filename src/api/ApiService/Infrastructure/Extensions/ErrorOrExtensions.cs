@@ -5,11 +5,22 @@ namespace AspireAppTemplate.ApiService.Infrastructure.Extensions;
 
 public static class ErrorOrExtensions
 {
-    public static async Task SendResultAsync<T>(this IEndpoint ep, ErrorOr<T> result, CancellationToken ct = default)
+    public static async Task SendResultAsync<T>(
+        this IEndpoint ep,
+        ErrorOr<T> result,
+        Func<T, CancellationToken, Task>? onSuccess = null,
+        CancellationToken ct = default)
     {
         if (!result.IsError)
         {
-            await ep.HttpContext.Response.SendAsync(result.Value, 200, cancellation: ct);
+            if (onSuccess is not null)
+            {
+                await onSuccess(result.Value, ct);
+            }
+            else
+            {
+                await ep.HttpContext.Response.SendAsync(result.Value, 200, cancellation: ct);
+            }
             return;
         }
 
@@ -27,15 +38,24 @@ public static class ErrorOrExtensions
 
         if (statusCode == 400 && result.ErrorsOrEmptyList.Count > 0)
         {
-             foreach (var error in result.ErrorsOrEmptyList)
-             {
-                 ep.ValidationFailures.Add(new(error.Code, error.Description));
-             }
-             await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, cancellation: ct);
+            foreach (var error in result.ErrorsOrEmptyList)
+            {
+                ep.ValidationFailures.Add(new(error.Code, error.Description));
+            }
+            await ep.HttpContext.Response.SendErrorsAsync(ep.ValidationFailures, cancellation: ct);
         }
         else
         {
-             await ep.HttpContext.Response.SendAsync(new { error = firstError.Description, code = firstError.Code }, statusCode, cancellation: ct);
+            // Create a standard ProblemDetails for non-validation errors
+            var problemDetails = new Microsoft.AspNetCore.Mvc.ProblemDetails
+            {
+                Status = statusCode,
+                Title = firstError.Code,
+                Detail = firstError.Description,
+                Instance = ep.HttpContext.Request.Path
+            };
+            
+            await ep.HttpContext.Response.SendAsync(problemDetails, statusCode, cancellation: ct);
         }
     }
 }

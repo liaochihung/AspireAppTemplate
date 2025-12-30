@@ -111,6 +111,13 @@ login user: jack/0000,
     *   `IStorageService`: 定義標準上傳 `UploadAsync` 與刪除 `Remove` 介面。
     *   `MinioStorageService`: 實作 MinIO 連線，並自動處理 Bucket 建立與 Public Policy 設定。
 
+### Exception Handling & Logging Standardization (2025-12-30)
+*   **ProblemDetails**: 全面採用 RFC 7807 標準格式回應錯誤。
+    *   Validation Errors: 自動回傳 400 詳細欄位錯誤。
+    *   Domain Errors: 透過 `ErrorOrExtensions.SendResultAsync` 將 `ErrorOr` 錯誤映射為 ProblemDetails。
+*   **Serilog Request Logging**: 啟用 `app.UseSerilogRequestLogging()`，提供高效能且結構化的 HTTP 請求日誌。
+*   **Result Pattern**: 強制使用 `ErrorOr<T>` 進行服務層流控，避免使用 Exception 控制邏輯。
+
 ## 常見任務 (Common Tasks)
 
 ### 1. 新增資料表
@@ -158,6 +165,10 @@ login user: jack/0000,
     *   **KISS 原則**：不強制拆分 Controller/Service 層，除非邏輯確實需要共用。
 *   **領域術語一致性**：使用與業務場景一致的命名，確保 Request/Response DTO 命名清晰。
 *   **互動與確認**：若規格包含無法測試的形容詞（如「方便」），請先要求定義驗收標準；若發現程式碼壞味道，請主動建議重構。
+*   **例外處理與日誌 (Exception & Logging)**：
+    *   **Result Pattern**: 服務層**禁止拋出例外**來控制流程，必須回傳 `ErrorOr<T>`。
+    *   **ProblemDetails**: API 錯誤回應必須遵循 RFC 7807 (由 `SendResultAsync` 自動處理)。
+    *   **Serilog**: 使用結構化日誌記錄關鍵業務事件，HTTP 請求日誌已自動啟用。
 
 ### 5. 開發工具與記憶管理 (Serena MCP)
 *   **符號感知開發 (Symbol-Aware)**：

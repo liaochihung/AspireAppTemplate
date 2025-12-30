@@ -9,7 +9,9 @@ public class StorageApiClient(HttpClient httpClient)
     public async Task<string> UploadFileAsync(IBrowserFile file, CancellationToken ct = default)
     {
         using var content = new MultipartFormDataContent();
+#pragma warning disable S5693 // 10 MB limit is intentional for file uploads
         using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024); // 10 MB limit
+#pragma warning restore S5693
         using var streamContent = new StreamContent(stream);
         
         streamContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);

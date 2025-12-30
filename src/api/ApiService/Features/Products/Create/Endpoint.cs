@@ -51,6 +51,6 @@ public class Endpoint(AppDbContext dbContext, IOutputCacheStore cacheStore, IAud
 
         ErrorOr<Product> result = product;
 
-        await this.SendResultAsync(result, ct: ct);
+        await this.SendResultAsync(result, onSuccess: (p, c) => SendAsync(p, 201, cancellation: c), ct: ct);
     }
 }

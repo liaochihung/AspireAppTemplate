@@ -50,7 +50,7 @@ Tier 1: 基礎設施增強
 使用者頭像上傳
 產品圖片管理
 匯出報表下載
-3. Email Notification（郵件通知） 🔥
+3. Email Notification（郵件通知） 🔥 - done
 為什麼需要：使用者註冊、密碼重設、任務失敗通知等場景必備。
 
 實作範圍：
@@ -64,7 +64,7 @@ Tier 1: 基礎設施增強
 歡迎信
 背景任務失敗通知
 密碼重設連結
-4. Caching Strategy（快取策略）
+4. Caching Strategy（快取策略） - done
 為什麼需要：提升效能，減少資料庫查詢。
 
 實作範圍：
@@ -78,7 +78,7 @@ Tier 1: 基礎設施增強
 快取使用者權限資訊
 快取產品清單（5 分鐘過期）
 Tier 2: 開發體驗提升
-5. Exception Handling & Error Logging（例外處理）
+- [x] 5. Exception Handling & Error Logging（例外處理）
 實作範圍：
 
 全域例外處理中介軟體

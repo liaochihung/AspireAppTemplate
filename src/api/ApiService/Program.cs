@@ -148,6 +148,7 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 app.UseExceptionHandler();
+app.UseSerilogRequestLogging();
 
 if (app.Environment.IsDevelopment())
 {
@@ -176,7 +177,11 @@ app.Use(async (context, next) =>
     await next();
 });
 
-app.UseFastEndpoints(c => { c.Endpoints.RoutePrefix = "api"; });
+app.UseFastEndpoints(c => 
+{ 
+    c.Endpoints.RoutePrefix = "api"; 
+    c.Errors.UseProblemDetails();
+});
 
 // Hangfire Dashboard (僅限 Administrator)
 app.MapHangfireDashboard("/hangfire", new DashboardOptions
