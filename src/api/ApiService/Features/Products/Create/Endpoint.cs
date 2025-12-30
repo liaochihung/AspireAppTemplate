@@ -26,7 +26,7 @@ public class CreateProductValidator : Validator<CreateProductRequest>
     }
 }
 
-public class Endpoint(AppDbContext dbContext, IOutputCacheStore cacheStore, IAuditService auditService) : Endpoint<CreateProductRequest, Product>
+public class Endpoint(AppDbContext dbContext, IAuditService auditService) : Endpoint<CreateProductRequest, Product>
 {
     public override void Configure()
     {
@@ -51,7 +51,8 @@ public class Endpoint(AppDbContext dbContext, IOutputCacheStore cacheStore, IAud
 
         dbContext.Products.Add(product);
         await dbContext.SaveChangesAsync(ct);
-        await cacheStore.EvictByTagAsync("products", ct);
+        
+        // List cache expires in 1 min, accept eventual consistency
 
         await auditService.LogAsync("Create", "Product", product.Id.ToString(), null, product, ct);
 

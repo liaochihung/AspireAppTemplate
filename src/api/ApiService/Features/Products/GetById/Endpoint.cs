@@ -4,9 +4,11 @@ using AspireAppTemplate.ApiService.Data;
 using AspireAppTemplate.ApiService.Infrastructure.Extensions;
 using ErrorOr;
 
+using AspireAppTemplate.ApiService.Services;
+
 namespace AspireAppTemplate.ApiService.Features.Products.GetById;
 
-public class Endpoint(AppDbContext dbContext) : EndpointWithoutRequest<Product>
+public class Endpoint(AppDbContext dbContext, ICacheService cacheService) : EndpointWithoutRequest<Product>
 {
     public override void Configure()
     {
@@ -18,7 +20,12 @@ public class Endpoint(AppDbContext dbContext) : EndpointWithoutRequest<Product>
     public override async Task HandleAsync(CancellationToken ct)
     {
         var id = Route<int>("id");
-        var product = await dbContext.Products.FindAsync([id], cancellationToken: ct);
+        var cacheKey = $"products:{id}";
+
+        var product = await cacheService.GetOrSetAsync(cacheKey, async cancellationToken => 
+        {
+            return await dbContext.Products.FindAsync([id], cancellationToken: cancellationToken);
+        }, TimeSpan.FromMinutes(10), ct);
 
         if (product is null)
         {

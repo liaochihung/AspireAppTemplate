@@ -5,10 +5,11 @@ using AspireAppTemplate.ApiService.Infrastructure.Extensions;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.OutputCaching;
+using AspireAppTemplate.ApiService.Services;
 
 namespace AspireAppTemplate.ApiService.Features.Products.Delete;
 
-public class Endpoint(AppDbContext dbContext, IOutputCacheStore cacheStore) : EndpointWithoutRequest
+public class Endpoint(AppDbContext dbContext, ICacheService cacheService) : EndpointWithoutRequest
 {
     public override void Configure()
     {
@@ -30,7 +31,8 @@ public class Endpoint(AppDbContext dbContext, IOutputCacheStore cacheStore) : En
 
         dbContext.Products.Remove(product);
         await dbContext.SaveChangesAsync(ct);
-        await cacheStore.EvictByTagAsync("products", ct);
+        
+        await cacheService.RemoveAsync($"products:{id}", ct);
 
         ErrorOr<Deleted> result = Result.Deleted;
         await this.SendResultAsync(result, ct: ct);

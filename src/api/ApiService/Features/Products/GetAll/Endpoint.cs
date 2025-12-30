@@ -5,35 +5,40 @@ using AspireAppTemplate.ApiService.Infrastructure.Extensions;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.OutputCaching;
+using AspireAppTemplate.ApiService.Services;
 
 namespace AspireAppTemplate.ApiService.Features.Products.GetAll;
 
-public class Endpoint(AppDbContext dbContext) : Endpoint<PaginationRequest, PaginatedResult<Product>>
+public class Endpoint(AppDbContext dbContext, ICacheService cacheService) : Endpoint<PaginationRequest, PaginatedResult<Product>>
 {
     public override void Configure()
     {
         Get("/products");
         AllowAnonymous();
-        Options(x => x.CacheOutput(c => c.Expire(TimeSpan.FromMinutes(5)).Tag("products")));
     }
 
     public override async Task HandleAsync(PaginationRequest req, CancellationToken ct)
     {
-        var query = dbContext.Products.AsQueryable();
+        var cacheKey = $"products:list:{req.Page}:{req.PageSize}:{req.SearchTerm}";
 
-        // Apply search if provided
-        if (!string.IsNullOrWhiteSpace(req.SearchTerm))
+        // Cache for 1 minute (eventual consistency for lists)
+        var result = await cacheService.GetOrSetAsync(cacheKey, async cancellationToken => 
         {
-            var term = req.SearchTerm.ToLower();
-            query = query.Where(p => 
-                p.Name.ToLower().Contains(term) || 
-                (p.Description != null && p.Description.ToLower().Contains(term)));
-        }
+            var query = dbContext.Products.AsQueryable();
 
-        var result = await query
-            .OrderBy(p => p.Id)
-            .ToPaginatedResultAsync(req, ct);
+            if (!string.IsNullOrWhiteSpace(req.SearchTerm))
+            {
+                var term = req.SearchTerm.ToLower();
+                query = query.Where(p => 
+                    p.Name.ToLower().Contains(term) || 
+                    (p.Description != null && p.Description.ToLower().Contains(term)));
+            }
 
-        await SendAsync(result, cancellation: ct);
+            return await query
+                .OrderBy(p => p.Id)
+                .ToPaginatedResultAsync(req, cancellationToken);
+        }, TimeSpan.FromMinutes(1), ct);
+
+        await SendAsync(result!, cancellation: ct);
     }
 }

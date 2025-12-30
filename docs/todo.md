@@ -64,7 +64,7 @@ Tier 1: 基礎設施增強
 歡迎信
 背景任務失敗通知
 密碼重設連結
-4. Caching Strategy（快取策略） - done
+4. Caching Strategy（快取策略） ✅ - done
 為什麼需要：提升效能，減少資料庫查詢。
 
 實作範圍：

@@ -36,28 +36,20 @@ public class SmtpEmailService : IEmailService
     {
         using var client = new SmtpClient();
 
-        try
+        _logger.LogInformation("Connecting to SMTP server {Host}:{Port} (SSL: {EnableSsl})...", _settings.Host, _settings.Port, _settings.EnableSsl);
+        
+        await client.ConnectAsync(_settings.Host, _settings.Port, _settings.EnableSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.Auto, cancellationToken);
+
+        if (!string.IsNullOrEmpty(_settings.Username) && !string.IsNullOrEmpty(_settings.Password))
         {
-            _logger.LogInformation("Connecting to SMTP server {Host}:{Port} (SSL: {EnableSsl})...", _settings.Host, _settings.Port, _settings.EnableSsl);
-            
-            await client.ConnectAsync(_settings.Host, _settings.Port, _settings.EnableSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.Auto, cancellationToken);
-
-            if (!string.IsNullOrEmpty(_settings.Username) && !string.IsNullOrEmpty(_settings.Password))
-            {
-                _logger.LogInformation("Authenticating with SMTP server...");
-                await client.AuthenticateAsync(_settings.Username, _settings.Password, cancellationToken);
-            }
-
-            _logger.LogInformation("Sending email to {To}...", message.To);
-            await client.SendAsync(message, cancellationToken);
-            _logger.LogInformation("Email sent successfully.");
-
-            await client.DisconnectAsync(true, cancellationToken);
+            _logger.LogInformation("Authenticating with SMTP server...");
+            await client.AuthenticateAsync(_settings.Username, _settings.Password, cancellationToken);
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to send email to {To}. Error: {Message}", message.To, ex.Message);
-            throw;
-        }
+
+        _logger.LogInformation("Sending email to {To}...", message.To);
+        await client.SendAsync(message, cancellationToken);
+        _logger.LogInformation("Email sent successfully.");
+
+        await client.DisconnectAsync(true, cancellationToken);
     }
 }

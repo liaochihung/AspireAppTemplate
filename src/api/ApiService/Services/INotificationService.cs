@@ -1,5 +1,3 @@
-// using AspireAppTemplate.Shared.Auth;
-
 namespace AspireAppTemplate.ApiService.Services;
 
 public interface INotificationService

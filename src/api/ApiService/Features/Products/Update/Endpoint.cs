@@ -7,6 +7,7 @@ using ErrorOr;
 using Microsoft.AspNetCore.OutputCaching;
 
 using AspireAppTemplate.ApiService.Infrastructure.Services;
+using AspireAppTemplate.ApiService.Services;
 using System.Text.Json;
 
 namespace AspireAppTemplate.ApiService.Features.Products.Update;
@@ -27,7 +28,7 @@ public class UpdateProductValidator : Validator<UpdateProductRequest>
     }
 }
 
-public class Endpoint(AppDbContext dbContext, IOutputCacheStore cacheStore, IAuditService auditService) : Endpoint<UpdateProductRequest, Product>
+public class Endpoint(AppDbContext dbContext, ICacheService cacheService, IAuditService auditService) : Endpoint<UpdateProductRequest, Product>
 {
     public override void Configure()
     {
@@ -55,7 +56,8 @@ public class Endpoint(AppDbContext dbContext, IOutputCacheStore cacheStore, IAud
         product.Description = req.Description;
 
         await dbContext.SaveChangesAsync(ct);
-        await cacheStore.EvictByTagAsync("products", ct);
+        
+        await cacheService.RemoveAsync($"products:{id}", ct);
 
         // Capture new values
         var newValues = new { product.Name, product.Price, product.Description };

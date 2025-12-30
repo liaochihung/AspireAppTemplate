@@ -22,6 +22,7 @@ builder.Logging.ClearProviders();
 builder.AddServiceDefaults();
 builder.AddNpgsqlDbContext<AppDbContext>("aspiredb");
 builder.AddRedisOutputCache("cache");
+builder.AddRedisDistributedCache("cache");
 
 builder.Host.UseSerilog((context, services, configuration) => configuration
     .ReadFrom.Configuration(context.Configuration)
@@ -44,6 +45,7 @@ builder.Services.SwaggerDocument(o =>
 });
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IAuditService, AuditService>();
+builder.Services.AddScoped<ICacheService, RedisCacheService>();
 builder.Services.AddScoped<IStorageService, MinioStorageService>();
 
 // Email Services

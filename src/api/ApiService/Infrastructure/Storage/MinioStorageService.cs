@@ -8,11 +8,13 @@ namespace AspireAppTemplate.ApiService.Infrastructure.Storage;
 
 public class MinioStorageService(IConfiguration configuration) : IStorageService
 {
+#pragma warning disable S1075 // URIs should not be hardcoded - This is a fallback for Docker/Aspire service discovery
     private readonly IMinioClient _minioClient = new MinioClient()
         .WithEndpoint(new Uri(configuration["MinIO:Endpoint"] ?? "http://minio:9000").Authority)
         .WithCredentials(configuration["MinIO:AccessKey"], configuration["MinIO:SecretKey"])
         .WithSSL(false)
         .Build();
+#pragma warning restore S1075
 
     private const string BucketName = "files";
 
