@@ -12,6 +12,7 @@ using Hangfire;
 using Hangfire.PostgreSql;
 using AspireAppTemplate.ApiService.Infrastructure.Hangfire;
 using AspireAppTemplate.ApiService.Infrastructure.Services;
+using AspireAppTemplate.ApiService.Infrastructure.Storage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +33,7 @@ builder.Services.AddFastEndpoints();
 builder.Services.SwaggerDocument();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IAuditService, AuditService>();
+builder.Services.AddScoped<IStorageService, MinioStorageService>();
 
 // Hangfire Configuration
 builder.Services.AddHangfire(config =>

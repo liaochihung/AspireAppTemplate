@@ -98,6 +98,19 @@ login user: jack/0000,
     *   API Endpoint 遵循 REPR Pattern: `Features/Jobs/<JobName>/<Action>/`
     *   使用 `AppPolicies.CanManageSystem` 策略保護任務管理 API
 
+### File Storage (2025-12-30)
+*   **MinIO**: 作為 S3-compatible 的物件儲存服務。
+    *   *架構*: 在 AppHost 中新增 `minio` 容器，並掛載 `minio-data` Volume 確保資料持久化。
+    *   *端口*: 固定開放 `9000` (API) 與 `9001` (Console) 以便開發調試。
+*   **資料流模式 (Proxy Mode)**:
+    *   **Upload**: 前端 -> API Server (Upload Endpoint) -> MinIO (PutObject)。
+    *   **Reference**: API 回傳自身 Proxy URL (e.g. `/api/storage/files/...`)。
+    *   **Access**: 瀏覽器 -> API Server (Get Endpoint) -> MinIO (GetStream)。
+    *   *原因*: 解決 Mixed Content 問題 (HTTPS 網頁無法載入 HTTP MinIO 圖片)，並隱藏 MinIO 真實位置。
+*   **介面設計**:
+    *   `IStorageService`: 定義標準上傳 `UploadAsync` 與刪除 `Remove` 介面。
+    *   `MinioStorageService`: 實作 MinIO 連線，並自動處理 Bucket 建立與 Public Policy 設定。
+
 ## 常見任務 (Common Tasks)
 
 ### 1. 新增資料表

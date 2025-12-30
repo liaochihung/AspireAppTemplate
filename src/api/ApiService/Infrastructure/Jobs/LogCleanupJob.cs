@@ -17,8 +17,7 @@ public class LogCleanupJob
     {
         _logger.LogInformation("Starting log cleanup for records older than {Days} days", retentionDays);
 
-        // TODO: 實作實際的清理邏輯
-        // 範例：await _db.AuditLogs.Where(log => log.CreatedAt < cutoffDate).ExecuteDeleteAsync(ct);
+        // Note: Actual cleanup logic to be implemented when AuditLogs DB is ready.
         
         await Task.Delay(1000, ct); // 模擬清理作業
         

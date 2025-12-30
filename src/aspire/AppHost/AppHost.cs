@@ -31,6 +31,21 @@ var apiService = builder.AddProject<Projects.AspireAppTemplate_ApiService>("apis
     .WithEnvironment("Keycloak__AdminUsername", username)
     .WithEnvironment("Keycloak__AdminPassword", password);
 
+var minioUser = builder.AddParameter("minio-user", secret: true, value: "minioadmin");
+var minioPass = builder.AddParameter("minio-pass", secret: true, value: "minioadmin");
+
+var minio = builder.AddContainer("minio", "minio/minio")
+    .WithArgs("server", "/data", "--console-address", ":9001")
+    .WithHttpEndpoint(port: 9000, targetPort: 9000, name: "api")
+    .WithHttpEndpoint(port: 9001, targetPort: 9001, name: "ui")
+    .WithEnvironment("MINIO_ROOT_USER", minioUser)
+    .WithEnvironment("MINIO_ROOT_PASSWORD", minioPass)
+    .WithVolume("minio-data", "/data");
+
+apiService.WithEnvironment("MinIO__Endpoint", minio.GetEndpoint("api"))
+          .WithEnvironment("MinIO__AccessKey", minioUser)
+          .WithEnvironment("MinIO__SecretKey", minioPass);
+
 builder.AddProject<Projects.AspireAppTemplate_Web>("webfrontend")
     .WithExternalHttpEndpoints()
     .WithHttpHealthCheck("/health")

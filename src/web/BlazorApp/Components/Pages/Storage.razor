@@ -1,0 +1,85 @@
+@page "/storage"
+@using AspireAppTemplate.Shared
+@using System.Net.Http.Headers
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Authorization
+@inject StorageApiClient StorageClient
+@inject ISnackbar Snackbar
+@attribute [Authorize]
+
+<PageTitle>Storage | Aspire App</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-8">
+    <MudText Typo="Typo.h3" GutterBottom="true">Storage</MudText>
+    <MudText Class="mb-4">Upload and manage files using MinIO storage.</MudText>
+
+    <MudGrid>
+        <MudItem xs="12" md="6">
+            <MudPaper Class="pa-4">
+                <MudText Typo="Typo.h5" Class="mb-4">File Upload</MudText>
+                
+                <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
+                    <ActivatorContent>
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.CloudUpload">
+                            Upload Image
+                        </MudButton>
+                    </ActivatorContent>
+                </MudFileUpload>
+
+                @if (_uploading)
+                {
+                    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="mt-4" />
+                    <MudText Class="mt-2">Uploading...</MudText>
+                }
+            </MudPaper>
+        </MudItem>
+        
+        <MudItem xs="12" md="6">
+            <MudPaper Class="pa-4">
+                <MudText Typo="Typo.h5" Class="mb-4">Preview</MudText>
+                
+                @if (!string.IsNullOrEmpty(_uploadedUrl))
+                {
+                    <MudImage Src="@_uploadedUrl" Alt="Uploaded Image" Elevation="25" Class="rounded-lg" Style="max-width: 100%;" />
+                    <MudText Class="mt-2" Typo="Typo.caption">URL: @_uploadedUrl</MudText>
+                    
+                     <MudButton Variant="Variant.Outlined" 
+                                Color="Color.Secondary" 
+                                Class="mt-2"
+                                OnClick="@(() => _uploadedUrl = string.Empty)">
+                        Clear Preview
+                    </MudButton>
+                }
+                else
+                {
+                    <MudAlert Severity="Severity.Info">No file uploaded yet.</MudAlert>
+                }
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    private bool _uploading;
+    private string _uploadedUrl = string.Empty;
+
+    private async Task UploadFiles(IBrowserFile file)
+    {
+        _uploading = true;
+        try
+        {
+            _uploadedUrl = await StorageClient.UploadFileAsync(file);
+            Snackbar.Add("File uploaded successfully!", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Upload failed: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _uploading = false;
+        }
+    }
+}
