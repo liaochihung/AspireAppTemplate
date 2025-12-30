@@ -13,6 +13,7 @@ using Hangfire.PostgreSql;
 using AspireAppTemplate.ApiService.Infrastructure.Hangfire;
 using AspireAppTemplate.ApiService.Infrastructure.Services;
 using AspireAppTemplate.ApiService.Infrastructure.Storage;
+using AspireAppTemplate.ApiService.Infrastructure.Services.Email;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +35,11 @@ builder.Services.SwaggerDocument();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<IStorageService, MinioStorageService>();
+
+// Email Services
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddTransient<IEmailService, SmtpEmailService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 // Hangfire Configuration
 builder.Services.AddHangfire(config =>
