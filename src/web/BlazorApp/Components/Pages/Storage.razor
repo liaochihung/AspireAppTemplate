@@ -43,20 +43,35 @@
             <MudPaper Elevation="2" Class="pa-4 mb-4">
                 <!-- Toolbar -->
                 <MudToolBar Dense="true" Class="px-0">
-                    <MudText Typo="Typo.h6">@GetBreadcrumbs()</MudText>
+                    <div class="d-flex align-center">
+                        <MudLink Typo="Typo.h6" OnClick="@(() => OnBreadcrumbClick(null))" Underline="Underline.Hover" Color="Color.Inherit">Root</MudLink>
+                        @if (_breadcrumbLinks.Any())
+                        {
+                            @foreach (var breadcrumb in _breadcrumbLinks)
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Class="mx-2" Color="Color.Default" Size="Size.Small" />
+                                <MudLink Typo="Typo.h6" OnClick="@(() => OnBreadcrumbClick(breadcrumb.Path))" Underline="Underline.Hover" Color="Color.Inherit">@breadcrumb.Name</MudLink>
+                            }
+                        }
+                    </div>
                     <MudSpacer />
                     <MudIconButton Icon="@Icons.Material.Filled.Refresh" OnClick="LoadFiles" Color="Color.Default" />
-                    <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
-                        <ActivatorContent>
-                            <MudButton Variant="Variant.Filled"
-                                       Color="Color.Primary"
-                                       StartIcon="@Icons.Material.Filled.CloudUpload"
-                                       Class="ml-2">
-                                Upload
-                            </MudButton>
-                        </ActivatorContent>
-                    </MudFileUpload>
                 </MudToolBar>
+            </MudPaper>
+
+            <!-- Upload Zone -->
+            <MudPaper Class="mb-4" Elevation="0" Style="position: relative; width: 100%; height: 150px;">
+                <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles" Hidden="false" Style="width: 100%; height: 100%;" InputClass="absolute" InputStyle="width: 100%; height: 100%; overflow: hidden; position: absolute; top: 0; left: 0; z-index: 20; opacity: 0;">
+                    <ActivatorContent>
+                         <MudPaper Class="d-flex align-center justify-center pa-6 border-dashed mud-border-primary" Elevation="0" Style="border: 2px dashed var(--mud-palette-primary); background-color: rgba(var(--mud-palette-primary-rgb), 0.05); width: 100%; height: 100%;">
+                            <div class="d-flex flex-column align-center">
+                                <MudIcon Icon="@Icons.Material.Filled.CloudUpload" Size="Size.Large" Color="Color.Primary" Class="mb-2" />
+                                <MudText Typo="Typo.h6" Color="Color.Primary">Drag & Drop Files Here</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">or click to browse</MudText>
+                            </div>
+                        </MudPaper>
+                    </ActivatorContent>
+                </MudFileUpload>
             </MudPaper>
 
             <!-- File Content / Gallery -->
@@ -177,6 +192,7 @@
             // Default view: Root
             _selectedFolder = null;
             UpdateCurrentFiles(null);
+            UpdateBreadcrumbs();
         }
         catch (Exception ex)
         {
@@ -278,6 +294,7 @@
             _selectedFolder = item;
             _selectedItem = null;
             UpdateCurrentFiles(itemData);
+            UpdateBreadcrumbs();
             // Toggle expansion handled by binding
         }
         else
@@ -380,11 +397,7 @@
         Snackbar.Add("Copied!", Severity.Success);
     }
 
-    private string GetBreadcrumbs()
-    {
-        if (_selectedFolder == null) return "Root";
-        return $"Root / {_selectedFolder.Name}";
-    }
+
 
     private static bool IsImage(string name)
     {
@@ -410,6 +423,58 @@
         }
         return $"{len:0.##} {sizes[order]}";
     }
+
+    private List<BreadcrumbLink> _breadcrumbLinks = new();
+
+    private void OnBreadcrumbClick(string? path)
+    {
+        if (string.IsNullOrEmpty(path))
+        {
+            // Root
+            _selectedFolder = null;
+            UpdateCurrentFiles(null);
+            return;
+        }
+
+        // Find the node corresponding to path
+        var node = FindNodeRecursive(_treeItems, path);
+        if (node != null)
+        {
+             OnTreeItemClick(node); // Reuse logic
+        }
+    }
+
+    private void UpdateBreadcrumbs()
+    {
+        _breadcrumbLinks.Clear();
+        if (_selectedFolder != null)
+        {
+            var parts = _selectedFolder.FullPath.Split('/');
+            string currentPath = "";
+            foreach (var part in parts)
+            {
+                if (string.IsNullOrEmpty(currentPath)) currentPath = part;
+                else currentPath += "/" + part;
+                
+                _breadcrumbLinks.Add(new BreadcrumbLink(part, currentPath));
+            }
+        }
+    }
+    
+    // Helper to find node recursively
+    private TreeItemData<FileTreeItem>? FindNodeRecursive(ICollection<TreeItemData<FileTreeItem>>? collection, string fullPath)
+    {
+        if (collection == null) return null;
+        foreach (var item in collection)
+        {
+            if (item.Value?.FullPath == fullPath) return item;
+            var childResult = FindNodeRecursive(item.Children, fullPath);
+            if (childResult != null) return childResult;
+        }
+        return null;
+    }
+
+    public record BreadcrumbLink(string Name, string Path);
 
     public class FileTreeItem
     {
