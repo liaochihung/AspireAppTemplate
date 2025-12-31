@@ -8,10 +8,13 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Serilog;
 using AspireAppTemplate.Shared;
 using MudBlazor.Services;
+using MudBlazor;
 using Blazored.LocalStorage;
 using AspireAppTemplate.Web.Infrastructure.Services;
 using AspireAppTemplate.Web.Services;
 
+
+using AspireAppTemplate.Web.Infrastructure.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +41,9 @@ builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<AspireAppTemplate.Web.Infrastructure.Authentication.TokenCacheService>();
 
 builder.Services.AddMudServices();
+builder.Services.AddLocalization();
+builder.Services.AddTransient<MudLocalizer, AppMudLocalizer>();
+
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<LayoutService>();
 builder.Services.AddScoped<NotificationService>();
@@ -138,7 +144,17 @@ app.UseAntiforgery();
 app.UseOutputCache();
 
 // Persist cached tokens to cookies (must run before response starts)
+// Persist cached tokens to cookies (must run before response starts)
 app.UseMiddleware<AspireAppTemplate.Web.Infrastructure.Middleware.TokenPersistenceMiddleware>();
+
+var supportedCultures = new[] { "en-US", "zh-TW" };
+var localizationOptions = new RequestLocalizationOptions()
+    .SetDefaultCulture("en-US")
+    .AddSupportedCultures(supportedCultures)
+    .AddSupportedUICultures(supportedCultures);
+
+app.UseRequestLocalization(localizationOptions);
+
 
 app.MapStaticAssets();
 

@@ -1,11 +1,15 @@
 using AspireAppTemplate.Shared;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using Microsoft.Extensions.Localization;
+using AspireAppTemplate.Shared.Resources;
 
 namespace AspireAppTemplate.Web.Components.Pages.Admin
 {
     public partial class Users
     {
+
+
         private IEnumerable<KeycloakUser> _users = new List<KeycloakUser>();
         private bool _loading = true;
         private string _searchString = string.Empty;
@@ -47,7 +51,7 @@ namespace AspireAppTemplate.Web.Components.Pages.Admin
             }
             catch (Exception ex)
             {
-                Snackbar.Add($"使用者載入失敗: {ex.Message}", Severity.Error);
+                Snackbar.Add(Loc["User_LoadFail", ex.Message], Severity.Error);
             }
             finally
             {
@@ -57,7 +61,7 @@ namespace AspireAppTemplate.Web.Components.Pages.Admin
 
         private async Task OpenUserDialog(KeycloakUser? user = null)
         {
-            var title = user == null ? "新增使用者" : "編輯使用者";
+            var title = user == null ? Loc["User_Create"] : Loc["User_Edit"];
             // Clone if editing to avoid mutating grid item directly before save
             var model = user == null ? new KeycloakUser() : new KeycloakUser
             {
@@ -82,18 +86,18 @@ namespace AspireAppTemplate.Web.Components.Pages.Admin
                     if (string.IsNullOrEmpty(savedModel.Id))
                     {
                         await IdentityClient.CreateUserAsync(savedModel);
-                        Snackbar.Add("使用者已新增", Severity.Success);
+                        Snackbar.Add(Loc["User_Created"], Severity.Success);
                     }
                     else
                     {
                         await IdentityClient.UpdateUserAsync(savedModel);
-                        Snackbar.Add("使用者已更新", Severity.Success);
+                        Snackbar.Add(Loc["User_Updated"], Severity.Success);
                     }
                     await LoadUsers();
                 }
                 catch (Exception ex)
                 {
-                    Snackbar.Add($"使用者儲存失敗: {ex.Message}", Severity.Error);
+                    Snackbar.Add(Loc["User_SaveFail", ex.Message], Severity.Error);
                 }
             }
         }
@@ -101,24 +105,24 @@ namespace AspireAppTemplate.Web.Components.Pages.Admin
         private async Task DeleteUser(KeycloakUser user)
         {
             var result = await DialogService.ShowMessageBox(
-                "Delete User",
-                $"Are you sure you want to delete {user.Username}?",
-                yesText: "Delete", cancelText: "Cancel");
+                Loc["ConfirmDelete_Title"],
+                Loc["ConfirmDelete_Content", user.Username],
+                yesText: Loc["Delete"], cancelText: Loc["Cancel"]);
 
             if (result == true)
             {
                 try
                 {
                     if (string.IsNullOrEmpty(user.Id))
-                        throw new InvalidOperationException("使用者 ID 為空");
+                        throw new InvalidOperationException("User ID is empty");
 
                     await IdentityClient.DeleteUserAsync(user.Id);
-                    Snackbar.Add("使用者已刪除", Severity.Success);
+                    Snackbar.Add(Loc["User_Deleted"], Severity.Success);
                     await LoadUsers();
                 }
                 catch (Exception ex)
                 {
-                    Snackbar.Add($"使用者刪除失敗: {ex.Message}", Severity.Error);
+                    Snackbar.Add(Loc["User_DeleteFail", ex.Message], Severity.Error);
                 }
             }
         }
@@ -127,7 +131,7 @@ namespace AspireAppTemplate.Web.Components.Pages.Admin
         {
             var parameters = new DialogParameters<UserRolesDialog> { { x => x.User, user } };
             var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
-            await DialogService.ShowAsync<UserRolesDialog>($"Roles for {user.Username}", parameters, options);
+            await DialogService.ShowAsync<UserRolesDialog>(Loc["User_AssignRoleTitle", user.Username ?? ""], parameters, options);
         }
     }
 }

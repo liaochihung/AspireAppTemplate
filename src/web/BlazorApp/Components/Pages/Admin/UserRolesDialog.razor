@@ -3,14 +3,17 @@
 @using MudBlazor
 @inject IdentityApiClient IdentityClient
 @inject ISnackbar Snackbar
+@using Microsoft.Extensions.Localization
+@using AspireAppTemplate.Shared.Resources
+@inject IStringLocalizer<SharedResource> Loc
 
 <MudDialog>
     <TitleContent>
         <div class="d-flex align-center">
             <MudIcon Icon="@Icons.Material.Filled.Security" Class="mr-3" Color="Color.Primary" />
             <div>
-                <MudText Typo="Typo.h6">分配角色</MudText>
-                <MudText Typo="Typo.caption">管理使用者 <b>@User.Username</b> 的權限</MudText>
+                <MudText Typo="Typo.h6">@Loc["User_AssignRoles"]</MudText>
+                <MudText Typo="Typo.caption">@Loc["User_ManagePermissions", User.Username]</MudText>
             </div>
         </div>
     </TitleContent>
@@ -20,14 +23,14 @@
             {
                 <div class="d-flex flex-column align-center justify-center py-12">
                     <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large" />
-                    <MudText Typo="Typo.body2" Class="mt-4">載入權限中...</MudText>
+                    <MudText Typo="Typo.body2" Class="mt-4">@Loc["Loading"]</MudText>
                 </div>
             }
             else
             {
-                <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="mb-2">新增權限</MudText>
+                <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="mb-2">@Loc["User_AddPermission"]</MudText>
                 <div class="d-flex align-end gap-2 mb-6">
-                    <MudSelect T="string" Label="選擇角色" 
+                    <MudSelect T="string" Label="@Loc["Role_Select"]" 
                                @bind-Value="_selectedRole" 
                                Variant="Variant.Outlined"
                                Margin="Margin.Dense"
@@ -43,17 +46,19 @@
                                Disabled="@string.IsNullOrEmpty(_selectedRole)"
                                DisableElevation="true"
                                Style="height: 40px;"
-                               StartIcon="@Icons.Material.Filled.Add">加入</MudButton>
+                               StartIcon="@Icons.Material.Filled.Add">@Loc["Add"]</MudButton>
                 </div>
 
                 <MudDivider Class="mb-4" />
 
-                <MudText Typo="Typo.subtitle2" Color="Color.Secondary" Class="mb-3">已持有的角色 (@_assignedRoles.Count)</MudText>
+                <MudDivider Class="mb-4" />
+
+                <MudText Typo="Typo.subtitle2" Color="Color.Secondary" Class="mb-3">@Loc["User_AssignedRoles"] (@_assignedRoles.Count)</MudText>
                 
                 @if (!_assignedRoles.Any())
                 {
                     <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="mt-2">
-                        此使用者目前沒有任何角色。
+                        @Loc["User_NoRoles"]
                     </MudAlert>
                 }
                 else
@@ -73,7 +78,7 @@
         </div>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Close" Variant="Variant.Filled" Class="px-8" DisableElevation="true">關閉</MudButton>
+        <MudButton OnClick="Close" Variant="Variant.Filled" Class="px-8" DisableElevation="true">@Loc["Close"]</MudButton>
     </DialogActions>
 </MudDialog>
 

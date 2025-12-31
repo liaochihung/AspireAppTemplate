@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor;
+using Microsoft.Extensions.Localization;
+using AspireAppTemplate.Shared.Resources;
 
 namespace AspireAppTemplate.Web.Components.Pages
 {
@@ -153,7 +155,7 @@ namespace AspireAppTemplate.Web.Components.Pages
                         products = arr.ToArray();
                     }
                     CloseForm();
-                    Snackbar.Add("產品更新成功", Severity.Success);
+                    Snackbar.Add(Loc["UpdateSuccess"], Severity.Success);
                 }
                 else
                 {
@@ -171,7 +173,7 @@ namespace AspireAppTemplate.Web.Components.Pages
                         list.Add(created);
                         products = list.ToArray();
                         CloseForm();
-                        Snackbar.Add("產品新增成功", Severity.Success);
+                        Snackbar.Add(Loc["CreateSuccess"], Severity.Success);
                     }
                 }
             }
@@ -185,9 +187,9 @@ namespace AspireAppTemplate.Web.Components.Pages
         private async Task ConfirmDelete(int id)
         {
             var result = await DialogService.ShowMessageBox(
-                "確認刪除",
-                $"確定要刪除產品 #{id} 嗎？此操作無法復原。",
-                yesText: "刪除", cancelText: "取消");
+                Loc["ConfirmDelete_Title"],
+                Loc["ConfirmDelete_Content", id],
+                yesText: Loc["Delete"], cancelText: Loc["Cancel"]);
 
             if (result != true) return;
 
@@ -203,7 +205,7 @@ namespace AspireAppTemplate.Web.Components.Pages
                     CloseForm();
                 }
 
-                Snackbar.Add("產品刪除成功", Severity.Success);
+                Snackbar.Add(Loc["DeleteSuccess"], Severity.Success);
             }
             catch (Exception ex)
             {

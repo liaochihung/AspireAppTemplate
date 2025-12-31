@@ -1,45 +1,48 @@
 @using AspireAppTemplate.Shared
 @using MudBlazor
 @inject ISnackbar Snackbar
+@using Microsoft.Extensions.Localization
+@using AspireAppTemplate.Shared.Resources
+@inject IStringLocalizer<SharedResource> Loc
 
 <MudDialog>
     <TitleContent>
         <div class="d-flex align-center">
             <MudIcon Icon="@Icons.Material.Filled.AdminPanelSettings" Class="mr-3" Color="Color.Primary" />
-            <MudText Typo="Typo.h6">新增角色</MudText>
+            <MudText Typo="Typo.h6">@Loc["Role_Create"]</MudText>
         </div>
     </TitleContent>
     <DialogContent>
         <MudForm @ref="_form" @bind-IsValid="_isValid">
             <MudGrid Spacing="2">
                 <MudItem xs="12">
-                    <MudTextField T="string" Label="角色名稱" 
+                    <MudTextField T="string" Label="@Loc["Role_Name"]" 
                                  @bind-Value="Model.Name" 
                                  Required="true" 
-                                 RequiredError="請輸入角色名稱"
+                                 RequiredError="@Loc["RequiredError", Loc["Role_Name"]]"
                                  Variant="Variant.Outlined"
                                  Margin="Margin.Dense"
-                                 Placeholder="例如: Admin, Editor" />
+                                 Placeholder="@Loc["Role_NamePlaceholder"]" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTextField T="string" Label="描述" 
+                    <MudTextField T="string" Label="@Loc["Role_Description"]" 
                                  @bind-Value="Model.Description" 
                                  Variant="Variant.Outlined"
                                  Margin="Margin.Dense"
                                  Lines="3"
-                                 Placeholder="簡單說明此角色的權限或用途" />
+                                 Placeholder="@Loc["Role_DescPlaceholder"]" />
                 </MudItem>
             </MudGrid>
         </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel" Variant="Variant.Text" Class="px-6">取消</MudButton>
+        <MudButton OnClick="Cancel" Variant="Variant.Text" Class="px-6">@Loc["Cancel"]</MudButton>
         <MudButton Color="Color.Primary" 
                    OnClick="Submit" 
                    Variant="Variant.Filled" 
                    Disabled="@(!_isValid)" 
                    Class="px-8 ml-2"
-                   DisableElevation="true">儲存</MudButton>
+                   DisableElevation="true">@Loc["Save"]</MudButton>
     </DialogActions>
 </MudDialog>
 

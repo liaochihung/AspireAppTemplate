@@ -9,14 +9,14 @@
 @inject ISnackbar Snackbar
 
 <PageHeader Icon="@Icons.Material.Filled.Security" 
-            Title="角色管理" 
-            Description="管理系統角色與權限設定">
+            Title="@Loc["Roles_Title"]" 
+            Description="@Loc["Roles_Description"]">
     <MudButton Variant="Variant.Filled" 
                Color="Color.Primary" 
                StartIcon="@Icons.Material.Filled.Add" 
                OnClick="CreateRole"
                DropShadow="false">
-        新增角色
+        @Loc["Role_Create"]
     </MudButton>
 </PageHeader>
 
@@ -24,12 +24,13 @@
     <AppDataGrid T="KeycloakRole" Items="@_roles" Loading="@_loading" Filterable="true" QuickFilter="@_quickFilter">
         <ToolBarContent>
             <MudSpacer />
+            <MudSpacer />
             <DebouncedSearchField @bind-Value="_searchString" 
-                                  Placeholder="搜尋角色..."
+                                  Placeholder="@Loc["Search"]"
                                   DebounceMs="300" />
         </ToolBarContent>
         <Columns>
-            <TemplateColumn T="KeycloakRole" Title="名稱">
+            <TemplateColumn T="KeycloakRole" Title="@Loc["Role_Name"]">
                 <CellTemplate Context="cellContext">
                     <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
                         <MudIcon Icon="@Icons.Material.Filled.Shield" Size="Size.Small" Color="Color.Primary" />
@@ -37,7 +38,7 @@
                     </MudStack>
                 </CellTemplate>
             </TemplateColumn>
-            <TemplateColumn T="KeycloakRole" Title="描述">
+            <TemplateColumn T="KeycloakRole" Title="@Loc["Role_Description"]">
                 <CellTemplate Context="cellContext">
                     @if (!string.IsNullOrWhiteSpace(cellContext.Item.Description))
                     {
@@ -49,9 +50,9 @@
                     }
                 </CellTemplate>
             </TemplateColumn>
-            <TemplateColumn T="KeycloakRole" Title="操作">
+            <TemplateColumn T="KeycloakRole" Title="@Loc["Actions"]">
                 <CellTemplate Context="cellContext">
-                    <MudTooltip Text="刪除角色">
+                    <MudTooltip Text="@Loc["Role_Delete"]">
                         <MudIconButton Icon="@Icons.Material.Filled.Delete" 
                                        Color="Color.Error" 
                                        Size="Size.Small"
@@ -66,7 +67,7 @@
         <NoRecordsContent>
             <MudStack AlignItems="AlignItems.Center" Class="pa-8">
                 <MudIcon Icon="@Icons.Material.Filled.GppBad" Size="Size.Large" Color="Color.Default" />
-                <MudText Typo="Typo.body1" Color="Color.Default">目前沒有角色資料</MudText>
+                <MudText Typo="Typo.body1" Color="Color.Default">@Loc["Role_NoRecords"]</MudText>
             </MudStack>
         </NoRecordsContent>
     </AppDataGrid>

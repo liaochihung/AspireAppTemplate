@@ -13,8 +13,8 @@
 <AuthorizeView Context="authContext">
     <Authorized>
         <PageHeader Icon="@Icons.Material.Filled.Inventory2"
-                    Title="產品管理"
-                    Description="管理產品資料，包含新增、編輯與刪除功能">
+                    Title="@Loc["Products_Title"]"
+                    Description="@Loc["Products_Description"]">
             @if (_canManage)
             {
                 <MudButton Variant="Variant.Filled"
@@ -22,7 +22,7 @@
                            StartIcon="@Icons.Material.Filled.Add"
                            OnClick="@(() => OpenAddForm())"
                            DropShadow="false">
-                    新增產品
+                    @Loc["Product_CreateTitle"]
                 </MudButton>
             }
         </PageHeader>
@@ -48,16 +48,16 @@
                         <AppDataGrid T="Product" Items="@products" Filterable="true" QuickFilter="@_quickFilter">
                             <ToolBarContent>
                                 <MudText Typo="Typo.subtitle1" Class="mud-text-secondary">
-                                    共 @(products?.Length ?? 0) 項產品
+                                    @Loc["TotalItems", products?.Length ?? 0]
                                 </MudText>
                                 <MudSpacer />
                                 <DebouncedSearchField @bind-Value="_searchString"
-                                                      Placeholder="搜尋產品..."
+                                                      Placeholder="@Loc["Search"]"
                                                       DebounceMs="300"
                                                       Style="max-width: 250px;" />
                             </ToolBarContent>
                             <Columns>
-                                <TemplateColumn T="Product" Title="名稱">
+                                <TemplateColumn T="Product" Title="@Loc["Product_Name"]">
                                     <CellTemplate Context="cellContext">
                                         <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
                                             <MudIcon Icon="@Icons.Material.Filled.Category" Size="Size.Small" Color="Color.Primary" />
@@ -65,14 +65,14 @@
                                         </MudStack>
                                     </CellTemplate>
                                 </TemplateColumn>
-                                <TemplateColumn T="Product" Title="價格">
+                                <TemplateColumn T="Product" Title="@Loc["Product_Price"]">
                                     <CellTemplate Context="cellContext">
                                         <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Filled">
                                             @cellContext.Item.Price.ToString("C")
                                         </MudChip>
                                     </CellTemplate>
                                 </TemplateColumn>
-                                <TemplateColumn T="Product" Title="描述">
+                                <TemplateColumn T="Product" Title="@Loc["Product_Description"]">
                                     <CellTemplate Context="cellContext">
                                         @if (!string.IsNullOrWhiteSpace(cellContext.Item.Description))
                                         {
@@ -86,15 +86,15 @@
                                         }
                                     </CellTemplate>
                                 </TemplateColumn>
-                                <TemplateColumn T="Product" Title="操作" Hidden="@(!_canManage)">
+                                <TemplateColumn T="Product" Title="@Loc["Actions"]" Hidden="@(!_canManage)">
                                     <CellTemplate Context="cellContext">
-                                        <MudTooltip Text="編輯">
+                                        <MudTooltip Text="@Loc["Edit"]">
                                             <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                                            Size="Size.Small"
                                                            Color="Color.Primary"
                                                            OnClick="@(() => StartEdit(cellContext.Item))" />
                                         </MudTooltip>
-                                        <MudTooltip Text="刪除">
+                                        <MudTooltip Text="@Loc["Delete"]">
                                             <MudIconButton Icon="@Icons.Material.Filled.Delete"
                                                            Size="Size.Small"
                                                            Color="Color.Error"
@@ -109,7 +109,7 @@
                             <NoRecordsContent>
                                 <MudStack AlignItems="AlignItems.Center" Class="pa-8">
                                     <MudIcon Icon="@Icons.Material.Filled.Inventory" Size="Size.Large" Color="Color.Default" />
-                                    <MudText Typo="Typo.body1" Color="Color.Default">目前沒有產品資料</MudText>
+                                    <MudText Typo="Typo.body1" Color="Color.Default">@Loc["NoRecords"]</MudText>
                                     @if (_canManage)
                                     {
                                         <MudButton Variant="Variant.Outlined"
@@ -117,7 +117,7 @@
                                                    StartIcon="@Icons.Material.Filled.Add"
                                                    OnClick="@(() => OpenAddForm())"
                                                    Class="mt-2">
-                                            新增第一個產品
+                                            @Loc["CreateFirstRecord"]
                                         </MudButton>
                                     }
                                 </MudStack>
@@ -135,7 +135,7 @@
                             <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
                                 <MudIcon Icon="@(isEditing ? Icons.Material.Filled.Edit : Icons.Material.Filled.Add)"
                                          Color="Color.Primary" />
-                                <MudText Typo="Typo.h6">@(isEditing ? "編輯產品" : "新增產品")</MudText>
+                                <MudText Typo="Typo.h6">@(isEditing ? Loc["Product_EditTitle"] : Loc["Product_CreateTitle"])</MudText>
                             </MudStack>
                             <MudIconButton Icon="@Icons.Material.Filled.Close"
                                            Size="Size.Small"
@@ -143,17 +143,16 @@
                         </MudStack>
 
                         <MudDivider Class="mb-4" />
-
                         <MudTextField @bind-Value="formModel.Name"
-                                      Label="產品名稱"
+                                      Label="@Loc["Product_Name"]"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
                                       Class="mb-3"
                                       Required="true"
-                                      RequiredError="產品名稱為必填" />
+                                      RequiredError="@Loc["RequiredError", Loc["Product_Name"]]" />
 
                         <MudNumericField @bind-Value="formModel.Price"
-                                         Label="價格"
+                                         Label="@Loc["Product_Price"]"
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense"
                                          Class="mb-3"
@@ -162,7 +161,7 @@
                                          AdornmentIcon="@Icons.Material.Filled.AttachMoney" />
 
                         <MudTextField @bind-Value="formModel.Description"
-                                      Label="描述"
+                                      Label="@Loc["Product_Description"]"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
                                       Class="mb-4"
@@ -171,13 +170,13 @@
                         <MudStack Row="true" Justify="Justify.FlexEnd" Spacing="2">
                             @if (isEditing)
                             {
-                                <MudButton Variant="Variant.Text" Color="Color.Default" OnClick="CancelEdit">取消</MudButton>
-                                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveForm" DropShadow="false">儲存變更</MudButton>
+                                <MudButton Variant="Variant.Text" Color="Color.Default" OnClick="CancelEdit">@Loc["Cancel"]</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveForm" DropShadow="false">@Loc["Save"]</MudButton>
                             }
                             else
                             {
-                                <MudButton Variant="Variant.Outlined" Color="Color.Default" OnClick="ClearForm">清除</MudButton>
-                                <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="SaveForm" DropShadow="false">新增產品</MudButton>
+                                <MudButton Variant="Variant.Outlined" Color="Color.Default" OnClick="ClearForm">@Loc["Clear"]</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="SaveForm" DropShadow="false">@Loc["Product_CreateTitle"]</MudButton>
                             }
                         </MudStack>
                     </MudPaper>
@@ -187,7 +186,7 @@
     </Authorized>
     <NotAuthorized>
         <MudAlert Severity="Severity.Info">
-            請 <MudLink Href="authentication/login">登入</MudLink> 以查看產品資料。
+            @Loc["Auth_LoginRequired"] <MudLink Href="authentication/login">@Loc["Login"]</MudLink>
         </MudAlert>
     </NotAuthorized>
 </AuthorizeView>

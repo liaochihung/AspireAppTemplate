@@ -1,0 +1,22 @@
+@using System.Globalization
+@using Microsoft.AspNetCore.Localization
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+<MudMenu Icon="@Icons.Material.Filled.Language" Color="Color.Inherit" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" Dense="true">
+    <MudMenuItem OnClick="@(() => ChangeLanguage("en-US"))">English</MudMenuItem>
+    <MudMenuItem OnClick="@(() => ChangeLanguage("zh-TW"))">繁體中文</MudMenuItem>
+</MudMenu>
+
+@code {
+    private async Task ChangeLanguage(string culture)
+    {
+        var cultureCookie = $"c={culture}|uic={culture}";
+        
+        // Use JS to set the cookie because HttpContext is not always available in Blazor components directly in standard way
+        // interacting with standard ASP.NET Core localization middleware
+        await JSRuntime.InvokeVoidAsync("eval", $"document.cookie = '{CookieRequestCultureProvider.DefaultCookieName}={cultureCookie}; path=/; max-age=31536000'");
+        
+        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+    }
+}

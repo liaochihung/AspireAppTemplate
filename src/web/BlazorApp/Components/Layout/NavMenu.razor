@@ -10,7 +10,7 @@
             {
                 <div class="ml-3">
                     <MudText Typo="Typo.subtitle1">@context.User.Identity?.Name</MudText>
-                    <MudText Typo="Typo.caption" Class="mud-text-secondary">使用者</MudText>
+                    <MudText Typo="Typo.caption" Class="mud-text-secondary">@Loc["User_Authenticated"]</MudText>
                 </div>
             }
         </Authorized>
@@ -21,7 +21,7 @@
             @if (IsOpen)
             {
                 <div class="ml-3">
-                    <MudText Typo="Typo.subtitle1">訪客</MudText>
+                    <MudText Typo="Typo.subtitle1">@Loc["User_Guest"]</MudText>
                 </div>
             }
         </NotAuthorized>
@@ -31,22 +31,22 @@
 <MudNavMenu>
     @if (IsOpen)
     {
-        <MudText Typo="Typo.subtitle2" Color="Color.Secondary" Class="ml-4 my-3">主要導覽</MudText>
+        <MudText Typo="Typo.subtitle2" Color="Color.Secondary" Class="ml-4 my-3">@Loc["Nav_Dashboard"]</MudText>
     }
-    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">首頁</MudNavLink>
-    <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddCircle">計數器</MudNavLink>
-    <MudNavLink Href="products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ShoppingCart">產品清單</MudNavLink>
-    <MudNavLink Href="weather" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Cloud">天氣預報</MudNavLink>
+    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">@Loc["Nav_Dashboard"]</MudNavLink>
+    <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddCircle">@Loc["Nav_Counter"]</MudNavLink>
+    <MudNavLink Href="products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ShoppingCart">@Loc["Nav_Products"]</MudNavLink>
+    <MudNavLink Href="weather" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Cloud">@Loc["Nav_Weather"]</MudNavLink>
     
     <AuthorizeView Policy="@AppPolicies.CanManageProducts">
         <Authorized>
             @if (IsOpen)
             {
-                <MudText Typo="Typo.subtitle2" Color="Color.Secondary" Class="ml-4 my-3">管理</MudText>
+                <MudText Typo="Typo.subtitle2" Color="Color.Secondary" Class="ml-4 my-3">@Loc["Nav_Admin"]</MudText>
             }
-            <MudNavLink Href="admin/users" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.People">使用者</MudNavLink>
-            <MudNavLink Href="admin/roles" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Security">角色</MudNavLink>
-            <MudNavLink Href="custom-jobs" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Schedule">自訂任務</MudNavLink>
+            <MudNavLink Href="admin/users" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.People">@Loc["Nav_Users"]</MudNavLink>
+            <MudNavLink Href="admin/roles" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Security">@Loc["Nav_Roles"]</MudNavLink>
+            <MudNavLink Href="custom-jobs" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Schedule">@Loc["Nav_CustomJobs"]</MudNavLink>
         </Authorized>
     </AuthorizeView>
 
@@ -54,22 +54,22 @@
         <Authorized>
             @if (IsOpen)
             {
-                <MudText Typo="Typo.subtitle2" Color="Color.Secondary" Class="ml-4 my-3">系統</MudText>
+                <MudText Typo="Typo.subtitle2" Color="Color.Secondary" Class="ml-4 my-3">@Loc["Nav_System"]</MudText>
             }
-            <MudNavLink Href="@GetHangfireUrl()" Target="_blank" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Dashboard">Hangfire 儀表板</MudNavLink>
-            <MudNavLink Href="audit-logs" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.History">稽核日誌</MudNavLink>
-            <MudNavLink Href="http://localhost:9001" Target="_blank" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">MinIO Console</MudNavLink>
+            <MudNavLink Href="@GetHangfireUrl()" Target="_blank" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Dashboard">Hangfire</MudNavLink>
+            <MudNavLink Href="audit-logs" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.History">@Loc["Nav_AuditLogs"]</MudNavLink>
+            <MudNavLink Href="http://localhost:9001" Target="_blank" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">@Loc["Nav_MinIO"]</MudNavLink>
         </Authorized>
     </AuthorizeView>
 
 
     @if (IsOpen)
     {
-        <MudText Typo="Typo.subtitle2" Color="Color.Secondary" Class="ml-4 my-3">技術測試</MudText>
+        <MudText Typo="Typo.subtitle2" Color="Color.Secondary" Class="ml-4 my-3">@Loc["Nav_TechTest"]</MudText>
     }
-    <MudNavLink Href="token" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Token">存取權杖</MudNavLink>
-    <MudNavLink Href="notifications-demo" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Notifications">通知中心</MudNavLink>
-    <MudNavLink Href="storage" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CloudUpload">檔案儲存</MudNavLink>
+    <MudNavLink Href="token" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Token">@Loc["Nav_Tokens"]</MudNavLink>
+    <MudNavLink Href="notifications-demo" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Notifications">@Loc["Nav_Notifications"]</MudNavLink>
+    <MudNavLink Href="storage" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CloudUpload">@Loc["Nav_FileStorage"]</MudNavLink>
     
     <VersionDisplay />
 </MudNavMenu>

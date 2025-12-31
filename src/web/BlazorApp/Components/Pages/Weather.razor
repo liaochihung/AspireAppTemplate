@@ -7,14 +7,14 @@
 <PageTitle>Weather</PageTitle>
 
 <PageHeader Icon="@Icons.Material.Filled.Cloud" 
-            Title="天氣預報" 
-            Description="此頁面展示從後端 API 服務載入的天氣資料">
+            Title="@Loc["Weather_Title"]" 
+            Description="@Loc["Weather_Description"]">
     <MudButton Variant="Variant.Outlined" 
                Color="Color.Primary" 
                StartIcon="@Icons.Material.Filled.Refresh"
                OnClick="LoadData"
                Disabled="@(forecasts == null)">
-        重新整理
+        @Loc["Refresh"]
     </MudButton>
 </PageHeader>
 
@@ -29,12 +29,12 @@
     {
         <AppDataGrid T="WeatherForecast" Items="@forecasts" Filterable="false" SortMode="SortMode.Single">
             <Columns>
-                <TemplateColumn T="WeatherForecast" Title="日期">
+                <TemplateColumn T="WeatherForecast" Title="@Loc["Weather_Date"]">
                     <CellTemplate Context="cellContext">
                         <MudText>@cellContext.Item.Date.ToString("yyyy/MM/dd")</MudText>
                     </CellTemplate>
                 </TemplateColumn>
-                <TemplateColumn T="WeatherForecast" Title="溫度 (°C)">
+                <TemplateColumn T="WeatherForecast" Title="@Loc["Weather_TempC"]">
                     <CellTemplate Context="cellContext">
                         @{
                             var temp = cellContext.Item.TemperatureC;
@@ -47,12 +47,12 @@
                         </MudStack>
                     </CellTemplate>
                 </TemplateColumn>
-                <TemplateColumn T="WeatherForecast" Title="溫度 (°F)">
+                <TemplateColumn T="WeatherForecast" Title="@Loc["Weather_TempF"]">
                     <CellTemplate Context="cellContext">
                         <MudText>@cellContext.Item.TemperatureF</MudText>
                     </CellTemplate>
                 </TemplateColumn>
-                <TemplateColumn T="WeatherForecast" Title="摘要">
+                <TemplateColumn T="WeatherForecast" Title="@Loc["Weather_Summary"]">
                     <CellTemplate Context="cellContext">
                         <MudChip T="string" Size="Size.Small" Color="Color.Default" Variant="Variant.Outlined">
                             @cellContext.Item.Summary
@@ -66,7 +66,7 @@
             <NoRecordsContent>
                 <MudStack AlignItems="AlignItems.Center" Class="pa-8">
                     <MudIcon Icon="@Icons.Material.Filled.CloudOff" Size="Size.Large" Color="Color.Default" />
-                    <MudText Typo="Typo.body1" Color="Color.Default">目前沒有天氣資料</MudText>
+                    <MudText Typo="Typo.body1" Color="Color.Default">@Loc["NoRecords"]</MudText>
                 </MudStack>
             </NoRecordsContent>
         </AppDataGrid>

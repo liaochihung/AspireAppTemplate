@@ -1,4 +1,5 @@
 ﻿@using AspireAppTemplate.Web.Infrastructure.Services
+@using AspireAppTemplate.Web.Components.Shared
 @inherits LayoutComponentBase
 @implements IDisposable
 @layout BaseLayout
@@ -11,16 +12,18 @@
                 OnClick="@DrawerToggle" />
         </MudTooltip>
         <MudButton Variant="Variant.Text" Color="Color.Inherit" Href="/" DropShadow="false">
-            首頁
+            @Loc["Nav_Dashboard"]
         </MudButton>
         <MudSpacer />
         
-        <MudTooltip Text="@(LayoutService.IsDarkMode ? "淺色模式" : "深色模式")">
+        <MudTooltip Text="@(LayoutService.IsDarkMode ? "Light Mode" : "Dark Mode")">
             <MudIconButton Icon="@(LayoutService.IsDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)"
                            Color="Color.Inherit" OnClick="@ToggleDarkMode" />
         </MudTooltip>
         
-        <MudTooltip Text="主題設定">
+        <LanguageSelector />
+
+        <MudTooltip Text="Theme Settings">
             <MudIconButton Icon="@Icons.Material.Filled.Palette" Color="Color.Inherit" 
                            OnClick="@OpenThemeDrawer" />
         </MudTooltip>

@@ -9,14 +9,14 @@
 @inject ISnackbar Snackbar
 
 <PageHeader Icon="@Icons.Material.Filled.People" 
-            Title="使用者管理" 
-            Description="管理系統使用者帳號、權限與角色分配">
+            Title="@Loc["Users_Title"]" 
+            Description="@Loc["Users_Description"]">
     <MudButton Variant="Variant.Filled" 
                Color="Color.Primary" 
                StartIcon="@Icons.Material.Filled.PersonAdd" 
                OnClick="@(() => OpenUserDialog())"
                DropShadow="false">
-        新增使用者
+        @Loc["User_Create"]
     </MudButton>
 </PageHeader>
 
@@ -24,12 +24,13 @@
     <AppDataGrid T="KeycloakUser" Items="@_users" Loading="@_loading" Filterable="true" QuickFilter="@_quickFilter">
         <ToolBarContent>
             <MudSpacer />
+            <MudSpacer />
             <DebouncedSearchField @bind-Value="_searchString" 
-                                  Placeholder="搜尋使用者..."
+                                  Placeholder="@Loc["Search"]"
                                   DebounceMs="300" />
         </ToolBarContent>
         <Columns>
-            <TemplateColumn T="KeycloakUser" Title="使用者名稱">
+            <TemplateColumn T="KeycloakUser" Title="@Loc["User_Username"]">
                 <CellTemplate Context="cellContext">
                     <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
                         <MudAvatar Size="Size.Small" Color="Color.Primary">
@@ -39,34 +40,34 @@
                     </MudStack>
                 </CellTemplate>
             </TemplateColumn>
-            <TemplateColumn T="KeycloakUser" Title="Email">
+            <TemplateColumn T="KeycloakUser" Title="@Loc["User_Email"]">
                 <CellTemplate Context="cellContext">
                     <MudText Typo="Typo.body2">@cellContext.Item.Email</MudText>
                 </CellTemplate>
             </TemplateColumn>
-            <TemplateColumn T="KeycloakUser" Title="名">
+            <TemplateColumn T="KeycloakUser" Title="@Loc["User_FirstName"]">
                 <CellTemplate Context="cellContext">
                     <MudText Typo="Typo.body2">@cellContext.Item.FirstName</MudText>
                 </CellTemplate>
             </TemplateColumn>
-            <TemplateColumn T="KeycloakUser" Title="姓">
+            <TemplateColumn T="KeycloakUser" Title="@Loc["User_LastName"]">
                 <CellTemplate Context="cellContext">
                     <MudText Typo="Typo.body2">@cellContext.Item.LastName</MudText>
                 </CellTemplate>
             </TemplateColumn>
-            <TemplateColumn T="KeycloakUser" Title="狀態">
+            <TemplateColumn T="KeycloakUser" Title="@Loc["User_Status"]">
                 <CellTemplate Context="cellContext">
                     @if (cellContext.Item.Enabled)
                     {
-                        <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Filled">啟用</MudChip>
+                        <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Filled">@Loc["User_Enabled"]</MudChip>
                     }
                     else
                     {
-                        <MudChip T="string" Size="Size.Small" Color="Color.Default" Variant="Variant.Outlined">停用</MudChip>
+                        <MudChip T="string" Size="Size.Small" Color="Color.Default" Variant="Variant.Outlined">@Loc["User_Disabled"]</MudChip>
                     }
                 </CellTemplate>
             </TemplateColumn>
-            <TemplateColumn T="KeycloakUser" Title="上次登入">
+            <TemplateColumn T="KeycloakUser" Title="@Loc["User_LastLogin"]">
                 <CellTemplate Context="cellContext">
                    <MudText Typo="Typo.body2">
                        @(cellContext.Item.LastLoginAt.HasValue 
@@ -75,21 +76,21 @@
                    </MudText>
                 </CellTemplate>
             </TemplateColumn>
-            <TemplateColumn T="KeycloakUser" Title="操作">
+            <TemplateColumn T="KeycloakUser" Title="@Loc["Actions"]">
                 <CellTemplate Context="cellContext">
-                    <MudTooltip Text="分配角色">
+                    <MudTooltip Text="@Loc["User_AssignRoles"]">
                         <MudIconButton Icon="@Icons.Material.Filled.Assignment" 
                                        Color="Color.Secondary" 
                                        Size="Size.Small"
                                        OnClick="@(() => ManageRoles(cellContext.Item))" />
                     </MudTooltip>
-                    <MudTooltip Text="編輯使用者">
+                    <MudTooltip Text="@Loc["User_Edit"]">
                         <MudIconButton Icon="@Icons.Material.Filled.Edit" 
                                        Color="Color.Primary" 
                                        Size="Size.Small"
                                        OnClick="@(() => OpenUserDialog(cellContext.Item))" />
                     </MudTooltip>
-                    <MudTooltip Text="刪除使用者">
+                    <MudTooltip Text="@Loc["User_Delete"]">
                         <MudIconButton Icon="@Icons.Material.Filled.Delete" 
                                        Color="Color.Error" 
                                        Size="Size.Small"
@@ -104,7 +105,7 @@
         <NoRecordsContent>
             <MudStack AlignItems="AlignItems.Center" Class="pa-8">
                 <MudIcon Icon="@Icons.Material.Filled.PersonOff" Size="Size.Large" Color="Color.Default" />
-                <MudText Typo="Typo.body1" Color="Color.Default">目前沒有使用者資料</MudText>
+                <MudText Typo="Typo.body1" Color="Color.Default">@Loc["User_NoRecords"]</MudText>
             </MudStack>
         </NoRecordsContent>
     </AppDataGrid>

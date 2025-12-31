@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  
+  <!-- General -->
+  <data name="App_Name" xml:space="preserve">
+    <value>Aspire 應用範本</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>載入中...</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>儲存</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>刪除</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>編輯</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>新增</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>搜尋</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>操作</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>關閉</value>
+  </data>
+  <data name="Clear" xml:space="preserve">
+    <value>清除</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>登入</value>
+  </data>
+
+  <data name="Refresh" xml:space="preserve">
+    <value>重新整理</value>
+  </data>
+  <data name="NoRecords" xml:space="preserve">
+    <value>目前沒有資料</value>
+  </data>
+  <data name="CreateFirstRecord" xml:space="preserve">
+    <value>新增第一筆資料</value>
+  </data>
+  <data name="TotalItems" xml:space="preserve">
+    <value>共 {0} 項</value>
+  </data>
+  <data name="ConfirmDelete_Title" xml:space="preserve">
+    <value>確認刪除</value>
+  </data>
+  <data name="ConfirmDelete_Content" xml:space="preserve">
+    <value>確定要刪除 #{0} 嗎？此操作無法復原。</value>
+  </data>
+  <data name="SaveSuccess" xml:space="preserve">
+    <value>儲存成功</value>
+  </data>
+  <data name="DeleteSuccess" xml:space="preserve">
+    <value>刪除成功</value>
+  </data>
+  <data name="CreateSuccess" xml:space="preserve">
+    <value>新增成功</value>
+  </data>
+  <data name="UpdateSuccess" xml:space="preserve">
+    <value>更新成功</value>
+  </data>
+  <data name="RequiredError" xml:space="preserve">
+    <value>{0} 為必填</value>
+  </data>
+
+  <!-- Navigation -->
+  <data name="Nav_Dashboard" xml:space="preserve">
+    <value>儀表板</value>
+  </data>
+  <data name="Nav_Products" xml:space="preserve">
+    <value>產品管理</value>
+  </data>
+  <data name="Nav_Weather" xml:space="preserve">
+    <value>天氣預報</value>
+  </data>
+  <data name="Nav_Users" xml:space="preserve">
+    <value>使用者管理</value>
+  </data>
+  <data name="Nav_Roles" xml:space="preserve">
+    <value>角色管理</value>
+  </data>
+  <data name="Nav_Settings" xml:space="preserve">
+    <value>系統設定</value>
+  </data>
+  <data name="Nav_AuditLogs" xml:space="preserve">
+    <value>稽核日誌</value>
+  </data>
+  <data name="Nav_FileStorage" xml:space="preserve">
+    <value>檔案儲存</value>
+  </data>
+  <data name="Nav_BackgroundJobs" xml:space="preserve">
+    <value>背景任務</value>
+  </data>
+  <data name="Nav_Login" xml:space="preserve">
+    <value>登入</value>
+  </data>
+  <data name="Nav_Logout" xml:space="preserve">
+    <value>登出</value>
+  </data>
+
+  <!-- Products -->
+  <data name="Products_Title" xml:space="preserve">
+    <value>產品列表</value>
+  </data>
+  <data name="Products_Description" xml:space="preserve">
+    <value>管理您的產品目錄。</value>
+  </data>
+  <data name="Product_Name" xml:space="preserve">
+    <value>名稱</value>
+  </data>
+  <data name="Product_Price" xml:space="preserve">
+    <value>價格</value>
+  </data>
+  <data name="Product_Description" xml:space="preserve">
+    <value>描述</value>
+  </data>
+  <data name="Product_CreateTitle" xml:space="preserve">
+    <value>新增產品</value>
+  </data>
+  <data name="Product_EditTitle" xml:space="preserve">
+    <value>編輯產品</value>
+  </data>
+
+  <!-- Weather -->
+  <data name="Weather_Title" xml:space="preserve">
+    <value>天氣預報</value>
+  </data>
+  <data name="Weather_Description" xml:space="preserve">
+    <value>查看目前的天氣狀況。</value>
+  </data>
+  <data name="Weather_Date" xml:space="preserve">
+    <value>日期</value>
+  </data>
+  <data name="Weather_TempC" xml:space="preserve">
+    <value>溫度 (C)</value>
+  </data>
+  <data name="Weather_TempF" xml:space="preserve">
+    <value>溫度 (F)</value>
+  </data>
+  <data name="Weather_Summary" xml:space="preserve">
+    <value>概況</value>
+  </data>
+
+  <!-- Users -->
+  <data name="Users_Title" xml:space="preserve">
+    <value>使用者列表</value>
+  </data>
+  <data name="Users_Description" xml:space="preserve">
+    <value>管理系統使用者。</value>
+  </data>
+  <data name="User_Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="User_FirstName" xml:space="preserve">
+    <value>名字</value>
+  </data>
+  <data name="User_LastName" xml:space="preserve">
+    <value>姓氏</value>
+  </data>
+  <data name="User_EmailVerified" xml:space="preserve">
+    <value>Email 已驗證</value>
+  </data>
+  <data name="User_Enabled" xml:space="preserve">
+    <value>已啟用</value>
+  </data>
+  <data name="User_Disabled" xml:space="preserve">
+    <value>停用</value>
+  </data>
+
+  <data name="User_LoadFail" xml:space="preserve">
+    <value>使用者載入失敗: {0}</value>
+  </data>
+  <data name="User_SaveFail" xml:space="preserve">
+    <value>使用者儲存失敗: {0}</value>
+  </data>
+  <data name="User_DeleteFail" xml:space="preserve">
+    <value>使用者刪除失敗: {0}</value>
+  </data>
+  <data name="User_Created" xml:space="preserve">
+    <value>使用者已新增</value>
+  </data>
+  <data name="User_Updated" xml:space="preserve">
+    <value>使用者已更新</value>
+  </data>
+  <data name="User_Deleted" xml:space="preserve">
+    <value>使用者已刪除</value>
+  </data>
+  <data name="User_AssignRoleTitle" xml:space="preserve">
+    <value>{0} 的角色</value>
+  </data>
+  <data name="User_Create" xml:space="preserve">
+    <value>新增使用者</value>
+  </data>
+  <data name="User_Edit" xml:space="preserve">
+    <value>編輯使用者</value>
+  </data>
+  <data name="User_LastLogin" xml:space="preserve">
+    <value>上次登入</value>
+  </data>
+  <data name="User_AssignRoles" xml:space="preserve">
+    <value>分配角色</value>
+  </data>
+  <data name="User_Delete" xml:space="preserve">
+    <value>刪除使用者</value>
+  </data>
+  <data name="User_NoRecords" xml:space="preserve">
+    <value>目前沒有使用者資料</value>
+  </data>
+  <data name="User_Status" xml:space="preserve">
+    <value>狀態</value>
+  </data>
+  <data name="User_Username" xml:space="preserve">
+    <value>使用者名稱</value>
+  </data>
+
+  <!-- Roles -->
+  <data name="Roles_Title" xml:space="preserve">
+    <value>角色列表</value>
+  </data>
+  <data name="Roles_Description" xml:space="preserve">
+    <value>管理使用者角色與權限。</value>
+  </data>
+  <data name="Role_Name" xml:space="preserve">
+    <value>角色名稱</value>
+  </data>
+  <data name="Role_Description" xml:space="preserve">
+    <value>描述</value>
+  </data>
+  
+  <data name="Role_LoadFail" xml:space="preserve">
+    <value>角色載入失敗: {0}</value>
+  </data>
+  <data name="Role_CreateFail" xml:space="preserve">
+    <value>角色新增失敗: {0}</value>
+  </data>
+  <data name="Role_DeleteFail" xml:space="preserve">
+    <value>角色刪除失敗: {0}</value>
+  </data>
+  <data name="Role_Created" xml:space="preserve">
+    <value>角色已新增</value>
+  </data>
+  <data name="Role_Deleted" xml:space="preserve">
+    <value>角色已刪除</value>
+  </data>
+  <data name="Role_ConfirmDelete" xml:space="preserve">
+    <value>確定要刪除 {0} 嗎?</value>
+  </data>
+  <data name="Role_Create" xml:space="preserve">
+    <value>新增角色</value>
+  </data>
+  <data name="Role_Delete" xml:space="preserve">
+    <value>刪除角色</value>
+  </data>
+  <data name="Role_NoRecords" xml:space="preserve">
+    <value>目前沒有角色資料</value>
+  </data>
+
+  <data name="User_InitialPassword" xml:space="preserve">
+    <value>起始密碼</value>
+  </data>
+  <data name="User_ResetPassword" xml:space="preserve">
+    <value>重設密碼 (可不填)</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>密碼</value>
+  </data>
+  <data name="Role_NamePlaceholder" xml:space="preserve">
+    <value>例如: Admin, Editor</value>
+  </data>
+  <data name="Role_DescPlaceholder" xml:space="preserve">
+    <value>簡單說明此角色的權限或用途</value>
+  </data>
+  <data name="User_ManagePermissions" xml:space="preserve">
+    <value>管理使用者 {0} 的權限</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>載入中...</value>
+  </data>
+  <data name="User_AddPermission" xml:space="preserve">
+    <value>新增權限</value>
+  </data>
+  <data name="Role_Select" xml:space="preserve">
+    <value>選擇角色</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>加入</value>
+  </data>
+  <data name="User_AssignedRoles" xml:space="preserve">
+    <value>已持有的角色</value>
+  </data>
+  <data name="User_NoRoles" xml:space="preserve">
+    <value>此使用者目前沒有任何角色</value>
+  </data>
+
+  <!-- MudBlazor internal overrides -->
+  <data name="MudBlazor_RowsPerPage" xml:space="preserve">
+    <value>每頁行數：</value>
+  </data>
+
+  <!-- Auth -->
+  <data name="Auth_LoginRequired" xml:space="preserve">
+    <value>您必須登入才能查看此內容。</value>
+  </data>
+  <data name="Auth_NotAuthorized" xml:space="preserve">
+    <value>您沒有權限存取此資源。</value>
+  </data>
+
+  <data name="Nav_Counter" xml:space="preserve">
+    <value>計數器</value>
+  </data>
+  <data name="Nav_Admin" xml:space="preserve">
+    <value>管理</value>
+  </data>
+  <data name="Nav_System" xml:space="preserve">
+    <value>系統</value>
+  </data>
+  <data name="Nav_TechTest" xml:space="preserve">
+    <value>技術測試</value>
+  </data>
+  <data name="Nav_Tokens" xml:space="preserve">
+    <value>存取權杖</value>
+  </data>
+  <data name="Nav_Notifications" xml:space="preserve">
+    <value>通知中心</value>
+  </data>
+  <data name="Nav_CustomJobs" xml:space="preserve">
+    <value>自訂任務</value>
+  </data>
+  <data name="Nav_MinIO" xml:space="preserve">
+    <value>MinIO Console</value>
+  </data>
+  <data name="User_Authenticated" xml:space="preserve">
+    <value>使用者</value>
+  </data>
+  <data name="User_Guest" xml:space="preserve">
+    <value>訪客</value>
+  </data>
+
+</root>
