@@ -1,4 +1,5 @@
 @page "/audit-logs"
+@inherits AspireAppTemplate.Web.Components.Pages.AuthenticatedComponentBase
 @attribute [Authorize(Policy = AppPolicies.CanManageSystem)]
 @using AspireAppTemplate.Shared.Models
 @using AspireAppTemplate.Shared
@@ -104,7 +105,10 @@
         _loading = true;
         try
         {
-            _logs = await AuditClient.GetAuditLogsAsync();
+            await ExecuteWithAuthHandlingAsync(async () =>
+            {
+                _logs = await AuditClient.GetAuditLogsAsync();
+            });
         }
         catch (Exception)
         {

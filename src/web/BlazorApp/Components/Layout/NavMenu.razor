@@ -31,7 +31,7 @@
 <MudNavMenu>
     @if (IsOpen)
     {
-        <MudText Typo="Typo.subtitle2" Color="Color.Surface" Class="ml-4 my-3">主要導覽</MudText>
+        <MudText Typo="Typo.subtitle2" Color="Color.Secondary" Class="ml-4 my-3">主要導覽</MudText>
     }
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">首頁</MudNavLink>
     <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AddCircle">計數器</MudNavLink>
@@ -42,7 +42,7 @@
         <Authorized>
             @if (IsOpen)
             {
-                <MudText Typo="Typo.subtitle2" Color="Color.Surface" Class="ml-4 my-3">管理</MudText>
+                <MudText Typo="Typo.subtitle2" Color="Color.Secondary" Class="ml-4 my-3">管理</MudText>
             }
             <MudNavLink Href="admin/users" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.People">使用者</MudNavLink>
             <MudNavLink Href="admin/roles" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Security">角色</MudNavLink>
@@ -54,7 +54,7 @@
         <Authorized>
             @if (IsOpen)
             {
-                <MudText Typo="Typo.subtitle2" Color="Color.Surface" Class="ml-4 my-3">系統</MudText>
+                <MudText Typo="Typo.subtitle2" Color="Color.Secondary" Class="ml-4 my-3">系統</MudText>
             }
             <MudNavLink Href="@GetHangfireUrl()" Target="_blank" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Dashboard">Hangfire 儀表板</MudNavLink>
             <MudNavLink Href="audit-logs" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.History">稽核日誌</MudNavLink>
@@ -65,7 +65,7 @@
 
     @if (IsOpen)
     {
-        <MudText Typo="Typo.subtitle2" Color="Color.Surface" Class="ml-4 my-3">技術測試</MudText>
+        <MudText Typo="Typo.subtitle2" Color="Color.Secondary" Class="ml-4 my-3">技術測試</MudText>
     }
     <MudNavLink Href="token" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Token">存取權杖</MudNavLink>
     <MudNavLink Href="notifications-demo" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Notifications">通知中心</MudNavLink>

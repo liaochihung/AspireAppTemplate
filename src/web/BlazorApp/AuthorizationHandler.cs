@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System.Globalization;
@@ -96,7 +95,11 @@ public class AuthorizationHandler : DelegatingHandler
             {
                 return refreshedToken;
             }
-            // Fall through to return current token if refresh fails
+            
+            // Refresh failed - token is expired and cannot be renewed.
+            // Return null to let the request fail with 401, which will be handled at the component level.
+            _logger.LogWarning("Token refresh failed for user {User}. Request will fail with 401.", httpContext.User.Identity?.Name);
+            return null;
         }
 
         return accessToken;

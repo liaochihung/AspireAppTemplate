@@ -37,8 +37,11 @@ namespace AspireAppTemplate.Web.Components.Pages
             _loading = true;
             try
             {
-                var response = await ApiClient.GetAllAsync();
-                _jobs = response.Jobs;
+                await ExecuteWithAuthHandlingAsync(async () =>
+                {
+                    var response = await ApiClient.GetAllAsync();
+                    _jobs = response.Jobs;
+                });
             }
             catch (Exception ex)
             {
@@ -60,7 +63,10 @@ namespace AspireAppTemplate.Web.Components.Pages
             {
                 try
                 {
-                    await ApiClient.CreateAsync(request);
+                    await ExecuteWithAuthHandlingAsync(async () =>
+                    {
+                        await ApiClient.CreateAsync(request);
+                    });
                     Snackbar.Add("任務已新增", Severity.Success);
                     await LoadJobs();
                 }
@@ -75,7 +81,10 @@ namespace AspireAppTemplate.Web.Components.Pages
         {
             try
             {
-                await ApiClient.ToggleAsync(job.Id);
+                await ExecuteWithAuthHandlingAsync(async () =>
+                {
+                    await ApiClient.ToggleAsync(job.Id);
+                });
                 Snackbar.Add($"任務已{(job.IsActive ? "停用" : "啟用")}", Severity.Success);
                 await LoadJobs();
             }
@@ -96,7 +105,10 @@ namespace AspireAppTemplate.Web.Components.Pages
             {
                 try
                 {
-                    await ApiClient.DeleteAsync(job.Id);
+                    await ExecuteWithAuthHandlingAsync(async () =>
+                    {
+                        await ApiClient.DeleteAsync(job.Id);
+                    });
                     Snackbar.Add("任務已刪除", Severity.Success);
                     await LoadJobs();
                 }

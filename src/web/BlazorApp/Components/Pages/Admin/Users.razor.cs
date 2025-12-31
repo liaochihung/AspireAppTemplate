@@ -40,11 +40,14 @@ namespace AspireAppTemplate.Web.Components.Pages.Admin
             _loading = true;
             try
             {
-                _users = await IdentityClient.GetUsersAsync();
+                await ExecuteWithAuthHandlingAsync(async () =>
+                {
+                    _users = await IdentityClient.GetUsersAsync();
+                });
             }
             catch (Exception ex)
             {
-                Snackbar.Add($"Error loading users: {ex.Message}", Severity.Error);
+                Snackbar.Add($"使用者載入失敗: {ex.Message}", Severity.Error);
             }
             finally
             {

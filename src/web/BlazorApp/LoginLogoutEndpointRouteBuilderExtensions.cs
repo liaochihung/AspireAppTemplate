@@ -14,6 +14,7 @@ internal static class LoginLogoutEndpointRouteBuilderExtensions
 
             group.MapGet(pattern: "login", OnLogin).AllowAnonymous();
             group.MapPost(pattern: "logout", OnLogout);
+            group.MapGet(pattern: "logout", OnLogout); // Also support GET for NavigationManager
 
             return group;
         }

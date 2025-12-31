@@ -1,4 +1,5 @@
 @page "/storage"
+@inherits AspireAppTemplate.Web.Components.Pages.AuthenticatedComponentBase
 @using AspireAppTemplate.Shared
 @using System.Net.Http.Headers
 @using Microsoft.AspNetCore.Components.Forms
@@ -70,7 +71,10 @@
         _uploading = true;
         try
         {
-            _uploadedUrl = await StorageClient.UploadFileAsync(file);
+            await ExecuteWithAuthHandlingAsync(async () =>
+            {
+                _uploadedUrl = await StorageClient.UploadFileAsync(file);
+            });
             Snackbar.Add("File uploaded successfully!", Severity.Success);
         }
         catch (Exception ex)

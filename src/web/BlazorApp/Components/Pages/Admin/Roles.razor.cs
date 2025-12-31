@@ -34,7 +34,10 @@ namespace AspireAppTemplate.Web.Components.Pages.Admin
             _loading = true;
             try
             {
-                _roles = await IdentityClient.GetRolesAsync();
+                await ExecuteWithAuthHandlingAsync(async () =>
+                {
+                    _roles = await IdentityClient.GetRolesAsync();
+                });
             }
             catch (Exception ex)
             {
@@ -55,7 +58,10 @@ namespace AspireAppTemplate.Web.Components.Pages.Admin
             {
                 try
                 {
-                    await IdentityClient.CreateRoleAsync(role);
+                    await ExecuteWithAuthHandlingAsync(async () =>
+                    {
+                        await IdentityClient.CreateRoleAsync(role);
+                    });
                     Snackbar.Add("角色已新增", Severity.Success);
                     await LoadRoles();
                 }
@@ -77,7 +83,10 @@ namespace AspireAppTemplate.Web.Components.Pages.Admin
             {
                 try
                 {
-                    await IdentityClient.DeleteRoleAsync(role.Name);
+                    await ExecuteWithAuthHandlingAsync(async () =>
+                    {
+                        await IdentityClient.DeleteRoleAsync(role.Name);
+                    });
                     Snackbar.Add("角色已刪除", Severity.Success);
                     await LoadRoles();
                 }
