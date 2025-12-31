@@ -1,6 +1,6 @@
 {
   "id": "86683c73-be28-4380-a014-6316c0404192",
-  "realm": "WeatherShop",
+  "realm": "AspireApp",
   "notBefore": 0,
   "defaultSignatureAlgorithm": "RS256",
   "revokeRefreshToken": false,
@@ -69,7 +69,7 @@
       ],
       "realmRoles": [
         "Administrator",
-        "default-roles-weathershop"
+        "default-roles-aspireapp"
       ],
       "clientRoles": {
         "account": [
@@ -95,7 +95,7 @@
       ],
       "realmRoles": [
         "Administrator",
-        "default-roles-weathershop"
+        "default-roles-aspireapp"
       ],
       "clientRoles": {
         "account": [
@@ -118,7 +118,7 @@
       },
       {
         "id": "f2bd959d-ed9d-4409-af6d-206a4a52cc23",
-        "name": "default-roles-weathershop",
+        "name": "default-roles-aspireapp",
         "description": "${role_default-roles}",
         "composite": true,
         "composites": {
@@ -369,7 +369,7 @@
           "attributes": {}
         }
       ],
-      "WeatherWeb": [],
+      "WebApp": [],
       "security-admin-console": [],
       "admin-cli": [],
       "account-console": [],
@@ -385,7 +385,7 @@
         }
       ],
       "Postman": [],
-      "weather.api": [],
+      "ApiService": [],
       "account": [
         {
           "id": "b4a01a53-3ed0-4e96-8fd1-efb0c143a45d",
@@ -479,7 +479,7 @@
   "groups": [],
   "defaultRole": {
     "id": "f2bd959d-ed9d-4409-af6d-206a4a52cc23",
-    "name": "default-roles-weathershop",
+    "name": "default-roles-aspireapp",
     "description": "${role_default-roles}",
     "composite": true,
     "clientRole": false,
@@ -598,13 +598,13 @@
         "address",
         "phone",
         "offline_access",
-        "weather:all",
+        "api:all",
         "microprofile-jwt"
       ]
     },
     {
       "id": "016c17d1-8e0f-4a67-9116-86b4691ba99c",
-      "clientId": "WeatherWeb",
+      "clientId": "WebApp",
       "name": "",
       "description": "",
       "rootUrl": "",
@@ -646,12 +646,12 @@
       "nodeReRegistrationTimeout": -1,
       "protocolMappers": [
         {
-          "name": "weather-api-audience",
+          "name": "ApiService-audience",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-hardcoded-audience-mapper",
           "consentRequired": false,
           "config": {
-            "included.custom.audience": "weather.api",
+            "included.custom.audience": "ApiService",
             "id.token.claim": "false",
             "access.token.claim": "true"
           }
@@ -668,7 +668,7 @@
         "address",
         "phone",
         "offline_access",
-        "weather:all",
+        "api:all",
         "microprofile-jwt"
       ]
     },
@@ -677,13 +677,13 @@
       "clientId": "account",
       "name": "${client_account}",
       "rootUrl": "${authBaseUrl}",
-      "baseUrl": "/realms/WeatherShop/account/",
+      "baseUrl": "/realms/AspireApp/account/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "/realms/WeatherShop/account/*"
+        "/realms/AspireApp/account/*"
       ],
       "webOrigins": [],
       "notBefore": 0,
@@ -721,13 +721,13 @@
       "clientId": "account-console",
       "name": "${client_account-console}",
       "rootUrl": "${authBaseUrl}",
-      "baseUrl": "/realms/WeatherShop/account/",
+      "baseUrl": "/realms/AspireApp/account/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "/realms/WeatherShop/account/*"
+        "/realms/AspireApp/account/*"
       ],
       "webOrigins": [],
       "notBefore": 0,
@@ -896,13 +896,13 @@
       "clientId": "security-admin-console",
       "name": "${client_security-admin-console}",
       "rootUrl": "${authAdminUrl}",
-      "baseUrl": "/admin/WeatherShop/console/",
+      "baseUrl": "/admin/AspireApp/console/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "/admin/WeatherShop/console/*"
+        "/admin/AspireApp/console/*"
       ],
       "webOrigins": [
         "+"
@@ -958,7 +958,7 @@
     },
     {
       "id": "4b5953fd-b218-41be-b061-58f37c1c7d26",
-      "clientId": "weather.api",
+      "clientId": "ApiService",
       "name": "",
       "description": "",
       "rootUrl": "",
@@ -1059,7 +1059,7 @@
     },
     {
       "id": "52fc55cb-995e-4aa2-95ae-3b3d6601dc41",
-      "name": "weather:all",
+      "name": "api:all",
       "description": "",
       "protocol": "openid-connect",
       "attributes": {
@@ -1071,12 +1071,12 @@
       "protocolMappers": [
         {
           "id": "06d03e02-1e56-4bde-911d-bcf28aeba90f",
-          "name": "weather api audience",
+          "name": "ApiService audience",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-audience-mapper",
           "consentRequired": false,
           "config": {
-            "included.client.audience": "weather.api",
+            "included.client.audience": "ApiService",
             "introspection.token.claim": "true",
             "userinfo.token.claim": "false",
             "id.token.claim": "false",
@@ -1609,7 +1609,7 @@
     "address",
     "phone",
     "microprofile-jwt",
-    "weather:all"
+    "api:all"
   ],
   "browserSecurityHeaders": {
     "contentSecurityPolicyReportOnly": "",

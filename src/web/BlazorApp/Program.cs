@@ -86,11 +86,11 @@ builder.Services.AddHttpClient<StorageApiClient>(client =>
 
 var oidcScheme = OpenIdConnectDefaults.AuthenticationScheme;
 builder.Services.AddAuthentication(oidcScheme)
-    .AddKeycloakOpenIdConnect("keycloak", realm: "WeatherShop", oidcScheme, options =>
+    .AddKeycloakOpenIdConnect("keycloak", realm: "AspireApp", oidcScheme, options =>
     {
-        options.ClientId="WeatherWeb";
+        options.ClientId="WebApp";
         options.ResponseType = OpenIdConnectResponseType.Code;
-        options.Scope.Add("weather:all");
+        options.Scope.Add("api:all");
         options.TokenValidationParameters.NameClaimType = JwtRegisteredClaimNames.Name;
         options.TokenValidationParameters.RoleClaimType = "role"; // Keycloak uses short "role" claim
         options.SaveTokens = true;
