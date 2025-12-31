@@ -16,7 +16,7 @@
             Style="width: 400px; max-height: 500px;">
     <MudPaper Elevation="0" Class="pa-4">
         <div class="d-flex justify-space-between align-center mb-3">
-            <MudText Typo="Typo.h6">通知中心</MudText>
+            <MudText Typo="Typo.h6">@Loc["NotificationCenter_Title"]</MudText>
             @if (_notifications.Any())
             {
                 <div>
@@ -24,13 +24,13 @@
                                Variant="Variant.Text" 
                                OnClick="MarkAllAsRead"
                                Disabled="@(_unreadCount == 0)">
-                        全部已讀
+                        @Loc["NotificationCenter_MarkAllRead"]
                     </MudButton>
                     <MudButton Size="Size.Small" 
                                Variant="Variant.Text" 
                                Color="Color.Error"
                                OnClick="ClearAll">
-                        清空
+                        @Loc["NotificationCenter_Clear"]
                     </MudButton>
                 </div>
             }
@@ -42,7 +42,7 @@
         {
             <div class="d-flex flex-column align-center justify-center pa-8">
                 <MudIcon Icon="@Icons.Material.Filled.NotificationsNone" Size="Size.Large" Color="Color.Default" Class="mb-2" />
-                <MudText Typo="Typo.body2" Color="Color.Default">目前沒有通知</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Default">@Loc["NotificationCenter_NoNotifications"]</MudText>
             </div>
         }
         else

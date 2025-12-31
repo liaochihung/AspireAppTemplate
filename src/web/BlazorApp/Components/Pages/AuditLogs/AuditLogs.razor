@@ -7,10 +7,13 @@
 @using Microsoft.AspNetCore.Authorization
 @inject AuditLogApiClient AuditClient
 @inject IDialogService DialogService
+@using Microsoft.Extensions.Localization
+@using AspireAppTemplate.Shared.Resources
+@inject IStringLocalizer<SharedResource> Loc
 
 <PageHeader Icon="@Icons.Material.Filled.History" 
-            Title="稽核日誌" 
-            Description="查看系統操作與變更記錄">
+            Title="@Loc["AuditLogs_Title"]" 
+            Description="@Loc["AuditLogs_Description"]">
 </PageHeader>
 
 <MudPaper Elevation="2" Class="pa-0">
@@ -18,18 +21,18 @@
         <ToolBarContent>
             <MudSpacer />
             <DebouncedSearchField @bind-Value="_searchString" 
-                                  Placeholder="搜尋操作、使用者或實體..."
+                                  Placeholder="@Loc["Audit_SearchPlaceholder"]"
                                   DebounceMs="300" />
         </ToolBarContent>
         <Columns>
-            <TemplateColumn T="AuditLogDto" Title="時間" SortBy="@(x => x.Timestamp)">
+            <TemplateColumn T="AuditLogDto" Title="@Loc["Audit_Timestamp"]" SortBy="@(x => x.Timestamp)">
                 <CellTemplate Context="cellContext">
                    <MudText Typo="Typo.body2">
                        @cellContext.Item.Timestamp.ToLocalTime().ToString("yyyy/MM/dd HH:mm:ss")
                    </MudText>
                 </CellTemplate>
             </TemplateColumn>
-            <TemplateColumn T="AuditLogDto" Title="使用者" SortBy="@(x => x.UserName)">
+            <TemplateColumn T="AuditLogDto" Title="@Loc["Audit_User"]" SortBy="@(x => x.UserName)">
                 <CellTemplate Context="cellContext">
                     <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
                         <MudAvatar Size="Size.Small" Color="Color.Tertiary">
@@ -42,22 +45,22 @@
                     </MudStack>
                 </CellTemplate>
             </TemplateColumn>
-            <TemplateColumn T="AuditLogDto" Title="動作" SortBy="x => x.Action">
+            <TemplateColumn T="AuditLogDto" Title="@Loc["Audit_Action"]" SortBy="x => x.Action">
                 <CellTemplate Context="cellContext">
                      <MudText Typo="Typo.body2">@cellContext.Item.Action</MudText>
                 </CellTemplate>
             </TemplateColumn>
-            <TemplateColumn T="AuditLogDto" Title="實體類型" SortBy="x => x.EntityName">
+            <TemplateColumn T="AuditLogDto" Title="@Loc["Audit_EntityType"]" SortBy="x => x.EntityName">
                 <CellTemplate Context="cellContext">
                      <MudText Typo="Typo.body2">@cellContext.Item.EntityName</MudText>
                 </CellTemplate>
             </TemplateColumn>
-            <TemplateColumn T="AuditLogDto" Title="實體 ID">
+            <TemplateColumn T="AuditLogDto" Title="@Loc["Audit_EntityId"]">
                 <CellTemplate Context="cellContext">
                     <MudText Typo="Typo.caption" Style="font-family: monospace;">@cellContext.Item.EntityId</MudText>
                 </CellTemplate>
             </TemplateColumn>
-            <TemplateColumn T="AuditLogDto" Title="詳情">
+            <TemplateColumn T="AuditLogDto" Title="@Loc["Audit_Details"]">
                 <CellTemplate Context="cellContext">
                      @{
                          var hasDetails = !string.IsNullOrEmpty(cellContext.Item.OldValues) || !string.IsNullOrEmpty(cellContext.Item.NewValues);
@@ -68,7 +71,7 @@
                                    Color="Color.Info" 
                                    Size="Size.Small"
                                    OnClick="@(async () => await ShowDetails(cellContext.Item))">
-                            查看變更
+                            @Loc["Audit_ViewChanges"]
                         </MudButton>
                      }
                      else
@@ -84,7 +87,7 @@
         <NoRecordsContent>
             <MudStack AlignItems="AlignItems.Center" Class="pa-8">
                 <MudIcon Icon="@Icons.Material.Filled.HistoryToggleOff" Size="Size.Large" Color="Color.Default" />
-                <MudText Typo="Typo.body1" Color="Color.Default">目前沒有稽核記錄</MudText>
+                <MudText Typo="Typo.body1" Color="Color.Default">@Loc["Audit_NoRecords"]</MudText>
             </MudStack>
         </NoRecordsContent>
     </AppDataGrid>
@@ -144,6 +147,6 @@
     {
         var parameters = new DialogParameters<AuditLogDetailDialog> { { x => x.AuditLog, item } };
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
-        await DialogService.ShowAsync<AuditLogDetailDialog>("變更詳情", parameters, options);
+        await DialogService.ShowAsync<AuditLogDetailDialog>(Loc["Audit_ChangeDetails"], parameters, options);
     }
 }

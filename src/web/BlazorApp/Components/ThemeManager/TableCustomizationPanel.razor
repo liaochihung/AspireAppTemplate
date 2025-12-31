@@ -1,7 +1,7 @@
 <MudExpansionPanel HideIcon="true">
     <TitleContent>
         <div class="d-flex">
-            <MudText Class="mt-1">自訂表格樣式</MudText>
+            <MudText Class="mt-1">@Loc["ThemeManager_TableCustomization"]</MudText>
             <MudAvatar Color="Color.Primary" Class="d-flex ml-auto"
                 style="width: 30px;height:30px;font-size:small!important">T
             </MudAvatar>
@@ -9,12 +9,12 @@
     </TitleContent>
     <ChildContent>
         <div @onclick:stopPropagation="true">
-            <MudSwitch T="bool" Label="緊湊" Color="Color.Info" @oninput="@ToggleDenseSwitch" @bind-Value="@IsDense" />
-            <MudSwitch T="bool" Label="條紋" Color="Color.Info" @oninput="@ToggleStripedSwitch"
+            <MudSwitch T="bool" Label="@Loc["ThemeManager_Dense"]" Color="Color.Info" @oninput="@ToggleDenseSwitch" @bind-Value="@IsDense" />
+            <MudSwitch T="bool" Label="@Loc["ThemeManager_Striped"]" Color="Color.Info" @oninput="@ToggleStripedSwitch"
                        @bind-Value="@IsStriped" />
-            <MudSwitch T="bool" Label="邊框" Color="Color.Info" @oninput="@ToggleBorderedSwitch"
+            <MudSwitch T="bool" Label="@Loc["ThemeManager_Bordered"]" Color="Color.Info" @oninput="@ToggleBorderedSwitch"
                        @bind-Value="@HasBorder" />
-            <MudSwitch T="bool" Label="懸停高亮" Color="Color.Info" @oninput="@ToggleHoverableSwitch"
+            <MudSwitch T="bool" Label="@Loc["ThemeManager_Hoverable"]" Color="Color.Info" @oninput="@ToggleHoverableSwitch"
                        @bind-Value="@IsHoverable" />
         </div>
     </ChildContent>

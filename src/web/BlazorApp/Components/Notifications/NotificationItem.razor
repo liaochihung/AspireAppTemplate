@@ -64,13 +64,13 @@
         var diff = DateTime.UtcNow - Notification.Timestamp;
 
         if (diff.TotalMinutes < 1)
-            return "剛剛";
+            return Loc["Time_JustNow"];
         if (diff.TotalMinutes < 60)
-            return $"{(int)diff.TotalMinutes} 分鐘前";
+            return Loc["Time_MinutesAgo", (int)diff.TotalMinutes];
         if (diff.TotalHours < 24)
-            return $"{(int)diff.TotalHours} 小時前";
+            return Loc["Time_HoursAgo", (int)diff.TotalHours];
         if (diff.TotalDays < 7)
-            return $"{(int)diff.TotalDays} 天前";
+            return Loc["Time_DaysAgo", (int)diff.TotalDays];
         
         return Notification.Timestamp.ToLocalTime().ToString("MM/dd HH:mm");
     }

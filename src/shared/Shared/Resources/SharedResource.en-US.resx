@@ -404,4 +404,338 @@
     <value>Guest</value>
   </data>
 
+  <!-- Custom Jobs -->
+  <data name="CustomJobs_Title" xml:space="preserve">
+    <value>Custom Jobs</value>
+  </data>
+  <data name="CustomJobs_Description" xml:space="preserve">
+    <value>Create background jobs that call HTTP APIs</value>
+  </data>
+  <data name="Job_Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Job_Type" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="Job_HttpMethod" xml:space="preserve">
+    <value>HTTP Method</value>
+  </data>
+  <data name="Job_URL" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="Job_Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Job_CreatedAt" xml:space="preserve">
+    <value>Created At</value>
+  </data>
+  <data name="Job_OneTime" xml:space="preserve">
+    <value>One-time</value>
+  </data>
+  <data name="Job_Recurring" xml:space="preserve">
+    <value>Recurring</value>
+  </data>
+  <data name="Job_Active" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="Job_Inactive" xml:space="preserve">
+    <value>Inactive</value>
+  </data>
+  <data name="Job_Enable" xml:space="preserve">
+    <value>Enable</value>
+  </data>
+  <data name="Job_Disable" xml:space="preserve">
+    <value>Disable</value>
+  </data>
+  <data name="Job_Delete" xml:space="preserve">
+    <value>Delete Job</value>
+  </data>
+  <data name="Job_Create" xml:space="preserve">
+    <value>Create Job</value>
+  </data>
+  <data name="Job_NoRecords" xml:space="preserve">
+    <value>No custom jobs found</value>
+  </data>
+  <data name="Job_LoadFail" xml:space="preserve">
+    <value>Failed to load jobs: {0}</value>
+  </data>
+  <data name="Job_Created" xml:space="preserve">
+    <value>Job created</value>
+  </data>
+  <data name="Job_CreateFail" xml:space="preserve">
+    <value>Failed to create job: {0}</value>
+  </data>
+  <data name="Job_Toggled" xml:space="preserve">
+    <value>Job {0}</value>
+  </data>
+  <data name="Job_ToggleFail" xml:space="preserve">
+    <value>Operation failed: {0}</value>
+  </data>
+  <data name="Job_Deleted" xml:space="preserve">
+    <value>Job deleted</value>
+  </data>
+  <data name="Job_DeleteFail" xml:space="preserve">
+    <value>Failed to delete job: {0}</value>
+  </data>
+  <data name="Job_ConfirmDelete" xml:space="preserve">
+    <value>Are you sure you want to delete {0}?</value>
+  </data>
+  <data name="Job_NamePlaceholder" xml:space="preserve">
+    <value>e.g. Sync Data, Generate Report</value>
+  </data>
+  <data name="Job_DescriptionPlaceholder" xml:space="preserve">
+    <value>Brief description of this job</value>
+  </data>
+  <data name="Job_Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Job_TypeLabel" xml:space="preserve">
+    <value>Job Type</value>
+  </data>
+  <data name="Job_ExecutionDate" xml:space="preserve">
+    <value>Execution Date</value>
+  </data>
+  <data name="Job_ExecutionTime" xml:space="preserve">
+    <value>Execution Time</value>
+  </data>
+  <data name="Job_CronExpression" xml:space="preserve">
+    <value>Cron Expression</value>
+  </data>
+  <data name="Job_CronHelper" xml:space="preserve">
+    <value>e.g. * * * * * (every minute) or 0 0 * * * (daily at midnight)</value>
+  </data>
+  <data name="Job_URLHelper" xml:space="preserve">
+    <value>e.g. https://jsonplaceholder.typicode.com/posts/1</value>
+  </data>
+  <data name="Job_TestConnection" xml:space="preserve">
+    <value>Test Connection</value>
+  </data>
+  <data name="Job_Testing" xml:space="preserve">
+    <value>Testing...</value>
+  </data>
+  <data name="Job_TestStatus" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Job_TestSuccess" xml:space="preserve">
+    <value>Success</value>
+  </data>
+  <data name="Job_TestFailed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+  <data name="Job_TestLatency" xml:space="preserve">
+    <value>Latency</value>
+  </data>
+  <data name="Job_TestError" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Job_TestResponse" xml:space="preserve">
+    <value>View Response</value>
+  </data>
+  <data name="Job_Headers" xml:space="preserve">
+    <value>Headers (JSON)</value>
+  </data>
+  <data name="Job_HeadersHelper" xml:space="preserve">
+    <value>e.g. {"Authorization": "Bearer token"}</value>
+  </data>
+  <data name="Job_Body" xml:space="preserve">
+    <value>Body (JSON)</value>
+  </data>
+  <data name="Job_BodyHelper" xml:space="preserve">
+    <value>e.g. {"title": "test", "body": "content"}</value>
+  </data>
+
+  <!-- Audit Logs -->
+  <data name="AuditLogs_Title" xml:space="preserve">
+    <value>Audit Logs</value>
+  </data>
+  <data name="AuditLogs_Description" xml:space="preserve">
+    <value>View system operations and change history</value>
+  </data>
+  <data name="Audit_Timestamp" xml:space="preserve">
+    <value>Time</value>
+  </data>
+  <data name="Audit_User" xml:space="preserve">
+    <value>User</value>
+  </data>
+  <data name="Audit_Action" xml:space="preserve">
+    <value>Action</value>
+  </data>
+  <data name="Audit_EntityType" xml:space="preserve">
+    <value>Entity Type</value>
+  </data>
+  <data name="Audit_EntityId" xml:space="preserve">
+    <value>Entity ID</value>
+  </data>
+  <data name="Audit_Details" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="Audit_ViewChanges" xml:space="preserve">
+    <value>View Changes</value>
+  </data>
+  <data name="Audit_NoRecords" xml:space="preserve">
+    <value>No audit records found</value>
+  </data>
+  <data name="Audit_SearchPlaceholder" xml:space="preserve">
+    <value>Search action, user or entity...</value>
+  </data>
+  <data name="Audit_ChangeDetails" xml:space="preserve">
+    <value>Change Details</value>
+  </data>
+  <data name="Audit_Before" xml:space="preserve">
+    <value>Before</value>
+  </data>
+  <data name="Audit_After" xml:space="preserve">
+    <value>After</value>
+  </data>
+  <data name="Audit_PerformedBy" xml:space="preserve">
+    <value>Performed by {0} at {1}</value>
+  </data>
+
+  <!-- Notifications Demo -->
+  <data name="NotificationsDemo_Title" xml:space="preserve">
+    <value>Notification Center Test</value>
+  </data>
+  <data name="NotificationsDemo_PageTitle" xml:space="preserve">
+    <value>Notification Center Test Page</value>
+  </data>
+  <data name="NotificationsDemo_TestIntegration" xml:space="preserve">
+    <value>Test Snackbar &amp; Notification Center Integration</value>
+  </data>
+  <data name="NotificationsDemo_InfoButton" xml:space="preserve">
+    <value>Info (Not in Center)</value>
+  </data>
+  <data name="NotificationsDemo_SuccessButton" xml:space="preserve">
+    <value>Success (Not in Center)</value>
+  </data>
+  <data name="NotificationsDemo_WarningButton" xml:space="preserve">
+    <value>Warning (In Center)</value>
+  </data>
+  <data name="NotificationsDemo_ErrorButton" xml:space="preserve">
+    <value>Error (In Center)</value>
+  </data>
+  <data name="NotificationsDemo_Instructions" xml:space="preserve">
+    <value>Instructions</value>
+  </data>
+  <data name="NotificationsDemo_InfoDesc" xml:space="preserve">
+    <value>Only shows Snackbar, auto-dismiss after 3s, not added to notification center</value>
+  </data>
+  <data name="NotificationsDemo_WarningDesc" xml:space="preserve">
+    <value>Shows Snackbar and adds to notification center, click 🔔 in top-right to view</value>
+  </data>
+  <data name="NotificationsDemo_ErrorDesc" xml:space="preserve">
+    <value>Shows Snackbar and adds to notification center, click 🔔 in top-right to view</value>
+  </data>
+  <data name="NotificationsDemo_TestMessage" xml:space="preserve">
+    <value>{0} Test Message #{1}</value>
+  </data>
+
+  <!-- Notification Center -->
+  <data name="NotificationCenter_Title" xml:space="preserve">
+    <value>Notification Center</value>
+  </data>
+  <data name="NotificationCenter_MarkAllRead" xml:space="preserve">
+    <value>Mark All Read</value>
+  </data>
+  <data name="NotificationCenter_Clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="NotificationCenter_NoNotifications" xml:space="preserve">
+    <value>No notifications</value>
+  </data>
+
+  <!-- Theme Manager -->
+  <data name="ThemeManager_Title" xml:space="preserve">
+    <value>Theme Settings</value>
+  </data>
+  <data name="ThemeManager_SwitchToLight" xml:space="preserve">
+    <value>Switch to Light Mode</value>
+  </data>
+  <data name="ThemeManager_SwitchToDark" xml:space="preserve">
+    <value>Switch to Dark Mode</value>
+  </data>
+  <data name="ThemeManager_PrimaryColor" xml:space="preserve">
+    <value>Primary Color</value>
+  </data>
+  <data name="ThemeManager_SecondaryColor" xml:space="preserve">
+    <value>Secondary Color</value>
+  </data>
+  <data name="ThemeManager_BorderRadius" xml:space="preserve">
+    <value>Border Radius (Rounded Corners)</value>
+  </data>
+  <data name="ThemeManager_TableCustomization" xml:space="preserve">
+    <value>Table Customization</value>
+  </data>
+  <data name="ThemeManager_Dense" xml:space="preserve">
+    <value>Dense</value>
+  </data>
+  <data name="ThemeManager_Striped" xml:space="preserve">
+    <value>Striped</value>
+  </data>
+  <data name="ThemeManager_Bordered" xml:space="preserve">
+    <value>Bordered</value>
+  </data>
+  <data name="ThemeManager_Hoverable" xml:space="preserve">
+    <value>Hover Highlight</value>
+  </data>
+
+  <!-- Time -->
+  <data name="Time_JustNow" xml:space="preserve">
+    <value>Just now</value>
+  </data>
+  <data name="Time_MinutesAgo" xml:space="preserve">
+    <value>{0} minutes ago</value>
+  </data>
+  <data name="Time_HoursAgo" xml:space="preserve">
+    <value>{0} hours ago</value>
+  </data>
+  <data name="Time_DaysAgo" xml:space="preserve">
+    <value>{0} days ago</value>
+  </data>
+
+  <!-- Login Display -->
+  <data name="LoginDisplay_Account" xml:space="preserve">
+    <value>Account</value>
+  </data>
+  <data name="LoginDisplay_Dashboard" xml:space="preserve">
+    <value>Dashboard</value>
+  </data>
+  <data name="LoginDisplay_Logout" xml:space="preserve">
+    <value>Logout</value>
+  </data>
+  <data name="LoginDisplay_Login" xml:space="preserve">
+    <value>Login</value>
+  </data>
+
+  <!-- Account Settings -->
+  <data name="Settings_Title" xml:space="preserve">
+    <value>Account Settings</value>
+  </data>
+  <data name="Settings_PageTitle" xml:space="preserve">
+    <value>User Settings</value>
+  </data>
+  <data name="Settings_BasicInfo" xml:space="preserve">
+    <value>Basic Information</value>
+  </data>
+  <data name="Settings_Username" xml:space="preserve">
+    <value>Username</value>
+  </data>
+  <data name="Settings_Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="Settings_DevInProgress" xml:space="preserve">
+    <value>Backend settings feature in development...</value>
+  </data>
+  <data name="Settings_SaveChanges" xml:space="preserve">
+    <value>Save Changes</value>
+  </data>
+  <data name="Settings_Security" xml:space="preserve">
+    <value>Security Settings</value>
+  </data>
+  <data name="Settings_ChangePassword" xml:space="preserve">
+    <value>Change Password</value>
+  </data>
+  <data name="Settings_Enable2FA" xml:space="preserve">
+    <value>Enable Two-Factor Authentication</value>
+  </data>
+
 </root>

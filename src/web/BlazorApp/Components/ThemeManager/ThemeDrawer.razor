@@ -5,7 +5,7 @@
     Width="350px" Height="100vh" OverlayAutoClose="true">
     <MudDrawerHeader Class="align-center">
         <MudText Typo="Typo.h6">
-            主題管理
+            @Loc["ThemeManager_Title"]
         </MudText>
         <MudSpacer />
         <MudIconButton Color="Color.Default" Icon="@Icons.Material.Filled.Close"
@@ -17,11 +17,11 @@
             <DarkModePanel OnIconClicked="ToggleDarkLightMode" />
             <ColorPanel OnColorClicked="UpdateThemePrimaryColor" 
                         Colors="_colors" 
-                        ColorType="主色調"
+                        ColorType="@Loc["ThemeManager_PrimaryColor"]"
                         CurrentColor="Color.Primary" />
             <ColorPanel OnColorClicked="UpdateThemeSecondaryColor" 
                         Colors="_colors" 
-                        ColorType="輔色調"
+                        ColorType="@Loc["ThemeManager_SecondaryColor"]"
                         CurrentColor="Color.Secondary" />
             <RadiusPanel Radius="ThemePreference==null ? 0 : ThemePreference.BorderRadius"
                 OnSliderChanged="UpdateBorderRadius" />

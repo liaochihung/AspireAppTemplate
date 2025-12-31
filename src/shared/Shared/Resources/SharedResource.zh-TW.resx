@@ -392,4 +392,338 @@
     <value>訪客</value>
   </data>
 
+  <!-- Custom Jobs -->
+  <data name="CustomJobs_Title" xml:space="preserve">
+    <value>自訂任務管理</value>
+  </data>
+  <data name="CustomJobs_Description" xml:space="preserve">
+    <value>建立可呼叫 HTTP API 的背景任務</value>
+  </data>
+  <data name="Job_Name" xml:space="preserve">
+    <value>名稱</value>
+  </data>
+  <data name="Job_Type" xml:space="preserve">
+    <value>類型</value>
+  </data>
+  <data name="Job_HttpMethod" xml:space="preserve">
+    <value>HTTP 方法</value>
+  </data>
+  <data name="Job_URL" xml:space="preserve">
+    <value>URL</value>
+  </data>
+  <data name="Job_Status" xml:space="preserve">
+    <value>狀態</value>
+  </data>
+  <data name="Job_CreatedAt" xml:space="preserve">
+    <value>建立時間</value>
+  </data>
+  <data name="Job_OneTime" xml:space="preserve">
+    <value>一次性</value>
+  </data>
+  <data name="Job_Recurring" xml:space="preserve">
+    <value>週期性</value>
+  </data>
+  <data name="Job_Active" xml:space="preserve">
+    <value>啟用中</value>
+  </data>
+  <data name="Job_Inactive" xml:space="preserve">
+    <value>已停用</value>
+  </data>
+  <data name="Job_Enable" xml:space="preserve">
+    <value>啟用</value>
+  </data>
+  <data name="Job_Disable" xml:space="preserve">
+    <value>停用</value>
+  </data>
+  <data name="Job_Delete" xml:space="preserve">
+    <value>刪除任務</value>
+  </data>
+  <data name="Job_Create" xml:space="preserve">
+    <value>新增任務</value>
+  </data>
+  <data name="Job_NoRecords" xml:space="preserve">
+    <value>目前沒有自訂任務</value>
+  </data>
+  <data name="Job_LoadFail" xml:space="preserve">
+    <value>任務載入失敗: {0}</value>
+  </data>
+  <data name="Job_Created" xml:space="preserve">
+    <value>任務已新增</value>
+  </data>
+  <data name="Job_CreateFail" xml:space="preserve">
+    <value>任務新增失敗: {0}</value>
+  </data>
+  <data name="Job_Toggled" xml:space="preserve">
+    <value>任務已{0}</value>
+  </data>
+  <data name="Job_ToggleFail" xml:space="preserve">
+    <value>操作失敗: {0}</value>
+  </data>
+  <data name="Job_Deleted" xml:space="preserve">
+    <value>任務已刪除</value>
+  </data>
+  <data name="Job_DeleteFail" xml:space="preserve">
+    <value>任務刪除失敗: {0}</value>
+  </data>
+  <data name="Job_ConfirmDelete" xml:space="preserve">
+    <value>確定要刪除 {0} 嗎?</value>
+  </data>
+  <data name="Job_NamePlaceholder" xml:space="preserve">
+    <value>例如: 同步資料、產生報表</value>
+  </data>
+  <data name="Job_DescriptionPlaceholder" xml:space="preserve">
+    <value>簡單說明此任務的用途</value>
+  </data>
+  <data name="Job_Description" xml:space="preserve">
+    <value>描述</value>
+  </data>
+  <data name="Job_TypeLabel" xml:space="preserve">
+    <value>任務類型</value>
+  </data>
+  <data name="Job_ExecutionDate" xml:space="preserve">
+    <value>執行日期</value>
+  </data>
+  <data name="Job_ExecutionTime" xml:space="preserve">
+    <value>執行時間</value>
+  </data>
+  <data name="Job_CronExpression" xml:space="preserve">
+    <value>Cron 表達式</value>
+  </data>
+  <data name="Job_CronHelper" xml:space="preserve">
+    <value>例如: * * * * * (每分鐘) 或 0 0 * * * (每天午夜)</value>
+  </data>
+  <data name="Job_URLHelper" xml:space="preserve">
+    <value>例如: https://jsonplaceholder.typicode.com/posts/1</value>
+  </data>
+  <data name="Job_TestConnection" xml:space="preserve">
+    <value>測試連線</value>
+  </data>
+  <data name="Job_Testing" xml:space="preserve">
+    <value>測試中...</value>
+  </data>
+  <data name="Job_TestStatus" xml:space="preserve">
+    <value>狀態</value>
+  </data>
+  <data name="Job_TestSuccess" xml:space="preserve">
+    <value>成功</value>
+  </data>
+  <data name="Job_TestFailed" xml:space="preserve">
+    <value>失敗</value>
+  </data>
+  <data name="Job_TestLatency" xml:space="preserve">
+    <value>耗時</value>
+  </data>
+  <data name="Job_TestError" xml:space="preserve">
+    <value>錯誤</value>
+  </data>
+  <data name="Job_TestResponse" xml:space="preserve">
+    <value>查看回應內容</value>
+  </data>
+  <data name="Job_Headers" xml:space="preserve">
+    <value>Headers (JSON)</value>
+  </data>
+  <data name="Job_HeadersHelper" xml:space="preserve">
+    <value>例如: {"Authorization": "Bearer token"}</value>
+  </data>
+  <data name="Job_Body" xml:space="preserve">
+    <value>Body (JSON)</value>
+  </data>
+  <data name="Job_BodyHelper" xml:space="preserve">
+    <value>例如: {"title": "test", "body": "content"}</value>
+  </data>
+
+  <!-- Audit Logs -->
+  <data name="AuditLogs_Title" xml:space="preserve">
+    <value>稽核日誌</value>
+  </data>
+  <data name="AuditLogs_Description" xml:space="preserve">
+    <value>查看系統操作與變更記錄</value>
+  </data>
+  <data name="Audit_Timestamp" xml:space="preserve">
+    <value>時間</value>
+  </data>
+  <data name="Audit_User" xml:space="preserve">
+    <value>使用者</value>
+  </data>
+  <data name="Audit_Action" xml:space="preserve">
+    <value>動作</value>
+  </data>
+  <data name="Audit_EntityType" xml:space="preserve">
+    <value>實體類型</value>
+  </data>
+  <data name="Audit_EntityId" xml:space="preserve">
+    <value>實體 ID</value>
+  </data>
+  <data name="Audit_Details" xml:space="preserve">
+    <value>詳情</value>
+  </data>
+  <data name="Audit_ViewChanges" xml:space="preserve">
+    <value>查看變更</value>
+  </data>
+  <data name="Audit_NoRecords" xml:space="preserve">
+    <value>目前沒有稽核記錄</value>
+  </data>
+  <data name="Audit_SearchPlaceholder" xml:space="preserve">
+    <value>搜尋操作、使用者或實體...</value>
+  </data>
+  <data name="Audit_ChangeDetails" xml:space="preserve">
+    <value>變更詳情</value>
+  </data>
+  <data name="Audit_Before" xml:space="preserve">
+    <value>變更前</value>
+  </data>
+  <data name="Audit_After" xml:space="preserve">
+    <value>變更後</value>
+  </data>
+  <data name="Audit_PerformedBy" xml:space="preserve">
+    <value>由 {0} 於 {1} 執行</value>
+  </data>
+
+  <!-- Notifications Demo -->
+  <data name="NotificationsDemo_Title" xml:space="preserve">
+    <value>通知中心測試</value>
+  </data>
+  <data name="NotificationsDemo_PageTitle" xml:space="preserve">
+    <value>Notification Center 測試頁面</value>
+  </data>
+  <data name="NotificationsDemo_TestIntegration" xml:space="preserve">
+    <value>測試 Snackbar 與 Notification Center 整合</value>
+  </data>
+  <data name="NotificationsDemo_InfoButton" xml:space="preserve">
+    <value>Info (不進通知中心)</value>
+  </data>
+  <data name="NotificationsDemo_SuccessButton" xml:space="preserve">
+    <value>Success (不進通知中心)</value>
+  </data>
+  <data name="NotificationsDemo_WarningButton" xml:space="preserve">
+    <value>Warning (進通知中心)</value>
+  </data>
+  <data name="NotificationsDemo_ErrorButton" xml:space="preserve">
+    <value>Error (進通知中心)</value>
+  </data>
+  <data name="NotificationsDemo_Instructions" xml:space="preserve">
+    <value>使用說明</value>
+  </data>
+  <data name="NotificationsDemo_InfoDesc" xml:space="preserve">
+    <value>只顯示 Snackbar，3 秒後自動消失，不進入通知中心</value>
+  </data>
+  <data name="NotificationsDemo_WarningDesc" xml:space="preserve">
+    <value>顯示 Snackbar 並同時加入通知中心，點擊右上角 🔔 查看</value>
+  </data>
+  <data name="NotificationsDemo_ErrorDesc" xml:space="preserve">
+    <value>顯示 Snackbar 並同時加入通知中心，點擊右上角 🔔 查看</value>
+  </data>
+  <data name="NotificationsDemo_TestMessage" xml:space="preserve">
+    <value>{0} 測試訊息 #{1}</value>
+  </data>
+
+  <!-- Notification Center -->
+  <data name="NotificationCenter_Title" xml:space="preserve">
+    <value>通知中心</value>
+  </data>
+  <data name="NotificationCenter_MarkAllRead" xml:space="preserve">
+    <value>全部已讀</value>
+  </data>
+  <data name="NotificationCenter_Clear" xml:space="preserve">
+    <value>清空</value>
+  </data>
+  <data name="NotificationCenter_NoNotifications" xml:space="preserve">
+    <value>目前沒有通知</value>
+  </data>
+
+  <!-- Theme Manager -->
+  <data name="ThemeManager_Title" xml:space="preserve">
+    <value>主題管理</value>
+  </data>
+  <data name="ThemeManager_SwitchToLight" xml:space="preserve">
+    <value>切換為淺色模式</value>
+  </data>
+  <data name="ThemeManager_SwitchToDark" xml:space="preserve">
+    <value>切換為深色模式</value>
+  </data>
+  <data name="ThemeManager_PrimaryColor" xml:space="preserve">
+    <value>主色調</value>
+  </data>
+  <data name="ThemeManager_SecondaryColor" xml:space="preserve">
+    <value>輔色調</value>
+  </data>
+  <data name="ThemeManager_BorderRadius" xml:space="preserve">
+    <value>邊框半徑(圓角)</value>
+  </data>
+  <data name="ThemeManager_TableCustomization" xml:space="preserve">
+    <value>自訂表格樣式</value>
+  </data>
+  <data name="ThemeManager_Dense" xml:space="preserve">
+    <value>緊湊</value>
+  </data>
+  <data name="ThemeManager_Striped" xml:space="preserve">
+    <value>條紋</value>
+  </data>
+  <data name="ThemeManager_Bordered" xml:space="preserve">
+    <value>邊框</value>
+  </data>
+  <data name="ThemeManager_Hoverable" xml:space="preserve">
+    <value>懸停高亮</value>
+  </data>
+
+  <!-- Time -->
+  <data name="Time_JustNow" xml:space="preserve">
+    <value>剛剛</value>
+  </data>
+  <data name="Time_MinutesAgo" xml:space="preserve">
+    <value>{0} 分鐘前</value>
+  </data>
+  <data name="Time_HoursAgo" xml:space="preserve">
+    <value>{0} 小時前</value>
+  </data>
+  <data name="Time_DaysAgo" xml:space="preserve">
+    <value>{0} 天前</value>
+  </data>
+
+  <!-- Login Display -->
+  <data name="LoginDisplay_Account" xml:space="preserve">
+    <value>帳戶</value>
+  </data>
+  <data name="LoginDisplay_Dashboard" xml:space="preserve">
+    <value>導覽頁</value>
+  </data>
+  <data name="LoginDisplay_Logout" xml:space="preserve">
+    <value>登出</value>
+  </data>
+  <data name="LoginDisplay_Login" xml:space="preserve">
+    <value>登入</value>
+  </data>
+
+  <!-- Account Settings -->
+  <data name="Settings_Title" xml:space="preserve">
+    <value>用戶設定</value>
+  </data>
+  <data name="Settings_PageTitle" xml:space="preserve">
+    <value>用戶設定</value>
+  </data>
+  <data name="Settings_BasicInfo" xml:space="preserve">
+    <value>基本資料</value>
+  </data>
+  <data name="Settings_Username" xml:space="preserve">
+    <value>使用者名稱</value>
+  </data>
+  <data name="Settings_Email" xml:space="preserve">
+    <value>電子郵件</value>
+  </data>
+  <data name="Settings_DevInProgress" xml:space="preserve">
+    <value>後端設定功能開發中...</value>
+  </data>
+  <data name="Settings_SaveChanges" xml:space="preserve">
+    <value>儲存更改</value>
+  </data>
+  <data name="Settings_Security" xml:space="preserve">
+    <value>安全設定</value>
+  </data>
+  <data name="Settings_ChangePassword" xml:space="preserve">
+    <value>更改密碼</value>
+  </data>
+  <data name="Settings_Enable2FA" xml:space="preserve">
+    <value>啟用兩步驟驗證</value>
+  </data>
+
 </root>

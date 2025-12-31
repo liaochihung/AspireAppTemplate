@@ -3,11 +3,11 @@
         <div class="d-flex" style="align-items: center;">
             @if (_isDarkMode)
             {
-                <MudText Class="mt-1">切換為淺色模式</MudText>
+                <MudText Class="mt-1">@Loc["ThemeManager_SwitchToLight"]</MudText>
             }
             else
             {
-                <MudText Class="mt-1">切換為深色模式</MudText>
+                <MudText Class="mt-1">@Loc["ThemeManager_SwitchToDark"]</MudText>
             }
             <MudToggleIconButton @bind-Toggled="_isDarkMode" Icon="@Icons.Material.Filled.WbSunny"
                 Color="@Color.Warning" title="off" Class="d-flex ml-auto" ToggledIcon="@Icons.Material.Filled.DarkMode"

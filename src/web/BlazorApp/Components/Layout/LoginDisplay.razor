@@ -10,12 +10,12 @@
                 <div class="py-2" style="min-width: 220px">
                     <MudMenuItem Icon="@Icons.Material.Filled.Person" href="/account/settings">
                         <div class="d-flex">
-                            <MudText>帳戶</MudText>
+                            <MudText>@Loc["LoginDisplay_Account"]</MudText>
                         </div>
                     </MudMenuItem>
                     <MudMenuItem Icon="@Icons.Material.Filled.Dashboard" href="/">
                         <div class="d-flex">
-                            <MudText>導覽頁</MudText>
+                            <MudText>@Loc["LoginDisplay_Dashboard"]</MudText>
                         </div>
                     </MudMenuItem>
                     <div class="mt-4 mx-4">
@@ -27,7 +27,7 @@
                                        Color="Color.Error" 
                                        Variant="Variant.Filled"
                                        DropShadow="false">
-                                登出
+                                @Loc["LoginDisplay_Logout"]
                             </MudButton>
                         </form>
                     </div>
@@ -37,7 +37,7 @@
     </Authorized>
     <NotAuthorized>
         <MudButton Href="/authentication/login" Variant="Variant.Filled" Color="Color.Surface" Size="Size.Small">
-            登入
+            @Loc["LoginDisplay_Login"]
         </MudButton>
     </NotAuthorized>
 </AuthorizeView>

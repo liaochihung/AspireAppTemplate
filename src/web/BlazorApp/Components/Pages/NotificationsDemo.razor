@@ -3,44 +3,47 @@
 @using AspireAppTemplate.Web.Infrastructure.Extensions
 @inject ISnackbar Snackbar
 @inject NotificationService NotificationService
+@using Microsoft.Extensions.Localization
+@using AspireAppTemplate.Shared.Resources
+@inject IStringLocalizer<SharedResource> Loc
 
-<PageTitle>通知中心測試</PageTitle>
+<PageTitle>@Loc["NotificationsDemo_Title"]</PageTitle>
 
-<MudText Typo="Typo.h4" Class="mb-4">Notification Center 測試頁面</MudText>
+<MudText Typo="Typo.h4" Class="mb-4">@Loc["NotificationsDemo_PageTitle"]</MudText>
 
 <MudPaper Class="pa-4 mb-4">
-    <MudText Typo="Typo.h6" Class="mb-3">測試 Snackbar 與 Notification Center 整合</MudText>
+    <MudText Typo="Typo.h6" Class="mb-3">@Loc["NotificationsDemo_TestIntegration"]</MudText>
     
     <MudStack Row="true" Spacing="2">
         <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="@(() => ShowNotification(Severity.Info))">
-            Info (不進通知中心)
+            @Loc["NotificationsDemo_InfoButton"]
         </MudButton>
         <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="@(() => ShowNotification(Severity.Success))">
-            Success (不進通知中心)
+            @Loc["NotificationsDemo_SuccessButton"]
         </MudButton>
         <MudButton Variant="Variant.Filled" Color="Color.Warning" OnClick="@(() => ShowNotification(Severity.Warning))">
-            Warning (進通知中心)
+            @Loc["NotificationsDemo_WarningButton"]
         </MudButton>
         <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="@(() => ShowNotification(Severity.Error))">
-            Error (進通知中心)
+            @Loc["NotificationsDemo_ErrorButton"]
         </MudButton>
     </MudStack>
 </MudPaper>
 
 <MudPaper Class="pa-4">
-    <MudText Typo="Typo.h6" Class="mb-3">使用說明</MudText>
+    <MudText Typo="Typo.h6" Class="mb-3">@Loc["NotificationsDemo_Instructions"]</MudText>
     <div class="ml-4">
         <div class="d-flex align-start mb-2">
             <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Info" Class="mr-2" />
-            <MudText><strong>Info / Success</strong>：只顯示 Snackbar，3 秒後自動消失，不進入通知中心</MudText>
+            <MudText><strong>Info / Success</strong>：@Loc["NotificationsDemo_InfoDesc"]</MudText>
         </div>
         <div class="d-flex align-start mb-2">
             <MudIcon Icon="@Icons.Material.Filled.Warning" Color="Color.Warning" Class="mr-2" />
-            <MudText><strong>Warning</strong>：顯示 Snackbar 並同時加入通知中心，點擊右上角 🔔 查看</MudText>
+            <MudText><strong>Warning</strong>：@Loc["NotificationsDemo_WarningDesc"]</MudText>
         </div>
         <div class="d-flex align-start mb-2">
             <MudIcon Icon="@Icons.Material.Filled.Error" Color="Color.Error" Class="mr-2" />
-            <MudText><strong>Error</strong>：顯示 Snackbar 並同時加入通知中心，點擊右上角 🔔 查看</MudText>
+            <MudText><strong>Error</strong>：@Loc["NotificationsDemo_ErrorDesc"]</MudText>
         </div>
     </div>
 </MudPaper>
@@ -51,7 +54,7 @@
     private async Task ShowNotification(Severity severity)
     {
         _counter++;
-        var message = $"{severity} 測試訊息 #{_counter}";
+        var message = Loc["NotificationsDemo_TestMessage", severity, _counter];
         
         // 使用擴充方法自動整合
         await Snackbar.AddWithNotificationAsync(NotificationService, message, severity);

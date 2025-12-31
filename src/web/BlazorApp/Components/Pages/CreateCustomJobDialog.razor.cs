@@ -1,6 +1,9 @@
 using AspireAppTemplate.Web;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using Microsoft.Extensions.Localization;
+using AspireAppTemplate.Shared.Resources;
+using AspireAppTemplate.Shared;
 
 namespace AspireAppTemplate.Web.Components.Pages
 {
@@ -45,16 +48,16 @@ namespace AspireAppTemplate.Web.Components.Pages
 
                 if (_testResult.IsSuccess)
                 {
-                    Snackbar.Add($"測試成功！HTTP {_testResult.StatusCode} ({_testResult.LatencyMs}ms)", Severity.Success);
+                    Snackbar.Add($"{Loc["Job_TestSuccess"]}! HTTP {_testResult.StatusCode} ({_testResult.LatencyMs}ms)", Severity.Success);
                 }
                 else
                 {
-                    Snackbar.Add($"測試失敗: {_testResult.ErrorMessage ?? $"HTTP {_testResult.StatusCode}"}", Severity.Warning);
+                    Snackbar.Add($"{Loc["Job_TestFailed"]}: {_testResult.ErrorMessage ?? $"HTTP {_testResult.StatusCode}"}", Severity.Warning);
                 }
             }
             catch (Exception ex)
             {
-                Snackbar.Add($"測試失敗: {ex.Message}", Severity.Error);
+                Snackbar.Add($"{Loc["Job_TestFailed"]}: {ex.Message}", Severity.Error);
             }
             finally
             {

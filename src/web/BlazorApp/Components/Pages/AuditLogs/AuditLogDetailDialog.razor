@@ -1,6 +1,9 @@
 @using AspireAppTemplate.Shared.Models
 @using System.Text.Json
 @using MudBlazor
+@using Microsoft.Extensions.Localization
+@using AspireAppTemplate.Shared.Resources
+@inject IStringLocalizer<SharedResource> Loc
 
 <MudDialog>
     <DialogContent>
@@ -11,7 +14,7 @@
                      (@AuditLog.EntityId)
                  </MudText>
                  <MudText Typo="Typo.body2" Class="mud-text-secondary">
-                     由 @AuditLog.UserName 於 @AuditLog.Timestamp.ToLocalTime().ToString("yyyy/MM/dd HH:mm:ss") 執行
+                     @Loc["Audit_PerformedBy", AuditLog.UserName, AuditLog.Timestamp.ToLocalTime().ToString("yyyy/MM/dd HH:mm:ss")]
                  </MudText>
             </MudItem>
             <MudItem xs="12">
@@ -21,7 +24,7 @@
             @if (!string.IsNullOrEmpty(AuditLog.OldValues))
             {
                 <MudItem xs="12" md="6">
-                    <MudText Typo="Typo.h6" Class="mb-2" Color="Color.Warning">變更前</MudText>
+                    <MudText Typo="Typo.h6" Class="mb-2" Color="Color.Warning">@Loc["Audit_Before"]</MudText>
                     <MudPaper Class="pa-4" Outlined="true" Style="background-color: var(--mud-palette-background-grey); min-height: 200px;">
                         <pre style="white-space: pre-wrap; word-wrap: break-word;">@FormatJson(AuditLog.OldValues)</pre>
                     </MudPaper>
@@ -31,7 +34,7 @@
             @if (!string.IsNullOrEmpty(AuditLog.NewValues))
             {
                  <MudItem xs="12" md="@(string.IsNullOrEmpty(AuditLog.OldValues) ? 12 : 6)">
-                    <MudText Typo="Typo.h6" Class="mb-2" Color="Color.Success">變更後</MudText>
+                    <MudText Typo="Typo.h6" Class="mb-2" Color="Color.Success">@Loc["Audit_After"]</MudText>
                     <MudPaper Class="pa-4" Outlined="true" Style="background-color: var(--mud-palette-background-grey); min-height: 200px;">
                         <pre style="white-space: pre-wrap; word-wrap: break-word;">@FormatJson(AuditLog.NewValues)</pre>
                     </MudPaper>
@@ -40,7 +43,7 @@
         </MudGrid>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">關閉</MudButton>
+        <MudButton OnClick="Cancel">@Loc["Close"]</MudButton>
     </DialogActions>
 </MudDialog>
 

@@ -1,6 +1,9 @@
 using AspireAppTemplate.Web;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using Microsoft.Extensions.Localization;
+using AspireAppTemplate.Shared.Resources;
+using AspireAppTemplate.Shared;
 
 namespace AspireAppTemplate.Web.Components.Pages
 {
@@ -45,7 +48,7 @@ namespace AspireAppTemplate.Web.Components.Pages
             }
             catch (Exception ex)
             {
-                Snackbar.Add($"任務載入失敗: {ex.Message}", Severity.Error);
+                Snackbar.Add(Loc["Job_LoadFail", ex.Message], Severity.Error);
             }
             finally
             {
@@ -56,7 +59,7 @@ namespace AspireAppTemplate.Web.Components.Pages
         private async Task CreateJob()
         {
             var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
-            var dialog = await DialogService.ShowAsync<CreateCustomJobDialog>("新增自訂任務", options);
+            var dialog = await DialogService.ShowAsync<CreateCustomJobDialog>(Loc["Job_Create"], options);
             var result = await dialog.Result;
             
             if (result is not null && !result.Canceled && result.Data is CustomJobsApiClient.CreateJobRequest request)
@@ -67,12 +70,12 @@ namespace AspireAppTemplate.Web.Components.Pages
                     {
                         await ApiClient.CreateAsync(request);
                     });
-                    Snackbar.Add("任務已新增", Severity.Success);
+                    Snackbar.Add(Loc["Job_Created"], Severity.Success);
                     await LoadJobs();
                 }
                 catch (Exception ex)
                 {
-                    Snackbar.Add($"任務新增失敗: {ex.Message}", Severity.Error);
+                    Snackbar.Add(Loc["Job_CreateFail", ex.Message], Severity.Error);
                 }
             }
         }
@@ -85,21 +88,21 @@ namespace AspireAppTemplate.Web.Components.Pages
                 {
                     await ApiClient.ToggleAsync(job.Id);
                 });
-                Snackbar.Add($"任務已{(job.IsActive ? "停用" : "啟用")}", Severity.Success);
+                Snackbar.Add(Loc["Job_Toggled", job.IsActive ? Loc["Job_Disable"] : Loc["Job_Enable"]], Severity.Success);
                 await LoadJobs();
             }
             catch (Exception ex)
             {
-                Snackbar.Add($"操作失敗: {ex.Message}", Severity.Error);
+                Snackbar.Add(Loc["Job_ToggleFail", ex.Message], Severity.Error);
             }
         }
 
         private async Task DeleteJob(CustomJobsApiClient.JobDto job)
         {
             var result = await DialogService.ShowMessageBox(
-               "刪除任務",
-               $"確定要刪除 {job.Name} 嗎?",
-               yesText: "刪除", cancelText: "取消");
+               Loc["ConfirmDelete_Title"],
+               Loc["Job_ConfirmDelete", job.Name],
+               yesText: Loc["Delete"], cancelText: Loc["Cancel"]);
 
             if (result == true)
             {
@@ -109,12 +112,12 @@ namespace AspireAppTemplate.Web.Components.Pages
                     {
                         await ApiClient.DeleteAsync(job.Id);
                     });
-                    Snackbar.Add("任務已刪除", Severity.Success);
+                    Snackbar.Add(Loc["Job_Deleted"], Severity.Success);
                     await LoadJobs();
                 }
                 catch (Exception ex)
                 {
-                    Snackbar.Add($"任務刪除失敗: {ex.Message}", Severity.Error);
+                    Snackbar.Add(Loc["Job_DeleteFail", ex.Message], Severity.Error);
                 }
             }
         }
