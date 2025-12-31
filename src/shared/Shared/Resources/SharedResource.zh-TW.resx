@@ -732,7 +732,31 @@
     <value>更改密碼</value>
   </data>
   <data name="Settings_Enable2FA" xml:space="preserve">
-    <value>啟用兩步驟驗證</value>
+    <value>啟用兩步驗證</value>
+  </data>
+  <data name="Settings_SecurityDescription" xml:space="preserve">
+    <value>管理您的密碼與雙因素驗證設定。</value>
+  </data>
+  <data name="Settings_EmailSent" xml:space="preserve">
+    <value>已發送郵件至您註冊的電子信箱。</value>
+  </data>
+  <data name="Settings_ActionFail" xml:space="preserve">
+    <value>無法觸發操作：{0}</value>
+  </data>
+  <data name="Settings_LoadFail" xml:space="preserve">
+    <value>無法載入個人資料：{0}</value>
+  </data>
+  <data name="Settings_SaveFail" xml:space="preserve">
+    <value>無法儲存變更：{0}</value>
+  </data>
+  <data name="Settings_Saved" xml:space="preserve">
+    <value>個人資料已更新。</value>
+  </data>
+  <data name="Saving" xml:space="preserve">
+    <value>儲存中...</value>
+  </data>
+  <data name="User_CannotDeleteSelf" xml:space="preserve">
+    <value>無法刪除自己的帳號</value>
   </data>
 
 </root>

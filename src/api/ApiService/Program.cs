@@ -53,6 +53,9 @@ builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Emai
 builder.Services.AddTransient<IEmailService, SmtpEmailService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 
+// Feature Flags
+builder.Services.Configure<FeatureFlags>(builder.Configuration.GetSection("FeatureFlags"));
+
 // Rate Limiting
 builder.Services.AddRateLimiter(options =>
 {

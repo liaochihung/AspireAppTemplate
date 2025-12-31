@@ -40,13 +40,19 @@ builder.Services.AddRazorComponents()
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<AspireAppTemplate.Web.Infrastructure.Authentication.TokenCacheService>();
 
-builder.Services.AddMudServices();
+builder.Services.AddMudServices(config =>
+{
+    config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomRight;
+});
 builder.Services.AddLocalization();
 builder.Services.AddTransient<MudLocalizer, AppMudLocalizer>();
 
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<LayoutService>();
 builder.Services.AddScoped<NotificationService>();
+
+// Feature Flags
+builder.Services.Configure<FeatureFlags>(builder.Configuration.GetSection("FeatureFlags"));
 
 
 builder.Services.AddHttpContextAccessor()

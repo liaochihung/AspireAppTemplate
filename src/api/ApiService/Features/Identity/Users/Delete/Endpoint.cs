@@ -26,6 +26,15 @@ public class Endpoint(IdentityService identityService, IOutputCacheStore cacheSt
             return;
         }
 
+        // Prevent self-deletion
+        var currentUserId = User.FindFirst("sub")?.Value;
+        if (currentUserId == id)
+        {
+            var error = ErrorOr.Error.Validation(description: "Cannot delete your own account.");
+            await this.SendResultAsync(error);
+            return;
+        }
+
         var result = await identityService.DeleteUserAsync(id);
         
         if (!result.IsError)

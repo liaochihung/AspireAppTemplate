@@ -262,5 +262,24 @@ public class IdentityService(
         
         return Error.Failure(description: $"Failed to update user: {response.StatusCode}");
     }
+
+    // --- Actions ---
+
+    public async Task<ErrorOr<Success>> ExecuteActionsEmailAsync(string userId, List<string> actions)
+    {
+        var response = await _httpClient.PutAsJsonAsync($"admin/realms/{_realm}/users/{userId}/execute-actions-email", actions);
+
+        if (response.IsSuccessStatusCode)
+        {
+            return Result.Success;
+        }
+
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return Error.NotFound(description: "User not found.");
+        }
+
+        return Error.Failure(description: $"Failed to execute actions: {response.StatusCode}");
+    }
 }
 

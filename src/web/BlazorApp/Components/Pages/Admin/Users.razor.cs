@@ -8,11 +8,13 @@ namespace AspireAppTemplate.Web.Components.Pages.Admin
 {
     public partial class Users
     {
+        [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
 
 
         private IEnumerable<KeycloakUser> _users = new List<KeycloakUser>();
         private bool _loading = true;
         private string _searchString = string.Empty;
+        private string? _currentUserId;
 
         private Func<KeycloakUser, bool> _quickFilter => user =>
         {
@@ -36,6 +38,11 @@ namespace AspireAppTemplate.Web.Components.Pages.Admin
 
         protected override async Task OnInitializedAsync()
         {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            _currentUserId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value 
+                             ?? user.FindFirst("sub")?.Value;
+
             await LoadUsers();
         }
 
