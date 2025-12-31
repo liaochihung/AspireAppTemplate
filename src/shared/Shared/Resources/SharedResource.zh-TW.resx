@@ -665,6 +665,15 @@
   <data name="ThemeManager_Hoverable" xml:space="preserve">
     <value>懸停高亮</value>
   </data>
+  <data name="ThemeManager_Layout" xml:space="preserve">
+    <value>佈局</value>
+  </data>
+  <data name="ThemeManager_Boxed" xml:space="preserve">
+    <value>固定寬度</value>
+  </data>
+  <data name="ThemeManager_Reset" xml:space="preserve">
+    <value>重置</value>
+  </data>
 
   <!-- Time -->
   <data name="Time_JustNow" xml:space="preserve">

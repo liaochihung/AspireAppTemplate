@@ -9,5 +9,6 @@ public class UserPreferences
     public string PrimaryColor { get; set; } = CustomColors.Light.Primary;
     public string SecondaryColor { get; set; } = CustomColors.Light.Secondary;
     public double BorderRadius { get; set; } = 4;
+    public bool IsBoxed { get; set; } = false;
     public TablePreference TablePreference { get; set; } = new();
 }

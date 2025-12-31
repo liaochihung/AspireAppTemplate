@@ -677,6 +677,15 @@
   <data name="ThemeManager_Hoverable" xml:space="preserve">
     <value>Hover Highlight</value>
   </data>
+  <data name="ThemeManager_Layout" xml:space="preserve">
+    <value>Layout</value>
+  </data>
+  <data name="ThemeManager_Boxed" xml:space="preserve">
+    <value>Boxed</value>
+  </data>
+  <data name="ThemeManager_Reset" xml:space="preserve">
+    <value>Reset</value>
+  </data>
 
   <!-- Time -->
   <data name="Time_JustNow" xml:space="preserve">

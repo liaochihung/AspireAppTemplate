@@ -112,4 +112,18 @@ public partial class ThemeDrawer
             await ThemePreferenceChanged.InvokeAsync(ThemePreference);
         }
     }
+    private async Task ToggleBoxedMode(bool isBoxed)
+    {
+        if (ThemePreference is not null)
+        {
+            ThemePreference.IsBoxed = isBoxed;
+            await ThemePreferenceChanged.InvokeAsync(ThemePreference);
+        }
+    }
+
+    private async Task ResetToDefault()
+    {
+        ThemePreference = new UserPreferences();
+        await ThemePreferenceChanged.InvokeAsync(ThemePreference);
+    }
 }
