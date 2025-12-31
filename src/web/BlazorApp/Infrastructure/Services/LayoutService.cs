@@ -88,6 +88,21 @@ public class LayoutService
         await SetPreferenceAsync(prefs);
     }
 
+    public async Task SetBoxedAsync(bool isBoxed)
+    {
+        var prefs = await GetPreferenceAsync();
+        prefs.IsBoxed = isBoxed;
+        await SetPreferenceAsync(prefs);
+    }
+
+    public async Task ResetPreferencesAsync()
+    {
+        var defaultPrefs = new UserPreferences();
+        await SetPreferenceAsync(defaultPrefs);
+        
+        IsDarkMode = defaultPrefs.IsDarkMode;
+    }
+
     public async Task SetPreferenceAsync(UserPreferences prefs)
     {
         _cachedPreferences = prefs;

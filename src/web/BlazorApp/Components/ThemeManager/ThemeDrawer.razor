@@ -30,6 +30,29 @@
                 OnStripedSwitchToggled="ToggleEntityTableStriped" 
                 OnBorderdedSwitchToggled="ToggleEntityTableBorder"
                 OnHoverableSwitchToggled="ToggleEntityTableHoverable" />
+
+             <MudExpansionPanel HideIcon="true">
+                <TitleContent>
+                    <div class="d-flex">
+                        <MudText Class="mt-1">@Loc["ThemeManager_Layout"]</MudText>
+                        <MudAvatar Color="Color.Primary" Class="d-flex ml-auto"
+                            style="width: 30px;height:30px;font-size:small!important">L
+                        </MudAvatar>
+                    </div>
+                </TitleContent>
+                <ChildContent>
+                     <div @onclick:stopPropagation="true">
+                        <MudSwitch T="bool" Label="@Loc["ThemeManager_Boxed"]" Color="Color.Info" 
+                                   Value="@(ThemePreference?.IsBoxed ?? false)" 
+                                   ValueChanged="ToggleBoxedMode" />
+                    </div>
+                </ChildContent>
+             </MudExpansionPanel>
+
+            <MudButton Variant="Variant.Filled" Color="Color.Error" FullWidth="true" Class="mt-4"
+                       OnClick="ResetToDefault">
+                @Loc["ThemeManager_Reset"]
+            </MudButton>
         </MudExpansionPanels>
     </div>
 </MudDrawer>

@@ -8,6 +8,7 @@ namespace AspireAppTemplate.Web.Components.Layout
     {
         private bool _drawerOpen;
         private bool _isDarkMode;
+        private bool _isBoxed;
 
         [CascadingParameter]
         public BaseLayout? ParentLayout { get; set; }
@@ -17,6 +18,7 @@ namespace AspireAppTemplate.Web.Components.Layout
             var prefs = await LayoutService.GetPreferenceAsync();
             _drawerOpen = prefs.IsDrawerOpen;
             _isDarkMode = prefs.IsDarkMode;
+            _isBoxed = prefs.IsBoxed;
 
             LayoutService.MajorUpdateOccurred += OnMajorUpdateOccurred;
 
@@ -53,6 +55,12 @@ namespace AspireAppTemplate.Web.Components.Layout
 
         private void OnMajorUpdateOccurred(object? sender, EventArgs e)
         {
+            if (LayoutService.UserPreferences != null)
+            {
+                _isBoxed = LayoutService.UserPreferences.IsBoxed;
+                _isDarkMode = LayoutService.UserPreferences.IsDarkMode; // Ensure this is synced too if reset happens
+                _drawerOpen = LayoutService.UserPreferences.IsDrawerOpen;
+            }
             InvokeAsync(StateHasChanged);
         }
 
