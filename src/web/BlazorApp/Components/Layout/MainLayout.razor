@@ -49,32 +49,4 @@
 @inject IdentityApiClient IdentityApiClient
 @inject IJSRuntime JSRuntime
 
-@code {
-
-    protected override async Task OnInitializedAsync()
-    {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        if (authState.User.Identity?.IsAuthenticated == true)
-        {
-            try
-            {
-                // Sync user to local DB (creates user if new, e.g. from Social Login)
-                await IdentityApiClient.SyncUserAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"User sync failed: {ex.Message}");
-            }
-        }
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await JSRuntime.InvokeVoidAsync("window.hideLoader");
-        }
-    }
-}
-
 

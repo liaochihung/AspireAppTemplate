@@ -8,6 +8,11 @@ var password = builder.AddParameter("password", secret: true, value: "admin");
 var keycloak = builder.AddKeycloak("keycloak", 8080, username, password)
     .WithDataVolume("keycloak")
     .WithRealmImport("./Realms")
+    // If you want to use your own domain, you can set the following environment variables
+    // and don't forget to add the redirect URIs in the client settings
+    // .WithEnvironment("KC_HOSTNAME_URL", "https://your-domain.com")
+    // .WithEnvironment("KC_HOSTNAME_STRICT_HTTPS", "true")
+    // .WithEnvironment("KC_HTTP_ENABLED", "true")
     .WithBindMount("./keycloak-themes/my-company-theme", "/opt/keycloak/themes/my-company-theme");
 
 var postgresPassword = builder.AddParameter("postgres-password", secret: true, value: "1111");

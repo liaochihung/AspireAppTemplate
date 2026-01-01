@@ -2,11 +2,11 @@
 @using AspireAppTemplate.Shared.Resources
 @using AspireAppTemplate.Shared
 @using Microsoft.Extensions.Options
+@using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
 @inject IdentityApiClient IdentityClient
 @inject ISnackbar Snackbar
 @inject ILogger<Settings> Logger
-@inject IOptions<FeatureFlags> FeatureFlagsOptions
 
 <PageTitle>@Loc["Settings_PageTitle"]</PageTitle>
 

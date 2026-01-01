@@ -30,8 +30,8 @@ public class Endpoint(IdentityService identityService, IOutputCacheStore cacheSt
         var currentUserId = User.FindFirst("sub")?.Value;
         if (currentUserId == id)
         {
-            var error = ErrorOr.Error.Validation(description: "Cannot delete your own account.");
-            await this.SendResultAsync(error);
+            AddError("Cannot delete your own account.");
+            await SendErrorsAsync(cancellation: ct);
             return;
         }
 

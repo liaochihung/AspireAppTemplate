@@ -341,9 +341,6 @@
   <data name="User_ManagePermissions" xml:space="preserve">
     <value>Manage permissions for {0}</value>
   </data>
-  <data name="Loading" xml:space="preserve">
-    <value>Loading...</value>
-  </data>
   <data name="User_AddPermission" xml:space="preserve">
     <value>Add Role</value>
   </data>

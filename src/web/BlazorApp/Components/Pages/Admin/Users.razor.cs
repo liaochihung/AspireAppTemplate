@@ -1,5 +1,6 @@
 using AspireAppTemplate.Shared;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor;
 using Microsoft.Extensions.Localization;
 using AspireAppTemplate.Shared.Resources;

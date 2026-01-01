@@ -1,5 +1,6 @@
 using AspireAppTemplate.Web.Infrastructure.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using MudBlazor;
 
 namespace AspireAppTemplate.Web.Components.Layout
@@ -34,6 +35,14 @@ namespace AspireAppTemplate.Web.Components.Layout
             catch (Exception ex)
             {
                 Console.WriteLine($"Failed to sync user: {ex.Message}");
+            }
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                await JSRuntime.InvokeVoidAsync("window.hideLoader");
             }
         }
 
