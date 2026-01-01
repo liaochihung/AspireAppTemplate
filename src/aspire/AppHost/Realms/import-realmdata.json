@@ -31,9 +31,9 @@
     "en",
     "zh-TW"
   ],
-  "defaultLocale": "zh-TW",
+  "defaultLocale": "en",
   "sslRequired": "external",
-  "loginTheme": "my-company-theme",
+  "loginTheme": "aspire-app-theme",
   "registrationAllowed": true,
   "registrationEmailAsUsername": false,
   "rememberMe": false,

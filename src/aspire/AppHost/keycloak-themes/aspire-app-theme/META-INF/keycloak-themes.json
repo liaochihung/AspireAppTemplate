@@ -1,0 +1,10 @@
+{
+  "themes": [
+    {
+      "name": "aspire-app-theme",
+      "types": [
+        "login"
+      ]
+    }
+  ]
+}

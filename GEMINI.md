@@ -39,7 +39,7 @@ login user: jack/0000,
 *   **Keycloak**: 使用 Docker 容器運行。
     *   預設 Admin: `admin` / `admin`
     *   Realm 設定位於 `src/aspire/AppHost/Realms/import-realmdata.json`，由 AppHost 自動匯入。
-    *   自訂 Theme 位於 `src/aspire/AppHost/keycloak-themes/my-company-theme/`，需在 Keycloak Admin 手動啟用。
+    *   自訂 Theme 位於 `src/aspire/AppHost/keycloak-themes/aspire-app-theme/`，需在 Keycloak Admin 手動啟用。
     *   *設計理念*: 所有 Keycloak 相關配置集中在 AppHost 目錄下，保持內聚性與一致性。
 
 ### UI Framework (2025-12-26)
@@ -47,6 +47,7 @@ login user: jack/0000,
 *   **Element Plus 風格配色**: 主色 `#409EFF`，使用 4px 圓角，支援中文字體。
 *   **深色/淺色切換**: 內建於 `MainLayout.razor`，AppBar 右側有切換按鈕。
 *   **Theme 設定架構** (對齊 MyDotnetStarterKit):
+    *   `src/aspire/AppHost/keycloak-themes/aspire-app-theme/` - Keycloak 自訂主題
     *   `Components/ThemeManager/` - 模組化主題元件
         *   `ThemeDrawer.razor` - 主題設定抽屜容器
         *   `DarkModePanel.razor` - 深色模式切換

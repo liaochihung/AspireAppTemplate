@@ -13,7 +13,7 @@ var keycloak = builder.AddKeycloak("keycloak", 8080, username, password)
     // .WithEnvironment("KC_HOSTNAME_URL", "https://your-domain.com")
     // .WithEnvironment("KC_HOSTNAME_STRICT_HTTPS", "true")
     // .WithEnvironment("KC_HTTP_ENABLED", "true")
-    .WithBindMount("./keycloak-themes/my-company-theme", "/opt/keycloak/themes/my-company-theme");
+    .WithBindMount("./keycloak-themes/aspire-app-theme", "/opt/keycloak/themes/aspire-app-theme");
 
 var postgresPassword = builder.AddParameter("postgres-password", secret: true, value: "1111");
 var postgres = builder.AddPostgres("postgres", password: postgresPassword, port: 5436)
