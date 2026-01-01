@@ -76,8 +76,11 @@
                    </MudText>
                 </CellTemplate>
             </TemplateColumn>
-            <TemplateColumn T="KeycloakUser" Title="@Loc["Actions"]">
+                <TemplateColumn T="KeycloakUser" Title="@Loc["Actions"]">
                 <CellTemplate Context="cellContext">
+                    @{
+                        var isCurrentUser = _currentUserId == cellContext.Item.Id;
+                    }
                     <MudTooltip Text="@Loc["User_AssignRoles"]">
                         <MudIconButton Icon="@Icons.Material.Filled.Assignment" 
                                        Color="Color.Secondary" 
@@ -90,10 +93,11 @@
                                        Size="Size.Small"
                                        OnClick="@(() => OpenUserDialog(cellContext.Item))" />
                     </MudTooltip>
-                    <MudTooltip Text="@Loc["User_Delete"]">
+                    <MudTooltip Text="@(isCurrentUser ? Loc["User_CannotDeleteSelf"] : Loc["User_Delete"])">
                         <MudIconButton Icon="@Icons.Material.Filled.Delete" 
                                        Color="Color.Error" 
                                        Size="Size.Small"
+                                       Disabled="@isCurrentUser"
                                        OnClick="@(() => DeleteUser(cellContext.Item))" />
                     </MudTooltip>
                 </CellTemplate>

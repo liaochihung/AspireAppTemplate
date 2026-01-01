@@ -1,9 +1,12 @@
 @page "/account/settings"
-@using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.Extensions.Localization
 @using AspireAppTemplate.Shared.Resources
+@using AspireAppTemplate.Shared
+@using Microsoft.Extensions.Options
+@using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
+@inject IdentityApiClient IdentityClient
+@inject ISnackbar Snackbar
+@inject ILogger<Settings> Logger
 
 <PageTitle>@Loc["Settings_PageTitle"]</PageTitle>
 
@@ -18,29 +21,57 @@
                 </CardHeaderContent>
             </MudCardHeader>
             <MudCardContent>
-                <MudTextField Label="@Loc["Settings_Username"]" Value="@(_authState?.User?.Identity?.Name)" ReadOnly="true" Variant="Variant.Outlined" Margin="MudBlazor.Margin.Dense" Class="mb-4" />
-                <MudTextField Label="@Loc["Settings_Email"]" Value="@("user@example.com")" ReadOnly="true" Variant="Variant.Outlined" Margin="MudBlazor.Margin.Dense" />
-                <MudAlert Severity="Severity.Info" Class="mt-4">@Loc["Settings_DevInProgress"]</MudAlert>
+                @if (_loading)
+                {
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" />
+                }
+                else if (_userModel != null)
+                {
+                    <MudTextField Label="@Loc["Settings_Username"]" @bind-Value="_userModel.Username" ReadOnly="true" Variant="Variant.Outlined" Margin="MudBlazor.Margin.Dense" Class="mb-4" HelperText="Username cannot be changed." />
+                    <MudTextField Label="@Loc["Settings_Email"]" @bind-Value="_userModel.Email" ReadOnly="true" Variant="Variant.Outlined" Margin="MudBlazor.Margin.Dense" Class="mb-4" HelperText="Email cannot be changed here." />
+                    <MudTextField Label="@Loc["User_FirstName"]" @bind-Value="_userModel.FirstName" Variant="Variant.Outlined" Margin="MudBlazor.Margin.Dense" Class="mb-4" />
+                    <MudTextField Label="@Loc["User_LastName"]" @bind-Value="_userModel.LastName" Variant="Variant.Outlined" Margin="MudBlazor.Margin.Dense" />
+                }
             </MudCardContent>
             <MudCardActions>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="true">@Loc["Settings_SaveChanges"]</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveChanges" Disabled="@(_saving || _loading)">
+                    @if (_saving)
+                    {
+                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                        <MudText Class="ms-2">@Loc["Saving"]</MudText>
+                    }
+                    else
+                    {
+                        @Loc["Settings_SaveChanges"]
+                    }
+                </MudButton>
             </MudCardActions>
         </MudCard>
     </MudItem>
     
-    <MudItem xs="12" sm="6">
-        <MudCard Elevation="2">
-            <MudCardHeader>
-                <CardHeaderContent>
-                    <MudText Typo="Typo.h6">@Loc["Settings_Security"]</MudText>
-                </CardHeaderContent>
-            </MudCardHeader>
-            <MudCardContent>
-                <MudButton Variant="Variant.Outlined" Color="Color.Error" FullWidth="true" Class="mb-4">@Loc["Settings_ChangePassword"]</MudButton>
-                <MudButton Variant="Variant.Outlined" Color="Color.Warning" FullWidth="true">@Loc["Settings_Enable2FA"]</MudButton>
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
+    @if (_featureFlags.EnableEmailFeatures)
+    {
+        <MudItem xs="12" sm="6">
+            <MudCard Elevation="2">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">@Loc["Settings_Security"]</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Typo="Typo.body2" Class="mb-4">
+                        @Loc["Settings_SecurityDescription"]
+                    </MudText>
+
+                    <MudButton Variant="Variant.Outlined" Color="Color.Error" FullWidth="true" Class="mb-4" OnClick="@(() => TriggerAction("UPDATE_PASSWORD"))">
+                        @Loc["Settings_ChangePassword"]
+                    </MudButton>
+                    
+                    <!-- <MudButton Variant="Variant.Outlined" Color="Color.Warning" FullWidth="true" OnClick="@(() => TriggerAction("CONFIGURE_TOTP"))">
+                        @Loc["Settings_Enable2FA"]
+                    </MudButton> -->
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    }
 </MudGrid>
-
-

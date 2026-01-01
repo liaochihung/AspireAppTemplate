@@ -123,4 +123,25 @@ public class IdentityApiClient(HttpClient httpClient)
         var response = await httpClient.DeleteAsync($"/api/v1/roles/{name}", ct);
         response.EnsureSuccessStatusCode();
     }
+
+    public async Task ExecuteActionsEmailAsync(string userId, List<string> actions, CancellationToken ct = default)
+    {
+        var request = new { Actions = actions };
+        var response = await httpClient.PutAsJsonAsync($"/api/v1/users/{userId}/actions", request, ct);
+        response.EnsureSuccessStatusCode();
+    }
+
+    // --- Profile ---
+
+    public async Task<KeycloakUser?> GetMyProfileAsync(CancellationToken ct = default)
+    {
+        return await httpClient.GetFromJsonAsync<KeycloakUser>("/api/v1/profile", ct);
+    }
+
+    public async Task UpdateMyProfileAsync(string? firstName, string? lastName, CancellationToken ct = default)
+    {
+        var request = new { FirstName = firstName, LastName = lastName };
+        var response = await httpClient.PutAsJsonAsync("/api/v1/profile", request, ct);
+        response.EnsureSuccessStatusCode();
+    }
 }
