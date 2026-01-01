@@ -1,5 +1,7 @@
 # AspireAppTemplate
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 [English Version](README.md)
 
 ## 項目概述 (Project Overview)
