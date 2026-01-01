@@ -1,101 +1,121 @@
 # AspireAppTemplate
 
-## 項目概述 (Project Overview)
+[繁體中文 (Traditional Chinese)](README.zh-TW.md)
 
-本專案是一個基於 **.NET Aspire** 的微服務應用程式範本，展示了現代化的雲端原生開發架構。它整合了前端 (Blazor)、後端 API、身份驗證 (Keycloak)、分散式快取 (Redis) 以及關聯式資料庫 (PostgreSQL)，旨在提供一個開箱即用的開發起點。
+## Project Overview
 
-## 架構與服務 (Architecture & Services)
+**AspireAppTemplate** is a production-ready microservice template based on **.NET Aspire**, designed for modern cloud-native development. It follows the **KISS (Keep It Simple, Stupid)** principle while providing a complete set of features: Frontend (Blazor), Backend API, Identity (Keycloak), Object Storage (MinIO), Distributed Cache (Redis), and Relational Database (PostgreSQL).
 
-系統由 `AspireAppTemplate.AppHost` 負責編排 (Orchestration)，包含以下核心組件：
+This template serves as a solid starting point for building scalable yet maintainable .NET systems.
 
-*   **AppHost (`AspireAppTemplate.AppHost`)**:
-    *   負責啟動、連接與管理所有微服務容器。
-    *   定義服務間的依賴關係。
+## Key Features
 
-*   **Web Frontend (`AspireAppTemplate.Web`)**:
-    *   基於 **Blazor Interactive Server** 的前端應用程式。
-    *   整合 **Keycloak (OpenID Connect)** 進行使用者身分驗證。
-    *   使用 `OutputCache` (Redis) 進行頁面級別的快取。
+*   **Cloud-Native Orchestration**: Powered by **.NET Aspire** for seamless local development and deployment.
+*   **Modern Frontend**:
+    *   **Blazor Interactive Server**: High-productivity UI development.
+    *   **MudBlazor**: Material Design component library with a custom "Element Plus" inspired theme.
+    *   **Theme Manager**: Built-in dark/light mode and color customization.
+*   **Vertical Slice Architecture**:
+    *   **FastEndpoints**: Backend API using the **REPR Pattern** (Request-Endpoint-Response) for high cohesion.
+    *   **No "Clean Architecture" Bloat**: Practical code structure without unnecessary abstraction layers.
+*   **Robust Identity Management**:
+    *   **Keycloak**: Fully integrated Docker container for OpenID Connect (OIDC) authentication.
+    *   **Custom Realm & Theme**: Pre-configured Realm and Theme (`aspire-app-theme`) auto-imported on startup.
+*   **Data & Storage**:
+    *   **PostgreSQL**: Primary relational database with EF Core.
+    *   **MinIO**: S3-compatible object storage for file management.
+    *   **Redis**: Distributed caching (OutputCache & Data Cache).
+*   **Background Processing**:
+    *   **Hangfire**: Integrated background job processing with a persistent PostgreSQL storage and Dashboard.
+*   **Observability**:
+    *   **OpenTelemetry**: Built-in tracing, metrics, and logging.
+    *   **Serilog**: Structured logging for all services.
+    *   **Scalar**: Next-gen API documentation UI.
 
-*   **API Service (`AspireAppTemplate.ApiService`)**:
-    *   採用 **FastEndpoints** 構建輕量級、垂直切片的後端 API。
-    *   負責處理業務邏輯與資料存取。
-    *   受 **JWT Bearer Token** 保護。
+## Project Structure
 
-*   **Database Project (`AspireAppTemplate.Database`)**:
-    *   獨立的類別庫 (Class Library)，封裝 **Entity Framework Core** 的 DbContext 與 Entity 定義。
-    *   提供資料庫遷移 (Migrations) 與種子資料 (Seeding) 邏輯。
+The project code is consolidated under the `src/` directory:
 
-*   **Infrastructure Containers**:
-    *   **PostgreSQL**: 關聯式資料庫 (Port: 5436, DB: `aspiredb`)。
-    *   **Keycloak**: IAM 服務 (Port: 8080)。
-    *   **Redis**: 分散式快取。
+*   **`src/api/` (Backend)**
+    *   `ApiService`: The core API service containing business logic, data access (EF Core), and Hangfire jobs.
+*   **`src/web/` (Frontend)**
+    *   `Web`: The Blazor Server application.
+*   **`src/aspire/` (Orchestration)**
+    *   `AppHost`: The Aspire orchestrator that defines containers and dependencies.
+    *   `ServiceDefaults`: Shared configurations for health checks and telemetry.
+*   **`src/shared/`**
+    *   Common DTOs and models shared between Frontend and Backend (minimal coupling).
 
-## 關鍵技術 (Key Technologies)
+## Getting Started
 
-*   **.NET 10**
-*   **.NET Aspire**: 雲端原生應用編排。
-*   **Entity Framework Core (PostgreSQL)**: ORM 框架。
-*   **Keycloak**: 身分與存取管理。
-*   **Blazor**: 互動式 Web UI。
-*   **FastEndpoints**: API 開發框架。
-*   **Scalar**: 現代化 API 文件與測試介面。
-*   **Serilog**: 結構化日誌。
+### Prerequisites
 
-## 快速開始 (Getting Started)
+1.  **[Discord](https://discord.com/)** (Just kidding, but join our community!)
+2.  **[.NET 10 SDK](https://dotnet.microsoft.com/download)** (Preview or latest).
+3.  **[Docker Desktop](https://www.docker.com/products/docker-desktop)** (Must be running).
 
-### 前置需求 (Prerequisites)
-1.  安裝 **.NET 10 SDK**。
-2.  安裝 **Docker Desktop** 並確保正在運行。
+### Running the Application
 
-### 執行專案 (Running the Application)
-
-專案根目錄提供了一個便捷腳本，可一鍵啟動開發環境：
+A convenience script is provided in the root directory to jumpstart your environment:
 
 ```cmd
 run.bat
 ```
 
-啟動後：
-1.  瀏覽器會自動開啟 **Aspire Dashboard**。
-2.  Dashboard 中將顯示所有服務 (`webfrontend`, `apiservice`, `postgres`, `keycloak`, `cache`) 的狀態。
-3.  資料庫 `aspiredb` 會在 `ApiService` 啟動時自動建立 (Development 環境)。
-4.  API 文件可透過 `/scalar/v1` 存取 (例如: `https://localhost:<port>/scalar/v1`)。
+Or using the CLI:
 
-### 常見問題 (Troubleshooting)
+```bash
+dotnet run --project src/aspire/AppHost/AspireAppTemplate.AppHost.csproj
+```
 
-**Q: 如果我的 7092/7085 埠口被佔用怎麼辦？**
+### What Happens Next?
 
-當您在不同電腦啟動專案時，若預設的 HTTPS 埠口 (`7092` 或 `7085`) 已被佔用，IDE 或 `dotnet run` 可能會自動分配一個新的隨機埠口。這會導致 Keycloak 登入失敗（錯誤：`invalid_request`, `Invalid parameter: redirect_uri`），因為新埠口不在 Keycloak 的允許清單中。
+1.  **Aspire Dashboard**: The browser opens automatically, showing the health of all services (`webfrontend`, `apiservice`, `postgres`, `keycloak`, `minio`, `cache`).
+2.  **Database Creation**: `ApiService` automatically creates the `aspiredb` database and applies migrations on startup.
+3.  **Keycloak Setup**: Keycloak starts, imports the realm configuration, and is ready to accept logins.
 
-解決步驟：
-1.  **確認新埠口**：查看瀏覽器網址列或 Aspire Dashboard，記下 `webfrontend` 目前運行的 HTTPS 埠口 (例如 `7123`)。
-2.  **更新 Keycloak 設定**：
-    *   開啟 `src/aspire/AppHost/Realms/import-realmdata.json`。
-    *   搜尋 `redirectUris` 和 `webOrigins` 區塊。
-    *   將新的網址 (例如 `https://localhost:7123` 和 `https://localhost:7123/signin-oidc/signout-callback-oidc`) 加入清單中。
-3.  **重啟環境**：因為 Keycloak 容器可能已經匯入了舊資料，建議執行 `docker volume prune` 或手動刪除 Keycloak 容器的 Volume 讓設定重新匯入。
+## Service Access & Credentials
 
-**Q: 如何在生產環境 Docker 中動態配置 Keycloak 參數？**
+Use the following default credentials for local development:
 
-若您希望在部署時透過環境變數動態替換 `import-realmdata.json` 中的網址 (例如將 `localhost` 替換為真實域名)，建議採用的方式為：
+| Service | Url | Username | Password | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| **Aspire Dashboard** | Auto-launched | - | - | Central view of all logs/traces. |
+| **Web Frontend** | `https://localhost:<port>` | `jack` | `0000` | Test user account. |
+| **Keycloak Console** | `http://localhost:8080` | `admin` | `admin` | IAM Administration. |
+| **MinIO Console** | `http://localhost:9001` | `minioadmin` | `minioadmin` | S3 Object Storage UI. |
+| **PostgreSQL** | `localhost:5436` | `postgres` | `1111` | DB: `aspiredb`. |
+| **Hangfire Dashboard** | `/hangfire` (API) | `admin` | - | Requires `Administrator` role. |
+| **Scalar (API Docs)** | `/scalar/v1` (API) | - | - | Interactive API Client. |
 
-1.  **自訂 Docker Image**: 建立一個繼承自官方 Keycloak 的 Dockerfile。
-2.  **使用 envsubst**: 安裝並使用 `envsubst` 工具。
-3.  **啟動腳本**: 撰寫 Entrypoint 腳本，在 Keycloak 啟動前讀取 `import-realmdata.template.json`，將其中的變數 (如 `${APP_BASE_URL}`) 替換為環境變數的值，生成最終的 `.json` 供 Keycloak 匯入。
+## Credits & Inspiration
 
-這能讓同一份 Docker Image 適用於不同的部署環境 (Staging/Production)。
+This project is heavily inspired by the [FullStackHero Blazor Starter Kit](https://github.com/fullstackhero/blazor-starter-kit).
 
-## 開發指南 (Development Guidelines)
+**Why another template?**
+While the Blazor Starter Kit is an amazing resource, its strict adherence to Clean Architecture can be overwhelming for smaller projects or developers who aren't purely frontend-focused. I wanted to build something simpler—a "wheel" designed for **.NET Aspire** that embraces the **Vertical Slice** pattern. This template aims to provide a more approachable starting point without sacrificing modern cloud-native capabilities.
 
-*   **資料庫開發**:
-    *   實體模型位於 `AspireAppTemplate.Database` 專案。
-    *   開發環境下，`ApiService` 會在啟動時自動呼叫 `EnsureCreatedAsync()` 建立資料庫結構。
-    *   PostgreSQL 預設開發埠口固定為 **5436**，方便本地工具連線。
+## Development Guide
 
-*   **解決方案結構**:
-    *   `.slnx` 檔案: 採用新的簡化 XML 格式定義解決方案。
-    *   `AspireAppTemplate.ServiceDefaults`: 包含 OpenTelemetry、HealthChecks 等標準化配置。
+### Database
+*   **EF Core**: The `DbContext` is located in `src/api/ApiService/Data`.
+*   **Port Fixed**: Check `5436` if you want to connect using pgAdmin or Datagrip.
 
----
-*Generated by Gemini CLI*
+### File Storage (MinIO)
+*   The project uses a **Proxy Mode** for file uploads/downloads.
+    *   **Frontend** uploads to `ApiService`.
+    *   **ApiService** streams to **MinIO** (port 9000).
+    *   This avoids Mixed Content issues (HTTPS Web vs HTTP MinIO) and encapsulates storage logic.
+
+### Troubleshooting
+
+**Q: Port 7092/7085 is in use, and Keycloak login fails.**
+*   If Aspire assigns a random port (e.g., `7123`) because default ports are busy, Keycloak will reject the redirect URI.
+*   **Fix**:
+    1.  Open `src/aspire/AppHost/Realms/import-realmdata.json`.
+    2.  Add `https://localhost:<new-port>` and `https://localhost:<new-port>/signin-oidc/signout-callback-oidc` to `redirectUris`.
+    3.  Restart the Keycloak container (delete the volume to force re-import if needed).
+
+**Q: How to deploy to Production?**
+*   Use environment variables to override the Keycloak and API URLs.
+*   See `src/aspire/AppHost/AppHost.cs` comments for `KC_HOSTNAME_URL` configuration.
