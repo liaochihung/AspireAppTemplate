@@ -10,6 +10,15 @@
 
 This template serves as a solid starting point for building scalable yet maintainable .NET systems.
 
+## Preview
+
+| .NET Aspire Dashboard | Modern Blazor UI |
+| :---: | :---: |
+| ![Dashboard](docs/images/page-aspire-resources1.jpeg) | ![Blazor UI](docs/images/page-weather.png) |
+
+> [!TIP]
+> **[Click here to view the full Screenshots Gallery](docs/SCREENSHOTS.md)**
+
 ## Key Features
 
 *   **Cloud-Native Orchestration**: Powered by **.NET Aspire** for seamless local development and deployment.

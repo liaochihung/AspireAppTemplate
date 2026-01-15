@@ -10,6 +10,15 @@
 
 此範本旨在為開發者提供一個穩固、可擴展且易於維護的開發起點。
 
+## 畫面預覽 (Preview)
+
+| .NET Aspire Dashboard | 現代化 Blazor 介面 |
+| :---: | :---: |
+| ![Dashboard](docs/images/page-aspire-resources1.jpeg) | ![Blazor UI](docs/images/page-weather.png) |
+
+> [!TIP]
+> **[更多功能截圖請點此查看](docs/SCREENSHOTS.md)**
+
 ## 核心功能 (Key Features)
 
 *   **雲端原生編排**: 透過 **.NET Aspire** 實現無縫的本地開發與容器編排。
